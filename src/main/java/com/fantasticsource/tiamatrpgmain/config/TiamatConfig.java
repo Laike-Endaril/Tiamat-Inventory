@@ -8,11 +8,9 @@ import net.minecraftforge.common.config.Config;
 @Config(modid = TiamatRPGMain.MODID)
 public class TiamatConfig
 {
-    @Config.Name("Client Settings")
-    @Config.LangKey(TiamatRPGMain.MODID + ".config.client")
+    @Config.Name("Client")
     public static ClientConfig client = new ClientConfig();
 
-    @Config.Name("Server Settings")
-    @Config.LangKey(TiamatRPGMain.MODID + ".config.server")
+    @Config.Name("Server")
     public static ServerConfig server = new ServerConfig();
 }
