@@ -1,9 +1,12 @@
 package com.fantasticsource.tiamatrpgmain;
 
 import com.fantasticsource.tiamatrpgmain.config.server.items.AffixesConfig;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -31,4 +34,16 @@ public class TiamatRPGMain
     {
         if (event.getModID().equals(MODID)) ConfigManager.sync(MODID, Config.Type.INSTANCE);
     }
+
+    @SubscribeEvent
+    public static void entityConstructing(EntityEvent.EntityConstructing event)
+    {
+        Entity entity = event.getEntity();
+        if (entity instanceof EntityLivingBase)
+        {
+            //Add new stealth-related attributes
+            Attributes.addAttributes((EntityLivingBase) entity);
+        }
+    }
+
 }
