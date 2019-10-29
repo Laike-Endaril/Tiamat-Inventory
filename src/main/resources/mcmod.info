@@ -2,7 +2,7 @@
 {
   "modid": "tiamatrpgmain",
   "name": "Tiamat RPG - Main",
-  "description": "Adds RPG levels, attributes and mechanics surrounding them, as well as customization of melee attacks",
+  "description": "Adds RPG levels, attributes and mechanics surrounding them, as well as customization of melee attacks, expandable inventory, and more",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",

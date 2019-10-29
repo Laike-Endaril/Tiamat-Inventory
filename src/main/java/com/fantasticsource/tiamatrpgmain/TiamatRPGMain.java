@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatrpgmain;
 
+import com.fantasticsource.tiamatrpgmain.config.server.items.AffixesConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -8,7 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@Mod(modid = TiamatRPGMain.MODID, name = TiamatRPGMain.NAME, version = TiamatRPGMain.VERSION)
+@Mod(modid = TiamatRPGMain.MODID, name = TiamatRPGMain.NAME, version = TiamatRPGMain.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.025f,)")
 public class TiamatRPGMain
 {
     public static final String MODID = "tiamatrpgmain";
@@ -19,6 +20,7 @@ public class TiamatRPGMain
     public static void preInit(FMLPreInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(TiamatRPGMain.class);
+        MinecraftForge.EVENT_BUS.register(AffixesConfig.class);
     }
 
     @SubscribeEvent

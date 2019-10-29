@@ -1,0 +1,5 @@
+tiamatrpgmain.config.server=Server
+tiamatrpgmain.config.client=Client
+
+tiamatrpgmain.config.attributes=Attributes
+tiamatrpgmain.config.inventory=Inventory
