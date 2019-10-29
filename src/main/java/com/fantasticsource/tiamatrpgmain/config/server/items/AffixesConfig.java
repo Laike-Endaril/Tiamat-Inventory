@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatrpgmain.config.server.items;
 
 import com.fantasticsource.mctools.ConfigHandler;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatrpgmain.config.TiamatConfig;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -13,6 +14,14 @@ import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
 
 public class AffixesConfig
 {
+    public static void init() throws IllegalAccessException
+    {
+        for (String typeName : TiamatConfig.server.items.affixes.affixTypeNames)
+        {
+            MCTools.addLangKey("general.server settings.items.affixes." + typeName.toLowerCase(), typeName);
+        }
+    }
+
     @Config.Name("Affix Type Names")
     @Config.LangKey(MODID + ".config.affixes.typeNames")
     @Config.Comment({"Each name entered here will create an affix type group to add affixes to (need to completely close and reopen config menu to populate)"})

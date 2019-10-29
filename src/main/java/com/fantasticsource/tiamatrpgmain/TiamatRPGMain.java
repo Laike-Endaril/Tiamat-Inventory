@@ -17,10 +17,11 @@ public class TiamatRPGMain
     public static final String VERSION = "1.12.2.000";
 
     @Mod.EventHandler
-    public static void preInit(FMLPreInitializationEvent event)
+    public static void preInit(FMLPreInitializationEvent event) throws IllegalAccessException
     {
         MinecraftForge.EVENT_BUS.register(TiamatRPGMain.class);
         MinecraftForge.EVENT_BUS.register(AffixesConfig.class);
+        AffixesConfig.init();
     }
 
     @SubscribeEvent
