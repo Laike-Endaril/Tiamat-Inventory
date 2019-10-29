@@ -29,7 +29,8 @@ public class Attributes
         //Add new attributes to entity
         if (TiamatConfig.server.attributes.meleeAOEAttributes)
         {
-            livingBase.getAttributeMap().registerAttribute(Attributes.MELEE_DISTANCE);
+            //Distance is already added to players
+            if (!(livingBase instanceof EntityPlayer)) livingBase.getAttributeMap().registerAttribute(Attributes.MELEE_DISTANCE).setBaseValue(3);
             livingBase.getAttributeMap().registerAttribute(Attributes.MELEE_ANGLE);
             livingBase.getAttributeMap().registerAttribute(Attributes.MELEE_TARGETS);
         }

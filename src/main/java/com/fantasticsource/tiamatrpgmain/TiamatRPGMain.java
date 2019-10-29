@@ -3,13 +3,18 @@ package com.fantasticsource.tiamatrpgmain;
 import com.fantasticsource.tiamatrpgmain.config.server.items.AffixesConfig;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.IOException;
@@ -46,4 +51,27 @@ public class TiamatRPGMain
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void attackBlock(PlayerInteractEvent.LeftClickBlock event)
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, false)) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void attackAir(PlayerInteractEvent.LeftClickEmpty event)
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, false)) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void attackEntity(AttackEntityEvent event)
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player instanceof EntityPlayerMP)
+        {
+            if (!Attacks.tryAttack((EntityPlayerMP) player, true)) event.setCanceled(true);
+        }
+    }
 }
