@@ -1,0 +1,18 @@
+Cone AOEs for melee (range, angle, #targets)
+
+Strength
+Dexterity
+Constitution
+Intelligence
+Wisdom
+Charisma
+
+MP
+Stamina (don't replace hunger)
+
+Dodge - No damage to you from attack, but attack may hit other targets in the AOE.  2x speed for 1s
+Block - No damage to you from attack, and the attack is stopped (will not hit any other targets).  Get knocked back
+Parry - No damage to you from attack, and the attack's damage is reduced for all other targets it may hit.  Get slowed
+
+HUD with modular elements for HP, MP, stamina, hunger, drowning, potion effects (potion level and duration)
+Move enemy health display from DS to this mod
