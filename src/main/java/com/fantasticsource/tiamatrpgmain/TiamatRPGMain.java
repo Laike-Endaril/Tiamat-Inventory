@@ -9,6 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -25,6 +26,11 @@ public class TiamatRPGMain
     public static final String MODID = "tiamatrpgmain";
     public static final String NAME = "Tiamat RPG - Main";
     public static final String VERSION = "1.12.2.000";
+
+    public TiamatRPGMain()
+    {
+        Attributes.init();
+    }
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event) throws IllegalAccessException, IOException
@@ -46,8 +52,19 @@ public class TiamatRPGMain
         Entity entity = event.getEntity();
         if (entity instanceof EntityLivingBase)
         {
-            //Add new stealth-related attributes
+            //Add new attributes
             Attributes.addAttributes((EntityLivingBase) entity);
+        }
+    }
+
+    @SubscribeEvent
+    public static void entityJoin(EntityJoinWorldEvent event)
+    {
+        Entity entity = event.getEntity();
+        if (entity instanceof EntityLivingBase)
+        {
+            //Edit existing attributes
+            Attributes.editAttributes((EntityLivingBase) entity);
         }
     }
 
@@ -55,23 +72,20 @@ public class TiamatRPGMain
     public static void attackBlock(PlayerInteractEvent.LeftClickBlock event)
     {
         EntityPlayer player = event.getEntityPlayer();
-        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, false)) event.setCanceled(true);
+        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, null)) event.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void attackAir(PlayerInteractEvent.LeftClickEmpty event)
     {
         EntityPlayer player = event.getEntityPlayer();
-        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, false)) event.setCanceled(true);
+        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, null)) event.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void attackEntity(AttackEntityEvent event)
     {
         EntityPlayer player = event.getEntityPlayer();
-        if (player instanceof EntityPlayerMP)
-        {
-            if (!Attacks.tryAttack((EntityPlayerMP) player, true)) event.setCanceled(true);
-        }
+        if (player instanceof EntityPlayerMP && !Attacks.tryAttack((EntityPlayerMP) player, event.getTarget())) event.setCanceled(true);
     }
 }
