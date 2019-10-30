@@ -35,6 +35,7 @@ public class TiamatRPGMain
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event) throws IllegalAccessException, IOException
     {
+        Network.init();
         MinecraftForge.EVENT_BUS.register(TiamatRPGMain.class);
         MinecraftForge.EVENT_BUS.register(AffixesConfig.class);
         AffixesConfig.init();
@@ -69,7 +70,7 @@ public class TiamatRPGMain
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackBlock(PlayerInteractEvent.LeftClickBlock event)
+    public static void attackBlock(PlayerInteractEvent.LeftClickBlock event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
         if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, null)) event.setCanceled(true);
@@ -78,12 +79,12 @@ public class TiamatRPGMain
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void attackAir(PlayerInteractEvent.LeftClickEmpty event)
     {
-        EntityPlayer player = event.getEntityPlayer();
-        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, null)) event.setCanceled(true);
+        //This event normally only happens client-side; need to send to server
+        Network.WRAPPER.sendToServer(new Network.LeftClickEmptyPacket());
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackEntity(AttackEntityEvent event)
+    public static void attackEntity(AttackEntityEvent event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
         if (player instanceof EntityPlayerMP && !Attacks.tryAttack((EntityPlayerMP) player, event.getTarget())) event.setCanceled(true);

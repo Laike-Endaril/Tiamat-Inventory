@@ -17,7 +17,7 @@ public class Attributes
     public static void init()
     {
         MELEE_DISTANCE = (RangedAttribute) EntityPlayer.REACH_DISTANCE; //generic.reachDistance
-        MELEE_ANGLE = new RangedAttribute(null, MODID + ".meleeAngle", 10, 0, Double.MAX_VALUE);
+        MELEE_ANGLE = new RangedAttribute(null, MODID + ".meleeAngle", 0, 0, Double.MAX_VALUE);
         MELEE_TARGETS = new RangedAttribute(null, MODID + ".meleeTargets", 1, 0, Double.MAX_VALUE);
     }
 
