@@ -8,7 +8,6 @@ import com.fantasticsource.tools.datastructures.ExplicitPriorityQueue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.projectile.EntitySnowball;
 import net.minecraft.util.math.Vec3d;
 
 import java.lang.reflect.Field;
@@ -19,6 +18,8 @@ import static com.fantasticsource.tiamatrpgmain.Attributes.*;
 
 public class Attacks
 {
+    private static final double DISTRIBUTED_RAYTRACE_SPACING = 0.5;
+
     private static Field entityLivingBaseTicksSinceLastSwingField;
     private static boolean recursive = false;
 
@@ -91,30 +92,40 @@ public class Attacks
 
 
             //Final check: "shotgun" check (cone of distributed raytraces) (mostly useful for detection vs. large mobs)
+            MCTools.spawnDebugSnowball(player.world, playerEyes.x, playerEyes.y, playerEyes.z);
             double distance = Math.sqrt(squareDist);
-            double subConeStep = Tools.radtodeg(TRIG_TABLE.arctan(0.5 / distance));
+            double subConeStep = Tools.radtodeg(TRIG_TABLE.arctan(DISTRIBUTED_RAYTRACE_SPACING / distance));
             int subConeCount = (int) (angle / subConeStep);
             subConeStep = angle / subConeCount;
             double angleFromAxis = subConeStep;
+
             for (int cone = 0; cone < subConeCount; cone++)
             {
-                double radius = distance * TRIG_TABLE.sin(angleFromAxis);
-                double thetaStep = Math.PI * radius * 2;
-                int thetaStepCount = (int) thetaStep + 1;
-                thetaStep = 360d / thetaStepCount;
+                double radius = distance * TRIG_TABLE.sin(Tools.degtorad(angleFromAxis));
+                double thetaStep = Math.PI * radius * 2 / DISTRIBUTED_RAYTRACE_SPACING;
+                int thetaStepCount = Tools.max((int) thetaStep + 1, 4);
+                thetaStep = Math.PI * 2 / thetaStepCount;
                 double theta = thetaStep;
+
                 for (int thetaStepI = 0; thetaStepI < thetaStepCount; thetaStepI++)
                 {
-                    //TODO Final calc, using theta and angleFromAxis
+                    //Final calc, using theta and angleFromAxis
                     //TODO Since this is a full, unordered 360* rotation around the cone perimeter, +/- and which one uses sin/cos doesn't really matter, but I might want to check them sometime and put the "right" calc in anyway
-                    double yaw = player.rotationYawHead + (angleFromAxis * TRIG_TABLE.sin(theta));
                     double pitch = player.rotationPitch + (angleFromAxis * TRIG_TABLE.cos(theta));
+                    double yaw = player.rotationYawHead + (angleFromAxis * TRIG_TABLE.sin(theta));
+                    if (pitch > 90)
+                    {
+                        pitch = 180 - pitch;
+                        yaw += 180;
+                    }
+                    else if (pitch < -90)
+                    {
+                        pitch = -180 - pitch;
+                        yaw += 180;
+                    }
 
                     Vec3d pos = Vec3d.fromPitchYaw((float) pitch, (float) yaw).scale(distance).add(playerEyes);
-                    EntitySnowball snowball = new EntitySnowball(player.world, pos.x, pos.y, pos.z);
-                    snowball.setVelocity(0, 0, 0);
-                    snowball.setNoGravity(true);
-                    player.world.spawnEntity(snowball);
+                    MCTools.spawnDebugSnowball(player.world, pos.x, pos.y, pos.z);
 
 
                     theta += thetaStep;
