@@ -16,6 +16,10 @@ import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
 
 public class AffixesConfig
 {
+    @Config.Name("Affix Type Names")
+    @Config.Comment({"Each name entered here will create an affix type group to add affixes to (need to completely close and reopen config menu to populate)"})
+    public String[] affixTypeNames = new String[0];
+
     public static void init() throws IllegalAccessException, IOException
     {
         ConfigHandler handler = new ConfigHandler(MODID).load();
@@ -43,10 +47,6 @@ public class AffixesConfig
             MCTools.addLangKey(typeName.toLowerCase(), typeName);
         }
     }
-
-    @Config.Name("Affix Type Names")
-    @Config.Comment({"Each name entered here will create an affix type group to add affixes to (need to completely close and reopen config menu to populate)"})
-    public String[] affixTypeNames = new String[0];
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void saveConfig(ConfigChangedEvent.OnConfigChangedEvent event) throws IOException, IllegalAccessException

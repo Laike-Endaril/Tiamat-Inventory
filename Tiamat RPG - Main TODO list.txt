@@ -1,4 +1,5 @@
 Dynamically defined rarities
+Color
 Affixes
 
 Dynamically defined weapon types

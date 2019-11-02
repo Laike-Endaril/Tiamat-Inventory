@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatrpgmain;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -45,7 +46,7 @@ public class Network
             {
                 try
                 {
-                    Attacks.tryAttack(ctx.getServerHandler().player, null);
+                    Attacks.tryAttack(ctx.getServerHandler().player, EntityLivingBase.class);
                 }
                 catch (IllegalAccessException e)
                 {

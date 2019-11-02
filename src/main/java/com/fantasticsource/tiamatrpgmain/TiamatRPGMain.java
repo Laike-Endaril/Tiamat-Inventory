@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.io.IOException;
 
-@Mod(modid = TiamatRPGMain.MODID, name = TiamatRPGMain.NAME, version = TiamatRPGMain.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.025f,)")
+@Mod(modid = TiamatRPGMain.MODID, name = TiamatRPGMain.NAME, version = TiamatRPGMain.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.026b,)")
 public class TiamatRPGMain
 {
     public static final String MODID = "tiamatrpgmain";
@@ -73,7 +73,7 @@ public class TiamatRPGMain
     public static void attackBlock(PlayerInteractEvent.LeftClickBlock event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
-        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, null)) event.setCanceled(true);
+        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
@@ -87,6 +87,6 @@ public class TiamatRPGMain
     public static void attackEntity(AttackEntityEvent event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
-        if (player instanceof EntityPlayerMP && !Attacks.tryAttack((EntityPlayerMP) player, event.getTarget())) event.setCanceled(true);
+        if (player instanceof EntityPlayerMP && !Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
     }
 }
