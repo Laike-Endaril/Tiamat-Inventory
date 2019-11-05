@@ -92,27 +92,30 @@ public class Attacks
 
 
             //Final check: "shotgun" check (cone of distributed raytraces) (mostly useful for detection vs. large mobs)
+            //Find evenly distributed points on evenly distributed subcones
+            //Transforms are: player yaw, player pitch, roll (theta along circular intersection of cone and sphere), pitch2(angle of current cone)
             MCTools.spawnDebugSnowball(player.world, playerEyes.x, playerEyes.y, playerEyes.z);
             double distance = Math.sqrt(squareDist);
-            double subConeStep = Tools.radtodeg(TRIG_TABLE.arctan(DISTRIBUTED_RAYTRACE_SPACING / distance));
-            int subConeCount = (int) (angle / subConeStep);
-            subConeStep = angle / subConeCount;
-            double angleFromAxis = subConeStep;
+            double pitch2Step = Tools.radtodeg(TRIG_TABLE.arctan(DISTRIBUTED_RAYTRACE_SPACING / distance));
+            int subConeCount = (int) (angle / pitch2Step);
+            pitch2Step = angle / subConeCount;
+            double pitch2 = pitch2Step;
 
             for (int cone = 0; cone < subConeCount; cone++)
             {
-                double radius = distance * TRIG_TABLE.sin(Tools.degtorad(angleFromAxis));
-                double thetaStep = Math.PI * radius * 2 / DISTRIBUTED_RAYTRACE_SPACING;
-                int thetaStepCount = Tools.max((int) thetaStep + 1, 4);
-                thetaStep = Math.PI * 2 / thetaStepCount;
-                double theta = thetaStep;
+                double radius = distance * TRIG_TABLE.sin(Tools.degtorad(pitch2));
+                double rollStep = Math.PI * radius * 2 / DISTRIBUTED_RAYTRACE_SPACING;
+                int thetaStepCount = Tools.max((int) rollStep + 1, 4);
+                rollStep = Math.PI * 2 / thetaStepCount;
+                double roll = rollStep;
 
                 for (int thetaStepI = 0; thetaStepI < thetaStepCount; thetaStepI++)
                 {
-                    //Final calc, using theta and angleFromAxis
-                    //TODO Since this is a full, unordered 360* rotation around the cone perimeter, +/- and which one uses sin/cos doesn't really matter, but I might want to check them sometime and put the "right" calc in anyway
-                    double pitch = player.rotationPitch + (angleFromAxis * TRIG_TABLE.cos(theta));
-                    double yaw = player.rotationYawHead + (angleFromAxis * TRIG_TABLE.sin(theta));
+                    //Final calc, using roll and pitch2
+                    double flatYawOffset = pitch2 * -TRIG_TABLE.cos(roll);
+                    double flatPitchOffset = pitch2 * -TRIG_TABLE.sin(roll);
+                    double yaw = player.rotationYawHead + flatYawOffset * TRIG_TABLE.cos(Tools.degtorad(flatPitchOffset));
+                    double pitch = (player.rotationPitch + flatPitchOffset) * TRIG_TABLE.cos(Tools.degtorad(flatYawOffset));
                     if (pitch > 90)
                     {
                         pitch = 180 - pitch;
@@ -125,14 +128,15 @@ public class Attacks
                     }
 
                     Vec3d pos = Vec3d.fromPitchYaw((float) pitch, (float) yaw).scale(distance).add(playerEyes);
+                    System.out.println(pos);
                     MCTools.spawnDebugSnowball(player.world, pos.x, pos.y, pos.z);
 
 
-                    theta += thetaStep;
+                    roll += rollStep;
                 }
 
 
-                angleFromAxis += subConeStep;
+                pitch2 += pitch2Step;
             }
 
 
