@@ -10,6 +10,11 @@ import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
 
 public class Attributes
 {
+    public static final double
+            DEFAULT_MELEE_DISTANCE = 3,
+            DEFAULT_MELEE_ANGLE = 0,
+            DEFAULT_MELEE_TARGETS = 1;
+
     public static RangedAttribute MELEE_DISTANCE;
     public static RangedAttribute MELEE_ANGLE;
     public static RangedAttribute MELEE_TARGETS;
@@ -17,8 +22,8 @@ public class Attributes
     public static void init()
     {
         MELEE_DISTANCE = (RangedAttribute) EntityPlayer.REACH_DISTANCE; //generic.reachDistance
-        MELEE_ANGLE = new RangedAttribute(null, MODID + ".meleeAngle", 45, 0, Double.MAX_VALUE);
-        MELEE_TARGETS = new RangedAttribute(null, MODID + ".meleeTargets", 1, 0, Double.MAX_VALUE);
+        MELEE_ANGLE = new RangedAttribute(null, MODID + ".meleeAngle", DEFAULT_MELEE_ANGLE, 0, Double.MAX_VALUE);
+        MELEE_TARGETS = new RangedAttribute(null, MODID + ".meleeTargets", DEFAULT_MELEE_TARGETS, 0, Double.MAX_VALUE);
     }
 
 
@@ -29,7 +34,7 @@ public class Attributes
         //Add new attributes to entity
         if (TiamatConfig.server.attributes.meleeAOEAttributes)
         {
-            if (!(livingBase instanceof EntityPlayer)) attributeMap.registerAttribute(MELEE_DISTANCE).setBaseValue(3);
+            if (!(livingBase instanceof EntityPlayer)) attributeMap.registerAttribute(MELEE_DISTANCE).setBaseValue(DEFAULT_MELEE_DISTANCE);
             attributeMap.registerAttribute(MELEE_ANGLE);
             attributeMap.registerAttribute(MELEE_TARGETS);
         }
@@ -42,7 +47,9 @@ public class Attributes
         //Add new attributes to entity
         if (TiamatConfig.server.attributes.meleeAOEAttributes)
         {
-            if (livingBase instanceof EntityPlayer) attributeMap.getAttributeInstance(MELEE_DISTANCE).setBaseValue(3);
+            attributeMap.getAttributeInstance(MELEE_DISTANCE).setBaseValue(DEFAULT_MELEE_DISTANCE);
+            attributeMap.getAttributeInstance(MELEE_ANGLE).setBaseValue(MELEE_ANGLE.getDefaultValue());
+            attributeMap.getAttributeInstance(MELEE_TARGETS).setBaseValue(MELEE_TARGETS.getDefaultValue());
         }
     }
 }

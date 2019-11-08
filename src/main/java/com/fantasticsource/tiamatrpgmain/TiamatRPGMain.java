@@ -58,7 +58,7 @@ public class TiamatRPGMain
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void entityJoin(EntityJoinWorldEvent event)
     {
         Entity entity = event.getEntity();

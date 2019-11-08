@@ -92,6 +92,10 @@ public class Attacks
             }
 
 
+            //Don't do the "shotgun check" if we're only attacking in a line and not a cone
+            if (angle == 0) continue;
+
+
             //Final check: "shotgun" check (cone of distributed raytraces) (mostly useful for detection vs. large mobs)
             //Find evenly distributed points on evenly distributed subcones
             //Transforms are: player yaw, player pitch, roll (theta along circular intersection of cone and sphere), subConeAngle(angle of current cone)
