@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.Vec3d;
+import org.lwjgl.util.vector.Quaternion;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -93,42 +94,36 @@ public class Attacks
 
             //Final check: "shotgun" check (cone of distributed raytraces) (mostly useful for detection vs. large mobs)
             //Find evenly distributed points on evenly distributed subcones
-            //Transforms are: player yaw, player pitch, roll (theta along circular intersection of cone and sphere), pitch2(angle of current cone)
+            //Transforms are: player yaw, player pitch, roll (theta along circular intersection of cone and sphere), subConeAngle(angle of current cone)
             MCTools.spawnDebugSnowball(player.world, playerEyes.x, playerEyes.y, playerEyes.z);
             double distance = Math.sqrt(squareDist);
-            double pitch2Step = Tools.radtodeg(TRIG_TABLE.arctan(DISTRIBUTED_RAYTRACE_SPACING / distance));
-            int subConeCount = (int) (angle / pitch2Step);
-            pitch2Step = angle / subConeCount;
-            double pitch2 = pitch2Step;
+            double subConeStep = Tools.radtodeg(TRIG_TABLE.arctan(DISTRIBUTED_RAYTRACE_SPACING / distance));
+            int subConeCount = (int) (angle / subConeStep);
+            subConeStep = angle / subConeCount;
+            double subConeAngle = subConeStep;
+
+            Vec3d pitchYaw = Vec3d.fromPitchYaw(0, player.rotationYawHead + 90);
+            Quaternion qPitchAxis = new Quaternion((float) pitchYaw.x, (float) pitchYaw.y, (float) pitchYaw.z, 0);
+            pitchYaw = Vec3d.fromPitchYaw(player.rotationPitch, player.rotationYawHead);
+            Quaternion qPitchYaw = new Quaternion((float) pitchYaw.x, (float) pitchYaw.y, (float) pitchYaw.z, 0);
 
             for (int cone = 0; cone < subConeCount; cone++)
             {
-                double radius = distance * TRIG_TABLE.sin(Tools.degtorad(pitch2));
+                double radius = distance * TRIG_TABLE.sin(Tools.degtorad(subConeAngle));
                 double rollStep = Math.PI * radius * 2 / DISTRIBUTED_RAYTRACE_SPACING;
                 int thetaStepCount = Tools.max((int) rollStep + 1, 4);
                 rollStep = Math.PI * 2 / thetaStepCount;
                 double roll = rollStep;
+                Quaternion theta0 = rotate(pitchYaw, qPitchAxis, subConeAngle);
 
                 for (int thetaStepI = 0; thetaStepI < thetaStepCount; thetaStepI++)
                 {
-                    //Final calc, using roll and pitch2
-                    double flatYawOffset = pitch2 * -TRIG_TABLE.cos(roll);
-                    double flatPitchOffset = pitch2 * -TRIG_TABLE.sin(roll);
-                    double yaw = player.rotationYawHead + flatYawOffset * TRIG_TABLE.cos(Tools.degtorad(flatPitchOffset));
-                    double pitch = (player.rotationPitch + flatPitchOffset) * TRIG_TABLE.cos(Tools.degtorad(flatYawOffset));
-                    if (pitch > 90)
-                    {
-                        pitch = 180 - pitch;
-                        yaw += 180;
-                    }
-                    else if (pitch < -90)
-                    {
-                        pitch = -180 - pitch;
-                        yaw += 180;
-                    }
+                    //Final calc, using roll and subConeAngle
 
-                    Vec3d pos = Vec3d.fromPitchYaw((float) pitch, (float) yaw).scale(distance).add(playerEyes);
-                    System.out.println(pos);
+
+                    Quaternion qRotated = rotate(theta0, qPitchYaw, Tools.radtodeg(roll));
+                    qRotated.scale((float) distance);
+                    Vec3d pos = new Vec3d(qRotated.x, qRotated.y, qRotated.z).add(playerEyes);
                     MCTools.spawnDebugSnowball(player.world, pos.x, pos.y, pos.z);
 
 
@@ -136,7 +131,7 @@ public class Attacks
                 }
 
 
-                pitch2 += pitch2Step;
+                subConeAngle += subConeStep;
             }
 
 
@@ -166,5 +161,19 @@ public class Attacks
 
 
         return false;
+    }
+
+    public static Quaternion rotate(Vec3d v, Quaternion axis, double theta)
+    {
+        return rotate(new Quaternion((float) v.x, (float) v.y, (float) v.z, 0), axis, theta);
+    }
+
+    public static Quaternion rotate(Quaternion v, Quaternion axis, double theta)
+    {
+        double sinThetaDiv2 = TRIG_TABLE.sin(Tools.degtorad(theta) * 0.5);
+        double cosThetaDiv2 = TRIG_TABLE.cos(Tools.degtorad(theta) * 0.5);
+        Quaternion q = new Quaternion((float) (sinThetaDiv2 * axis.x), (float) (sinThetaDiv2 * axis.y), (float) (sinThetaDiv2 * axis.z), (float) cosThetaDiv2);
+        Quaternion qConjugate = new Quaternion((float) -(sinThetaDiv2 * axis.x), (float) -(sinThetaDiv2 * axis.y), (float) -(sinThetaDiv2 * axis.z), (float) cosThetaDiv2);
+        return Quaternion.mul(Quaternion.mul(q, v, null), qConjugate, null);
     }
 }
