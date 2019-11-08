@@ -111,6 +111,7 @@ public class Attacks
             pitchYaw = Vec3d.fromPitchYaw(player.rotationPitch, player.rotationYawHead);
             Quaternion qPitchYaw = new Quaternion((float) pitchYaw.x, (float) pitchYaw.y, (float) pitchYaw.z, 0);
 
+            boolean stop = false;
             for (int cone = 0; cone < subConeCount; cone++)
             {
                 double radius = distance * TRIG_TABLE.sin(Tools.degtorad(subConeAngle));
@@ -128,12 +129,18 @@ public class Attacks
                     Quaternion qRotated = MCTools.rotatedQuaternion(theta0, qPitchYaw, roll);
                     qRotated.scale((float) distance);
                     Vec3d pos = new Vec3d(qRotated.x, qRotated.y, qRotated.z).add(playerEyes);
-                    MCTools.spawnDebugSnowball(player.world, pos.x, pos.y, pos.z);
 
+                    if (ImprovedRayTracing.entityPenetration(target, playerEyes, pos, true) > 0)
+                    {
+                        queue.add(target, squareDist);
+                        stop = true;
+                        break;
+                    }
 
                     roll += rollStep;
                 }
 
+                if (stop) break;
 
                 subConeAngle += subConeStep;
             }
