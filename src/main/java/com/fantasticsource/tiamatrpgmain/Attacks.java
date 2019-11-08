@@ -114,14 +114,14 @@ public class Attacks
                 int thetaStepCount = Tools.max((int) rollStep + 1, 4);
                 rollStep = Math.PI * 2 / thetaStepCount;
                 double roll = rollStep;
-                Quaternion theta0 = rotate(pitchYaw, qPitchAxis, subConeAngle);
+                Quaternion theta0 = MCTools.rotatedQuaternion(qPitchYaw, qPitchAxis, Tools.degtorad(subConeAngle));
 
                 for (int thetaStepI = 0; thetaStepI < thetaStepCount; thetaStepI++)
                 {
                     //Final calc, using roll and subConeAngle
 
 
-                    Quaternion qRotated = rotate(theta0, qPitchYaw, Tools.radtodeg(roll));
+                    Quaternion qRotated = MCTools.rotatedQuaternion(theta0, qPitchYaw, roll);
                     qRotated.scale((float) distance);
                     Vec3d pos = new Vec3d(qRotated.x, qRotated.y, qRotated.z).add(playerEyes);
                     MCTools.spawnDebugSnowball(player.world, pos.x, pos.y, pos.z);
@@ -161,19 +161,5 @@ public class Attacks
 
 
         return false;
-    }
-
-    public static Quaternion rotate(Vec3d v, Quaternion axis, double theta)
-    {
-        return rotate(new Quaternion((float) v.x, (float) v.y, (float) v.z, 0), axis, theta);
-    }
-
-    public static Quaternion rotate(Quaternion v, Quaternion axis, double theta)
-    {
-        double sinThetaDiv2 = TRIG_TABLE.sin(Tools.degtorad(theta) * 0.5);
-        double cosThetaDiv2 = TRIG_TABLE.cos(Tools.degtorad(theta) * 0.5);
-        Quaternion q = new Quaternion((float) (sinThetaDiv2 * axis.x), (float) (sinThetaDiv2 * axis.y), (float) (sinThetaDiv2 * axis.z), (float) cosThetaDiv2);
-        Quaternion qConjugate = new Quaternion((float) -(sinThetaDiv2 * axis.x), (float) -(sinThetaDiv2 * axis.y), (float) -(sinThetaDiv2 * axis.z), (float) cosThetaDiv2);
-        return Quaternion.mul(Quaternion.mul(q, v, null), qConjugate, null);
     }
 }
