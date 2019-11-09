@@ -1,11 +1,23 @@
+Attributes...
+If the hotspot were defined as...
+...an optimal distance
+...an effective deviation
+...a optimal multiplier, for damage at the optimal distance
+...a non-optimal multiplier, for damage outside the effective area (effective area being optimal distance +/- effective deviation)
+...a mode, which can either be...
+1. Uses optimal multiplier if the attack hits anywhere within effective area, and non-optimal multiplier anywhere else
+2. Uses optimal multiplier only at optimal distance, and fades from that to the non-optimal multiplier as you approach the near- and far- boundaries of the effective area
+
+This would use 5 very specific attributes, be pretty flexible, and make it so that eg. if you had an attack which swings in a larger arc due to holding the weapon closer to the pommel, it could alter only the optimal distance without messing up the other attributes
+
 Dynamically defined rarities
-Color
-Affixes
+...Color
+...Affixes
 
 Dynamically defined weapon types
-Weapon name (Sword) (Excalibur)
-Weapon type name (Sword)
-Weapon attribute ranges
+...Weapon name (Sword) (Excalibur)
+...Weapon type name (Sword)
+...Weapon attribute ranges
 
 Dynamically defined sets
 
