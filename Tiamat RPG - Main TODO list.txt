@@ -23,8 +23,6 @@ Dynamically defined sets
 
 
 
-Cone AOEs for melee (range, angle, #targets)
-
 Strength
 Dexterity
 Constitution

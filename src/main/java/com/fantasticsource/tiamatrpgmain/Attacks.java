@@ -50,7 +50,7 @@ public class Attacks
 
 
         //Cube distance check
-        double range = MCTools.getAttribute(player, MELEE_DISTANCE, MELEE_DISTANCE.getDefaultValue());
+        double range = MCTools.getAttribute(player, MELEE_RANGE, MELEE_RANGE.getDefaultValue());
         List<Entity> entityList = player.world.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().grow(range));
         if (entityList.size() == 0) return false;
 
