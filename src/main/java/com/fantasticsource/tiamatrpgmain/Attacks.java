@@ -7,8 +7,15 @@ import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.ExplicitPriorityQueue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.util.vector.Quaternion;
 
 import java.lang.reflect.Field;
@@ -45,17 +52,17 @@ public class Attacks
 
 
         //Possible hit count
-        double hitsRemaining = MCTools.getAttribute(player, MELEE_TARGETS, MELEE_TARGETS.getDefaultValue());
+        double hitsRemaining = MCTools.getAttribute(player, MELEE_TARGETS);
         if (hitsRemaining <= 0) return false;
 
 
         //Cube distance check
-        double range = MCTools.getAttribute(player, MELEE_RANGE, MELEE_RANGE.getDefaultValue());
+        double range = MCTools.getAttribute(player, MELEE_BEST_DISTANCE) + MCTools.getAttribute(player, MELEE_TOLERANCE);
         List<Entity> entityList = player.world.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().grow(range));
         if (entityList.size() == 0) return false;
 
 
-        double angle = MCTools.getAttribute(player, MELEE_ANGLE, MELEE_ANGLE.getDefaultValue());
+        double angle = MCTools.getAttribute(player, MELEE_ANGLE);
         Vec3d playerEyes = player.getPositionVector().addVector(0, player.eyeHeight, 0);
         ExplicitPriorityQueue<Entity> queue = new ExplicitPriorityQueue<>(entityList.size());
 
@@ -172,5 +179,75 @@ public class Attacks
 
 
         return false;
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void attackBlock(PlayerInteractEvent.LeftClickBlock event) throws IllegalAccessException
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void attackAir(PlayerInteractEvent.LeftClickEmpty event)
+    {
+        //This event normally only happens client-side; need to send to server
+        Network.WRAPPER.sendToServer(new Network.LeftClickEmptyPacket());
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void attackEntity(AttackEntityEvent event) throws IllegalAccessException
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player instanceof EntityPlayerMP && !Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void damageEntity(LivingHurtEvent event)
+    {
+        DamageSource source = event.getSource();
+        Entity entity = source.getTrueSource();
+        if (!(entity instanceof EntityLivingBase)) entity = source.getImmediateSource();
+        if (!(entity instanceof EntityLivingBase) || entity.world.isRemote) return;
+
+        EntityLivingBase attacker = (EntityLivingBase) entity;
+        switch ((int) MCTools.getAttribute(attacker, MELEE_MODE))
+        {
+            case 1:
+            {
+                double dist = attacker.getDistance(event.getEntityLiving());
+                double optimum = MCTools.getAttribute(attacker, MELEE_BEST_DISTANCE);
+                double dif = Math.abs(dist - optimum);
+                if (dif > MCTools.getAttribute(attacker, MELEE_TOLERANCE))
+                {
+                    event.setAmount((float) (event.getAmount() * MCTools.getAttribute(attacker, MELEE_MULTIPLIER_BAD)));
+                }
+                else
+                {
+                    event.setAmount((float) (event.getAmount() * MCTools.getAttribute(attacker, MELEE_MULTIPLIER_GOOD)));
+                }
+                break;
+            }
+
+            case 2:
+            {
+                double dist = attacker.getDistance(event.getEntityLiving());
+                double optimum = MCTools.getAttribute(attacker, MELEE_BEST_DISTANCE);
+                double dif = Math.abs(dist - optimum);
+                double tolerance = MCTools.getAttribute(attacker, MELEE_TOLERANCE);
+                if (dif > tolerance)
+                {
+                    event.setAmount((float) (event.getAmount() * MCTools.getAttribute(attacker, MELEE_MULTIPLIER_BAD)));
+                }
+                else
+                {
+                    double ratio = 1 - (dif / tolerance);
+                    double multiplier = MCTools.getAttribute(attacker, MELEE_MULTIPLIER_BAD) + MCTools.getAttribute(attacker, MELEE_MULTIPLIER_GOOD) * ratio;
+                    event.setAmount((float) (event.getAmount() * multiplier));
+                }
+                break;
+            }
+        }
+        //If mode is not set, just do full damage at all distances in range
     }
 }
