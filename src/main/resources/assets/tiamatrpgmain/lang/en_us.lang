@@ -1,9 +1,11 @@
+tiamatrpgmain.keyCategory=Tiamat RPG - Main
+tiamatrpgmain.key.inventory=Inventory
+
+
+
 server=Server
 client=Client
 
-attributes=Attributes
-inventory=Inventory
 items=Items
 
 affixes=Affixes
-

@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatrpgmain;
 
 import com.fantasticsource.tiamatrpgmain.config.server.items.AffixesConfig;
+import com.fantasticsource.tiamatrpgmain.gui.TiamatInventoryGUI;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
@@ -9,10 +10,12 @@ import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
@@ -36,6 +39,13 @@ public class TiamatRPGMain
         MinecraftForge.EVENT_BUS.register(AffixesConfig.class);
         AffixesConfig.init();
         MinecraftForge.EVENT_BUS.register(Attacks.class);
+        MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
+
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+        {
+            //Physical client
+            Keys.init(event);
+        }
     }
 
     @SubscribeEvent
