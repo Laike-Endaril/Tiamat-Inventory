@@ -1,6 +1,5 @@
 package com.fantasticsource.tiamatrpgmain;
 
-import com.fantasticsource.tiamatrpgmain.config.TiamatConfig;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
@@ -55,21 +54,18 @@ public class Attributes
         AttributeMap attributeMap = (AttributeMap) livingBase.getAttributeMap();
 
         //Add new attributes to entity
-        if (TiamatConfig.server.attributes.meleeAOEAttributes)
-        {
-            attributeMap.registerAttribute(MELEE_ANGLE);
-            attributeMap.registerAttribute(MELEE_TARGETS);
+        attributeMap.registerAttribute(MELEE_ANGLE);
+        attributeMap.registerAttribute(MELEE_TARGETS);
 
-            attributeMap.registerAttribute(MELEE_MODE);
-            attributeMap.registerAttribute(MELEE_BEST_DISTANCE);
-            attributeMap.registerAttribute(MELEE_TOLERANCE);
-            attributeMap.registerAttribute(MELEE_MULTIPLIER_GOOD);
-            attributeMap.registerAttribute(MELEE_MULTIPLIER_BAD);
+        attributeMap.registerAttribute(MELEE_MODE);
+        attributeMap.registerAttribute(MELEE_BEST_DISTANCE);
+        attributeMap.registerAttribute(MELEE_TOLERANCE);
+        attributeMap.registerAttribute(MELEE_MULTIPLIER_GOOD);
+        attributeMap.registerAttribute(MELEE_MULTIPLIER_BAD);
 
-            attributeMap.registerAttribute(BLOCK);
-            attributeMap.registerAttribute(PARRY);
-            attributeMap.registerAttribute(DODGE);
-        }
+        attributeMap.registerAttribute(BLOCK);
+        attributeMap.registerAttribute(PARRY);
+        attributeMap.registerAttribute(DODGE);
     }
 
     public static void editAttributes(EntityLivingBase livingBase)
@@ -77,20 +73,17 @@ public class Attributes
         AttributeMap attributeMap = (AttributeMap) livingBase.getAttributeMap();
 
         //Add new attributes to entity
-        if (TiamatConfig.server.attributes.meleeAOEAttributes)
-        {
-            attributeMap.getAttributeInstance(MELEE_ANGLE).setBaseValue(MELEE_ANGLE.getDefaultValue());
-            attributeMap.getAttributeInstance(MELEE_TARGETS).setBaseValue(MELEE_TARGETS.getDefaultValue());
+        attributeMap.getAttributeInstance(MELEE_ANGLE).setBaseValue(MELEE_ANGLE.getDefaultValue());
+        attributeMap.getAttributeInstance(MELEE_TARGETS).setBaseValue(MELEE_TARGETS.getDefaultValue());
 
-            attributeMap.getAttributeInstance(MELEE_MODE).setBaseValue(MELEE_MODE.getDefaultValue());
-            attributeMap.getAttributeInstance(MELEE_BEST_DISTANCE).setBaseValue(MELEE_BEST_DISTANCE.getDefaultValue());
-            attributeMap.getAttributeInstance(MELEE_TOLERANCE).setBaseValue(MELEE_TOLERANCE.getDefaultValue());
-            attributeMap.getAttributeInstance(MELEE_MULTIPLIER_GOOD).setBaseValue(MELEE_MULTIPLIER_GOOD.getDefaultValue());
-            attributeMap.getAttributeInstance(MELEE_MULTIPLIER_BAD).setBaseValue(MELEE_MULTIPLIER_BAD.getDefaultValue());
+        attributeMap.getAttributeInstance(MELEE_MODE).setBaseValue(MELEE_MODE.getDefaultValue());
+        attributeMap.getAttributeInstance(MELEE_BEST_DISTANCE).setBaseValue(MELEE_BEST_DISTANCE.getDefaultValue());
+        attributeMap.getAttributeInstance(MELEE_TOLERANCE).setBaseValue(MELEE_TOLERANCE.getDefaultValue());
+        attributeMap.getAttributeInstance(MELEE_MULTIPLIER_GOOD).setBaseValue(MELEE_MULTIPLIER_GOOD.getDefaultValue());
+        attributeMap.getAttributeInstance(MELEE_MULTIPLIER_BAD).setBaseValue(MELEE_MULTIPLIER_BAD.getDefaultValue());
 
-            attributeMap.getAttributeInstance(BLOCK).setBaseValue(BLOCK.getDefaultValue());
-            attributeMap.getAttributeInstance(PARRY).setBaseValue(PARRY.getDefaultValue());
-            attributeMap.getAttributeInstance(DODGE).setBaseValue(DODGE.getDefaultValue());
-        }
+        attributeMap.getAttributeInstance(BLOCK).setBaseValue(BLOCK.getDefaultValue());
+        attributeMap.getAttributeInstance(PARRY).setBaseValue(PARRY.getDefaultValue());
+        attributeMap.getAttributeInstance(DODGE).setBaseValue(DODGE.getDefaultValue());
     }
 }
