@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static com.fantasticsource.mctools.MCTools.TRIG_TABLE;
 import static com.fantasticsource.tiamatrpgmain.Attributes.*;
+import static net.minecraft.entity.SharedMonsterAttributes.KNOCKBACK_RESISTANCE;
 
 public class Attacks
 {
@@ -43,7 +45,7 @@ public class Attacks
         }
     }
 
-    public static boolean tryAttack(EntityPlayerMP player, Class filter) throws IllegalAccessException
+    public static boolean tryAttack(EntityPlayerMP attacker, Class filter) throws IllegalAccessException
     {
         if (recursive) return true;
 
@@ -52,18 +54,18 @@ public class Attacks
 
 
         //Possible hit count
-        double hitsRemaining = MCTools.getAttribute(player, MELEE_TARGETS);
+        double hitsRemaining = MCTools.getAttribute(attacker, MELEE_TARGETS);
         if (hitsRemaining <= 0) return false;
 
 
         //Cube distance check
-        double range = MCTools.getAttribute(player, MELEE_BEST_DISTANCE) + MCTools.getAttribute(player, MELEE_TOLERANCE);
-        List<Entity> entityList = player.world.getEntitiesWithinAABBExcludingEntity(player, player.getEntityBoundingBox().grow(range));
+        double range = MCTools.getAttribute(attacker, MELEE_BEST_DISTANCE) + MCTools.getAttribute(attacker, MELEE_TOLERANCE);
+        List<Entity> entityList = attacker.world.getEntitiesWithinAABBExcludingEntity(attacker, attacker.getEntityBoundingBox().grow(range));
         if (entityList.size() == 0) return false;
 
 
-        double angle = MCTools.getAttribute(player, MELEE_ANGLE);
-        Vec3d playerEyes = player.getPositionVector().addVector(0, player.eyeHeight, 0);
+        double angle = MCTools.getAttribute(attacker, MELEE_ANGLE);
+        Vec3d playerEyes = attacker.getPositionVector().addVector(0, attacker.eyeHeight, 0);
         ExplicitPriorityQueue<Entity> queue = new ExplicitPriorityQueue<>(entityList.size());
 
         for (Entity target : entityList)
@@ -74,7 +76,7 @@ public class Attacks
             //Spherical distance check
             Vec3d targetCenter = target.getPositionVector().addVector(0, target.height / 2, 0);
             double squareDist = playerEyes.squareDistanceTo(targetCenter);
-            if (squareDist > Math.pow(range + (player.width + target.width) / 2, 2)) continue;
+            if (squareDist > Math.pow(range + (attacker.width + target.width) / 2, 2)) continue;
 
             //Succeed if player center is within target sphere
             if (squareDist < Math.pow(target.width / 2, 2))
@@ -84,14 +86,14 @@ public class Attacks
             }
 
             //Succeed if direct raytrace along player vision line hits
-            if (ImprovedRayTracing.entityPenetration(player, range, target, true) >= 0)
+            if (ImprovedRayTracing.entityPenetration(attacker, range, target, true) >= 0)
             {
                 queue.add(target, squareDist);
                 continue;
             }
 
             //Succeed if direct raytrace along axis between sphere centers is within attack angle and hits
-            double angleDif = MCTools.lookAngleDifDeg(player, target);
+            double angleDif = MCTools.lookAngleDifDeg(attacker, target);
             if (angleDif <= angle && ImprovedRayTracing.entityPenetration(target, playerEyes, target.getPositionVector(), true) >= 0)
             {
                 queue.add(target, squareDist);
@@ -106,16 +108,16 @@ public class Attacks
             //Final check: "shotgun" check (cone of distributed raytraces) (mostly useful for detection vs. large mobs)
             //Find evenly distributed points on evenly distributed subcones
             //Transforms are: player yaw, player pitch, roll (theta along circular intersection of cone and sphere), subConeAngle(angle of current cone)
-            MCTools.spawnDebugSnowball(player.world, playerEyes.x, playerEyes.y, playerEyes.z);
+            MCTools.spawnDebugSnowball(attacker.world, playerEyes.x, playerEyes.y, playerEyes.z);
             double distance = Math.sqrt(squareDist);
             double subConeStep = Tools.radtodeg(TRIG_TABLE.arctan(DISTRIBUTED_RAYTRACE_SPACING / distance));
             int subConeCount = (int) (angle / subConeStep);
             subConeStep = angle / subConeCount;
             double subConeAngle = subConeStep;
 
-            Vec3d pitchYaw = Vec3d.fromPitchYaw(0, player.rotationYawHead + 90);
+            Vec3d pitchYaw = Vec3d.fromPitchYaw(0, attacker.rotationYawHead + 90);
             Quaternion qPitchAxis = new Quaternion((float) pitchYaw.x, (float) pitchYaw.y, (float) pitchYaw.z, 0);
-            pitchYaw = Vec3d.fromPitchYaw(player.rotationPitch, player.rotationYawHead);
+            pitchYaw = Vec3d.fromPitchYaw(attacker.rotationPitch, attacker.rotationYawHead);
             Quaternion qPitchYaw = new Quaternion((float) pitchYaw.x, (float) pitchYaw.y, (float) pitchYaw.z, 0);
 
             boolean stop = false;
@@ -159,20 +161,53 @@ public class Attacks
 
 
         //Attack sequence
-        int lastSwingTime = (int) entityLivingBaseTicksSinceLastSwingField.get(player);
+        int lastSwingTime = (int) entityLivingBaseTicksSinceLastSwingField.get(attacker);
         while (queue.size() > 0)
         {
             Entity target = queue.poll();
 
 
-            //TODO check for block, deflect, and dodge
+            if (target instanceof EntityLivingBase)
+            {
+                EntityLivingBase targetLivingBase = (EntityLivingBase) target;
 
+                //Block
+                if (Math.random() < MCTools.getAttribute(targetLivingBase, BLOCK))
+                {
+                    //TODO make knockback use damage amount (need to do damage first!)
+                    knockback(targetLivingBase, attacker, 100);
+                    //TODO particle effect
 
-            player.attackTargetEntityWithCurrentItem(target);
-            entityLivingBaseTicksSinceLastSwingField.set(player, lastSwingTime);
+                    //Stop the attack
+                    break;
+                }
+
+                //Parry
+                if (Math.random() < MCTools.getAttribute(targetLivingBase, PARRY))
+                {
+                    //TODO 1/2 second root
+                    //TODO halve damage
+
+                    //Don't damage this player, but do count this player against hit count
+                    if (--hitsRemaining <= 0) break;
+                    continue;
+                }
+
+                //Dodge
+                if (Math.random() < MCTools.getAttribute(targetLivingBase, DODGE))
+                {
+                    //TODO 1 second of 2x movement speed
+
+                    //Don't damage this player
+                    continue;
+                }
+            }
+
+            attacker.attackTargetEntityWithCurrentItem(target);
+            entityLivingBaseTicksSinceLastSwingField.set(attacker, lastSwingTime);
             if (--hitsRemaining <= 0) break;
         }
-        player.resetCooldown();
+        attacker.resetCooldown();
 
 
         recursive = false;
@@ -180,6 +215,7 @@ public class Attacks
 
         return false;
     }
+
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void attackBlock(PlayerInteractEvent.LeftClickBlock event) throws IllegalAccessException
@@ -201,6 +237,7 @@ public class Attacks
         EntityPlayer player = event.getEntityPlayer();
         if (player instanceof EntityPlayerMP && !Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
     }
+
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void damageEntity(LivingHurtEvent event)
@@ -249,5 +286,46 @@ public class Attacks
             }
         }
         //If mode is not set, just do full damage at all distances in range
+    }
+
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void vanillaKnockback(LivingKnockBackEvent event)
+    {
+        event.setCanceled(true);
+    }
+
+    public static void knockback(EntityLivingBase target, Entity source, double force)
+    {
+        knockback(target, source, source != null ? target.getPositionVector().subtract(source.getPositionVector()) : new Vec3d(0, 0, 0).subtract(target.getLookVec()), force);
+    }
+
+    public static void knockback(EntityLivingBase target, Entity source, double xRatio, double yRatio, double zRatio, double force)
+    {
+        knockback(target, source, new Vec3d(xRatio, yRatio, zRatio), force);
+    }
+
+    public static void knockback(EntityLivingBase target, Entity source, Vec3d directionVector, double force)
+    {
+        //TODO add source's knockback bonus
+
+        double ratio = 1 - MCTools.getAttribute(target, KNOCKBACK_RESISTANCE);
+        if (ratio <= 0) return;
+
+        Vec3d motion = new Vec3d(target.motionX, target.motionY, target.motionZ);
+        System.out.println(target.getName());
+        System.out.println(motion);
+        if (!target.onGround) force *= 2;
+        else motion.scale(0.5);
+
+        target.isAirBorne = true;
+
+        motion = motion.add(directionVector.normalize().scale(force * ratio));
+        System.out.println(motion);
+        System.out.println();
+
+        target.motionX = motion.x;
+        target.motionY = motion.y;
+        target.motionZ = motion.z;
     }
 }
