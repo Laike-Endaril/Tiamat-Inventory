@@ -313,16 +313,12 @@ public class Attacks
         if (ratio <= 0) return;
 
         Vec3d motion = new Vec3d(target.motionX, target.motionY, target.motionZ);
-        System.out.println(target.getName());
-        System.out.println(motion);
         if (!target.onGround) force *= 2;
         else motion.scale(0.5);
 
         target.isAirBorne = true;
 
         motion = motion.add(directionVector.normalize().scale(force * ratio));
-        System.out.println(motion);
-        System.out.println();
 
         target.motionX = motion.x;
         target.motionY = motion.y;
