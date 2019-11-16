@@ -29,7 +29,6 @@ public class TiamatInventoryGUI extends GuiContainer
         allowUserInput = true;
     }
 
-    private float oldMouseX, oldMouseY;
     private boolean buttonClicked;
 
     public void initGui()
@@ -45,8 +44,6 @@ public class TiamatInventoryGUI extends GuiContainer
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         renderHoveredToolTip(mouseX, mouseY);
-        oldMouseX = mouseX;
-        oldMouseY = mouseY;
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
@@ -63,7 +60,7 @@ public class TiamatInventoryGUI extends GuiContainer
         bufferbuilder.pos(guiLeft, guiTop, zLevel).tex(uOffset * U_PIXEL, vOffset * V_PIXEL).endVertex();
         tessellator.draw();
 
-        drawEntityOnScreen(guiLeft + 51, guiTop + 75, 30, (float) (guiLeft + 51) - oldMouseX, (float) (guiTop + 75 - 50) - oldMouseY, mc.player);
+        drawEntityOnScreen(guiLeft + 60, guiTop + 51 + 30, 30, 0, 0, mc.player);
     }
 
     public static void drawEntityOnScreen(int posX, int posY, int scale, float mouseX, float mouseY, EntityLivingBase ent)
