@@ -1,6 +1,8 @@
 package com.fantasticsource.tiamatrpgmain.gui;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -135,13 +137,36 @@ public class TiamatInventoryGUI extends GuiContainer
                 break;
 
             case 1:
+                xSize = 249;
+                ySize = 197;
+                uOffset = 0;
+                vOffset = 256;
                 break;
 
             case 2:
+                xSize = 249;
+                ySize = 197;
+                uOffset = 256;
+                vOffset = 0;
                 break;
         }
 
         guiTop = (height - ySize) >> 1;
         guiLeft = (width - xSize) >> 1;
+
+        //Tab buttons
+        GuiButtonImage button = new GuiButtonImage(0, guiLeft + 230, guiTop + 4, 19, 31, TEXTURE_W - 19, TEXTURE_H - 31, 0, TEXTURE);
+        buttonList.add(button);
+        button = new GuiButtonImage(1, guiLeft + 230, guiTop + 36, 19, 31, TEXTURE_W - 19, TEXTURE_H - 31, 0, TEXTURE);
+        buttonList.add(button);
+        button = new GuiButtonImage(2, guiLeft + 230, guiTop + 68, 19, 31, TEXTURE_W - 19, TEXTURE_H - 31, 0, TEXTURE);
+        buttonList.add(button);
+    }
+
+    protected void actionPerformed(GuiButton button)
+    {
+        buttonClicked = true;
+
+        if (button.id <= 2) setTab(button.id);
     }
 }
