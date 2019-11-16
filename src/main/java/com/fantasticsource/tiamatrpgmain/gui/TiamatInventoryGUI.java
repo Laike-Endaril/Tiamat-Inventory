@@ -2,21 +2,27 @@ package com.fantasticsource.tiamatrpgmain.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 
 import static com.fantasticsource.tiamatrpgmain.Keys.TIAMAT_INVENTORY_KEY;
+import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
 
 public class TiamatInventoryGUI extends GuiContainer
 {
+    private static int tab = 0;
+    private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
+    private static final int TEXTURE_W = 512, TEXTURE_H = 512;
+    private static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
+
+    private int uOffset, vOffset;
+
     public TiamatInventoryGUI(EntityPlayer player)
     {
         super(player.inventoryContainer);
@@ -26,33 +32,10 @@ public class TiamatInventoryGUI extends GuiContainer
     private float oldMouseX, oldMouseY;
     private boolean buttonClicked;
 
-    public void updateScreen()
-    {
-        if (mc.playerController.isInCreativeMode())
-        {
-            mc.displayGuiScreen(new GuiContainerCreative(mc.player));
-        }
-    }
-
     public void initGui()
     {
-        buttonList.clear();
-
-        if (mc.playerController.isInCreativeMode())
-        {
-            mc.displayGuiScreen(new GuiContainerCreative(mc.player));
-        }
-        else
-        {
-            super.initGui();
-        }
-
-        guiLeft = (width - xSize) >> 1;
-    }
-
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-    {
-        fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
+        setTab(tab);
+        super.initGui();
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
@@ -62,26 +45,33 @@ public class TiamatInventoryGUI extends GuiContainer
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         renderHoveredToolTip(mouseX, mouseY);
-        oldMouseX = (float) mouseX;
-        oldMouseY = (float) mouseY;
+        oldMouseX = mouseX;
+        oldMouseY = mouseY;
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1, 1, 1, 1);
-        mc.getTextureManager().bindTexture(INVENTORY_BACKGROUND);
-        int i = guiLeft;
-        int j = guiTop;
-        drawTexturedModalRect(i, j, 0, 0, xSize, ySize);
-        drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - oldMouseX, (float) (j + 75 - 50) - oldMouseY, mc.player);
+        mc.getTextureManager().bindTexture(TEXTURE);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+        bufferbuilder.pos(guiLeft, guiTop + ySize, zLevel).tex(uOffset * U_PIXEL, (vOffset + ySize) * V_PIXEL).endVertex();
+        bufferbuilder.pos(guiLeft + xSize, guiTop + ySize, zLevel).tex((uOffset + xSize) * U_PIXEL, (vOffset + ySize) * V_PIXEL).endVertex();
+        bufferbuilder.pos(guiLeft + xSize, guiTop, zLevel).tex((uOffset + xSize) * U_PIXEL, vOffset * V_PIXEL).endVertex();
+        bufferbuilder.pos(guiLeft, guiTop, zLevel).tex(uOffset * U_PIXEL, vOffset * V_PIXEL).endVertex();
+        tessellator.draw();
+
+        drawEntityOnScreen(guiLeft + 51, guiTop + 75, 30, (float) (guiLeft + 51) - oldMouseX, (float) (guiTop + 75 - 50) - oldMouseY, mc.player);
     }
 
     public static void drawEntityOnScreen(int posX, int posY, int scale, float mouseX, float mouseY, EntityLivingBase ent)
     {
         GlStateManager.enableColorMaterial();
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float) posX, (float) posY, 50);
-        GlStateManager.scale((float) (-scale), (float) scale, (float) scale);
+        GlStateManager.translate(posX, posY, 50);
+        GlStateManager.scale(-scale, scale, scale);
         GlStateManager.rotate(180, 0, 0, 1);
         float f = ent.renderYawOffset;
         float f1 = ent.rotationYaw;
@@ -130,5 +120,31 @@ public class TiamatInventoryGUI extends GuiContainer
         {
             Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI(Minecraft.getMinecraft().player));
         }
+    }
+
+    private void setTab(int tab)
+    {
+        TiamatInventoryGUI.tab = tab;
+
+        buttonList.clear();
+
+        switch (tab)
+        {
+            case 0:
+                xSize = 249;
+                ySize = 197;
+                uOffset = 0;
+                vOffset = 0;
+                break;
+
+            case 1:
+                break;
+
+            case 2:
+                break;
+        }
+
+        guiTop = (height - ySize) >> 1;
+        guiLeft = (width - xSize) >> 1;
     }
 }
