@@ -1,22 +1,26 @@
 package com.fantasticsource.tiamatrpgmain.gui;
 
+import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
+import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
+
 public class TiamatInventoryContainer extends Container
 {
     private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
-    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
-    public InventoryCraftResult craftResult = new InventoryCraftResult();
     public boolean isLocalWorld;
     private final EntityPlayer player;
 
@@ -24,18 +28,9 @@ public class TiamatInventoryContainer extends Container
     {
         player = playerIn;
         InventoryPlayer playerInventory = playerIn.inventory;
-
         isLocalWorld = !playerIn.world.isRemote;
-        addSlotToContainer(new SlotCrafting(playerInventory.player, craftMatrix, craftResult, 0, 154, 28));
 
-        for (int i = 0; i < 2; ++i)
-        {
-            for (int j = 0; j < 2; ++j)
-            {
-                addSlotToContainer(new Slot(craftMatrix, j + i * 2, 98 + j * 18, 18 + i * 18));
-            }
-        }
-
+        //Armor
         for (int k = 0; k < 4; ++k)
         {
             final EntityEquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[k];
@@ -66,6 +61,7 @@ public class TiamatInventoryContainer extends Container
             });
         }
 
+        //Main inventory
         for (int l = 0; l < 3; ++l)
         {
             for (int j1 = 0; j1 < 9; ++j1)
@@ -74,36 +70,15 @@ public class TiamatInventoryContainer extends Container
             }
         }
 
+        //Hotbar
         for (int i1 = 0; i1 < 9; ++i1)
         {
             addSlotToContainer(new Slot(playerInventory, i1, 8 + i1 * 18, 142));
         }
 
-        addSlotToContainer(new Slot(playerInventory, 40, 77, 62)
-        {
-            @Nullable
-            @SideOnly(Side.CLIENT)
-            public String getSlotTexture()
-            {
-                return "minecraft:items/empty_armor_slot_shield";
-            }
-        });
-    }
-
-    public void onCraftMatrixChanged(IInventory inventoryIn)
-    {
-        slotChangedCraftingGrid(player.world, player, craftMatrix, craftResult);
-    }
-
-    public void onContainerClosed(EntityPlayer playerIn)
-    {
-        super.onContainerClosed(playerIn);
-        craftResult.clear();
-
-        if (!playerIn.world.isRemote)
-        {
-            clearContainer(playerIn, playerIn.world, craftMatrix);
-        }
+        //Offhand
+        TexturedSlot slot = new TexturedSlot(playerInventory, 40, 77, 62, 112, 496);
+        addSlotToContainer(slot);
     }
 
     public boolean canInteractWith(EntityPlayer playerIn)
@@ -203,10 +178,5 @@ public class TiamatInventoryContainer extends Container
         }
 
         return itemstack;
-    }
-
-    public boolean canMergeSlot(ItemStack stack, Slot slotIn)
-    {
-        return slotIn.inventory != craftResult && super.canMergeSlot(stack, slotIn);
     }
 }

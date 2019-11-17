@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatrpgmain.gui;
 
+import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import moe.plushie.armourers_workshop.common.network.PacketHandler;
 import moe.plushie.armourers_workshop.common.network.messages.client.MessageClientKeyPress;
 import net.minecraft.client.Minecraft;
@@ -10,8 +11,13 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -20,6 +26,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import static com.fantasticsource.tiamatrpgmain.Keys.TIAMAT_INVENTORY_KEY;
 import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
 
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
@@ -154,6 +161,133 @@ public class TiamatInventoryGUI extends GuiContainer
         {
             reopen = false;
             Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
+        }
+    }
+
+    @Override
+    public void drawSlot(Slot slot)
+    {
+        int x = slot.xPos;
+        int y = slot.yPos;
+        ItemStack itemstack = slot.getStack();
+        boolean flag = false;
+        boolean flag1 = slot == this.clickedSlot && !this.draggedStack.isEmpty() && !this.isRightMouseClick;
+        ItemStack itemstack1 = this.mc.player.inventory.getItemStack();
+        String s = null;
+
+        if (slot == this.clickedSlot && !this.draggedStack.isEmpty() && this.isRightMouseClick && !itemstack.isEmpty())
+        {
+            itemstack = itemstack.copy();
+            itemstack.setCount(itemstack.getCount() / 2);
+        }
+        else if (this.dragSplitting && this.dragSplittingSlots.contains(slot) && !itemstack1.isEmpty())
+        {
+            if (this.dragSplittingSlots.size() == 1)
+            {
+                return;
+            }
+
+            if (Container.canAddItemToSlot(slot, itemstack1, true) && this.inventorySlots.canDragIntoSlot(slot))
+            {
+                itemstack = itemstack1.copy();
+                flag = true;
+                Container.computeStackSize(this.dragSplittingSlots, this.dragSplittingLimit, itemstack, slot.getStack().isEmpty() ? 0 : slot.getStack().getCount());
+                int k = Math.min(itemstack.getMaxStackSize(), slot.getItemStackLimit(itemstack));
+
+                if (itemstack.getCount() > k)
+                {
+                    s = TextFormatting.YELLOW.toString() + k;
+                    itemstack.setCount(k);
+                }
+            }
+            else
+            {
+                this.dragSplittingSlots.remove(slot);
+                this.updateDragSplitting();
+            }
+        }
+
+        this.zLevel = 100.0F;
+        this.itemRender.zLevel = 100.0F;
+
+        if (itemstack.isEmpty() && slot.isEnabled())
+        {
+            if (slot instanceof TexturedSlot)
+            {
+                TexturedSlot texturedSlot = (TexturedSlot) slot;
+                int u = texturedSlot.u, v = texturedSlot.v;
+
+                mc.getTextureManager().bindTexture(TEXTURE);
+
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder bufferbuilder = tessellator.getBuffer();
+                bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+                bufferbuilder.pos(x, y + 16, zLevel).tex(u * U_PIXEL, (v + 16) * V_PIXEL).endVertex();
+                bufferbuilder.pos(x + 16, y + 16, zLevel).tex((u + 16) * U_PIXEL, (v + 16) * V_PIXEL).endVertex();
+                bufferbuilder.pos(x + 16, y, zLevel).tex((u + 16) * U_PIXEL, v * V_PIXEL).endVertex();
+                bufferbuilder.pos(x, y, zLevel).tex(u * U_PIXEL, v * V_PIXEL).endVertex();
+                tessellator.draw();
+            }
+            else
+            {
+                TextureAtlasSprite textureatlassprite = slot.getBackgroundSprite();
+                if (textureatlassprite != null)
+                {
+                    GlStateManager.disableLighting();
+                    mc.getTextureManager().bindTexture(slot.getBackgroundLocation());
+                    drawTexturedModalRect(x, y, textureatlassprite, 16, 16);
+                    GlStateManager.enableLighting();
+                    flag1 = true;
+                }
+            }
+        }
+
+        if (!flag1)
+        {
+            if (flag)
+            {
+                drawRect(x, y, x + 16, y + 16, -2130706433);
+            }
+
+            GlStateManager.enableDepth();
+            this.itemRender.renderItemAndEffectIntoGUI(this.mc.player, itemstack, x, y);
+            this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, itemstack, x, y, s);
+        }
+
+        this.itemRender.zLevel = 0.0F;
+        this.zLevel = 0.0F;
+    }
+
+    public void updateDragSplitting()
+    {
+        ItemStack itemstack = this.mc.player.inventory.getItemStack();
+
+        if (!itemstack.isEmpty() && this.dragSplitting)
+        {
+            if (this.dragSplittingLimit == 2)
+            {
+                this.dragSplittingRemnant = itemstack.getMaxStackSize();
+            }
+            else
+            {
+                this.dragSplittingRemnant = itemstack.getCount();
+
+                for (Slot slot : this.dragSplittingSlots)
+                {
+                    ItemStack itemstack1 = itemstack.copy();
+                    ItemStack itemstack2 = slot.getStack();
+                    int i = itemstack2.isEmpty() ? 0 : itemstack2.getCount();
+                    Container.computeStackSize(this.dragSplittingSlots, this.dragSplittingLimit, itemstack1, i);
+                    int j = Math.min(itemstack1.getMaxStackSize(), slot.getItemStackLimit(itemstack1));
+
+                    if (itemstack1.getCount() > j)
+                    {
+                        itemstack1.setCount(j);
+                    }
+
+                    this.dragSplittingRemnant -= itemstack1.getCount() - i;
+                }
+            }
         }
     }
 }
