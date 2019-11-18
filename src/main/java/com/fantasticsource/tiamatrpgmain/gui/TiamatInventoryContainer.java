@@ -23,7 +23,7 @@ public class TiamatInventoryContainer extends Container
     {
         player = playerIn;
         InventoryPlayer playerInventory = playerIn.inventory;
-        InventoryTiamatPlayer tiamatPlayerInventory = InventoryTiamatPlayer.tiamatInventories.get(playerIn.getPersistentID());
+        TiamatPlayerInventory tiamatPlayerInventory = TiamatPlayerInventory.tiamatInventories.get(playerIn.getPersistentID());
 
         //Offhand slots
         //Index 0 - 1

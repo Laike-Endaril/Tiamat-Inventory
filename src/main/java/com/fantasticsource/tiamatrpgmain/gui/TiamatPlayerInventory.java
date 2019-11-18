@@ -1,12 +1,8 @@
 package com.fantasticsource.tiamatrpgmain.gui;
 
 import com.fantasticsource.mctools.MCTools;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.RecipeItemHelper;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.Item;
@@ -15,13 +11,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.ReportedException;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,14 +22,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.UUID;
 
-public class InventoryTiamatPlayer implements IInventory
+public class TiamatPlayerInventory implements IInventory
 {
-    public static LinkedHashMap<UUID, InventoryTiamatPlayer> tiamatInventories = new LinkedHashMap<>();
+    public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
 
-    public final NonNullList<ItemStack> mainInventory = NonNullList.withSize(36, ItemStack.EMPTY);
     public final NonNullList<ItemStack> armorInventory = NonNullList.withSize(4, ItemStack.EMPTY);
     public final NonNullList<ItemStack> offHandInventory = NonNullList.withSize(1, ItemStack.EMPTY);
     private final List<NonNullList<ItemStack>> allInventories;
@@ -45,9 +40,9 @@ public class InventoryTiamatPlayer implements IInventory
     private ItemStack itemStack;
     private int timesChanged;
 
-    public InventoryTiamatPlayer(EntityPlayer playerIn)
+    public TiamatPlayerInventory(EntityPlayer playerIn)
     {
-        allInventories = Arrays.asList(mainInventory, armorInventory, offHandInventory);
+        allInventories = Arrays.asList(armorInventory, offHandInventory);
         itemStack = ItemStack.EMPTY;
         player = playerIn;
     }
@@ -60,108 +55,6 @@ public class InventoryTiamatPlayer implements IInventory
     private boolean stackEqualExact(ItemStack stack1, ItemStack stack2)
     {
         return stack1.getItem() == stack2.getItem() && (!stack1.getHasSubtypes() || stack1.getMetadata() == stack2.getMetadata()) && ItemStack.areItemStackTagsEqual(stack1, stack2);
-    }
-
-    public int getFirstEmptyStack()
-    {
-        for (int i = 0; i < mainInventory.size(); ++i)
-        {
-            if (mainInventory.get(i).isEmpty())
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void setPickedItemStack(ItemStack stack)
-    {
-        int i = getSlotFor(stack);
-
-        if (i == -1)
-        {
-            currentItem = getBestHotbarSlot();
-
-            if (!mainInventory.get(currentItem).isEmpty())
-            {
-                int j = getFirstEmptyStack();
-
-                if (j != -1)
-                {
-                    mainInventory.set(j, mainInventory.get(currentItem));
-                }
-            }
-
-            mainInventory.set(currentItem, stack);
-        }
-        else
-        {
-            pickItem(i);
-        }
-    }
-
-    public void pickItem(int index)
-    {
-        currentItem = getBestHotbarSlot();
-        ItemStack itemstack = mainInventory.get(currentItem);
-        mainInventory.set(currentItem, mainInventory.get(index));
-        mainInventory.set(index, itemstack);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int getSlotFor(ItemStack stack)
-    {
-        for (int i = 0; i < mainInventory.size(); ++i)
-        {
-            if (!mainInventory.get(i).isEmpty() && stackEqualExact(stack, mainInventory.get(i)))
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    public int findSlotMatchingUnusedItem(ItemStack p_194014_1_)
-    {
-        for (int i = 0; i < mainInventory.size(); ++i)
-        {
-            ItemStack itemstack = mainInventory.get(i);
-
-            if (!mainInventory.get(i).isEmpty() && stackEqualExact(p_194014_1_, mainInventory.get(i)) && !mainInventory.get(i).isItemDamaged() && !itemstack.isItemEnchanted() && !itemstack.hasDisplayName())
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    public int getBestHotbarSlot()
-    {
-        for (int i = 0; i < 9; ++i)
-        {
-            int j = (currentItem + i) % 9;
-
-            if (mainInventory.get(j).isEmpty())
-            {
-                return j;
-            }
-        }
-
-        for (int k = 0; k < 9; ++k)
-        {
-            int l = (currentItem + k) % 9;
-
-            if (!mainInventory.get(l).isItemEnchanted())
-            {
-                return l;
-            }
-        }
-
-        return currentItem;
     }
 
     @SideOnly(Side.CLIENT)
@@ -179,7 +72,6 @@ public class InventoryTiamatPlayer implements IInventory
 
         for (currentItem -= direction; currentItem < 0; currentItem += 9)
         {
-            ;
         }
 
         while (currentItem >= 9)
@@ -257,18 +149,6 @@ public class InventoryTiamatPlayer implements IInventory
         return i;
     }
 
-    private int storePartialItemStack(ItemStack itemStackIn)
-    {
-        int i = storeItemStack(itemStackIn);
-
-        if (i == -1)
-        {
-            i = getFirstEmptyStack();
-        }
-
-        return i == -1 ? itemStackIn.getCount() : addResource(i, itemStackIn);
-    }
-
     private int addResource(int p_191973_1_, ItemStack p_191973_2_)
     {
         int i = p_191973_2_.getCount();
@@ -312,30 +192,6 @@ public class InventoryTiamatPlayer implements IInventory
         }
     }
 
-    public int storeItemStack(ItemStack itemStackIn)
-    {
-        if (canMergeStacks(getStackInSlot(currentItem), itemStackIn))
-        {
-            return currentItem;
-        }
-        else if (canMergeStacks(getStackInSlot(40), itemStackIn))
-        {
-            return 40;
-        }
-        else
-        {
-            for (int i = 0; i < mainInventory.size(); ++i)
-            {
-                if (canMergeStacks(mainInventory.get(i), itemStackIn))
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-    }
-
     public void decrementAnimations()
     {
         for (NonNullList<ItemStack> nonnulllist : allInventories)
@@ -357,122 +213,6 @@ public class InventoryTiamatPlayer implements IInventory
         }
     }
 
-    public boolean addItemStackToInventory(ItemStack itemStackIn)
-    {
-        return add(-1, itemStackIn);
-    }
-
-    public boolean add(int p_191971_1_, final ItemStack p_191971_2_)
-    {
-        if (p_191971_2_.isEmpty())
-        {
-            return false;
-        }
-        else
-        {
-            try
-            {
-                if (p_191971_2_.isItemDamaged())
-                {
-                    if (p_191971_1_ == -1)
-                    {
-                        p_191971_1_ = getFirstEmptyStack();
-                    }
-
-                    if (p_191971_1_ >= 0)
-                    {
-                        mainInventory.set(p_191971_1_, p_191971_2_.copy());
-                        mainInventory.get(p_191971_1_).setAnimationsToGo(5);
-                        p_191971_2_.setCount(0);
-                        return true;
-                    }
-                    else if (player.capabilities.isCreativeMode)
-                    {
-                        p_191971_2_.setCount(0);
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    int i;
-
-                    while (true)
-                    {
-                        i = p_191971_2_.getCount();
-
-                        if (p_191971_1_ == -1)
-                        {
-                            p_191971_2_.setCount(storePartialItemStack(p_191971_2_));
-                        }
-                        else
-                        {
-                            p_191971_2_.setCount(addResource(p_191971_1_, p_191971_2_));
-                        }
-
-                        if (p_191971_2_.isEmpty() || p_191971_2_.getCount() >= i)
-                        {
-                            break;
-                        }
-                    }
-
-                    if (p_191971_2_.getCount() == i && player.capabilities.isCreativeMode)
-                    {
-                        p_191971_2_.setCount(0);
-                        return true;
-                    }
-                    else
-                    {
-                        return p_191971_2_.getCount() < i;
-                    }
-                }
-            }
-            catch (Throwable throwable)
-            {
-                CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Adding item to inventory");
-                CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being added");
-                crashreportcategory.addCrashSection("Item ID", Item.getIdFromItem(p_191971_2_.getItem()));
-                crashreportcategory.addCrashSection("Item data", p_191971_2_.getMetadata());
-                crashreportcategory.addDetail("Registry Name", () -> String.valueOf(p_191971_2_.getItem().getRegistryName()));
-                crashreportcategory.addDetail("Item Class", () -> p_191971_2_.getItem().getClass().getName());
-                crashreportcategory.addDetail("Item name", p_191971_2_::getDisplayName);
-                throw new ReportedException(crashreport);
-            }
-        }
-    }
-
-    public void placeItemBackInInventory(World p_191975_1_, ItemStack p_191975_2_)
-    {
-        if (!p_191975_1_.isRemote)
-        {
-            while (!p_191975_2_.isEmpty())
-            {
-                int i = storeItemStack(p_191975_2_);
-
-                if (i == -1)
-                {
-                    i = getFirstEmptyStack();
-                }
-
-                if (i == -1)
-                {
-                    player.dropItem(p_191975_2_, false);
-                    break;
-                }
-
-                int j = p_191975_2_.getMaxStackSize() - getStackInSlot(i).getCount();
-
-                if (add(i, p_191975_2_.splitStack(j)))
-                {
-                    ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(-2, i, getStackInSlot(i)));
-                }
-            }
-        }
-    }
-
     public ItemStack decrStackSize(int index, int count)
     {
         List<ItemStack> list = null;
@@ -489,21 +229,6 @@ public class InventoryTiamatPlayer implements IInventory
         }
 
         return list != null && !list.get(index).isEmpty() ? ItemStackHelper.getAndSplit(list, index, count) : ItemStack.EMPTY;
-    }
-
-    public void deleteStack(ItemStack stack)
-    {
-        for (NonNullList<ItemStack> nonnulllist : allInventories)
-        {
-            for (int i = 0; i < nonnulllist.size(); ++i)
-            {
-                if (nonnulllist.get(i) == stack)
-                {
-                    nonnulllist.set(i, ItemStack.EMPTY);
-                    break;
-                }
-            }
-        }
     }
 
     public ItemStack removeStackFromSlot(int index)
@@ -554,31 +279,8 @@ public class InventoryTiamatPlayer implements IInventory
         }
     }
 
-    public float getDestroySpeed(IBlockState state)
-    {
-        float f = 1.0F;
-
-        if (!mainInventory.get(currentItem).isEmpty())
-        {
-            f *= mainInventory.get(currentItem).getDestroySpeed(state);
-        }
-
-        return f;
-    }
-
     public NBTTagList writeToNBT(NBTTagList nbtTagListIn)
     {
-        for (int i = 0; i < mainInventory.size(); ++i)
-        {
-            if (!mainInventory.get(i).isEmpty())
-            {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
-                nbttagcompound.setByte("Slot", (byte) i);
-                mainInventory.get(i).writeToNBT(nbttagcompound);
-                nbtTagListIn.appendTag(nbttagcompound);
-            }
-        }
-
         for (int j = 0; j < armorInventory.size(); ++j)
         {
             if (!armorInventory.get(j).isEmpty())
@@ -606,7 +308,6 @@ public class InventoryTiamatPlayer implements IInventory
 
     public void readFromNBT(NBTTagList nbtTagListIn)
     {
-        mainInventory.clear();
         armorInventory.clear();
         offHandInventory.clear();
 
@@ -618,11 +319,7 @@ public class InventoryTiamatPlayer implements IInventory
 
             if (!itemstack.isEmpty())
             {
-                if (j < mainInventory.size())
-                {
-                    mainInventory.set(j, itemstack);
-                }
-                else if (j >= 100 && j < armorInventory.size() + 100)
+                if (j >= 100 && j < armorInventory.size() + 100)
                 {
                     armorInventory.set(j - 100, itemstack);
                 }
@@ -636,19 +333,11 @@ public class InventoryTiamatPlayer implements IInventory
 
     public int getSizeInventory()
     {
-        return mainInventory.size() + armorInventory.size() + offHandInventory.size();
+        return armorInventory.size() + offHandInventory.size();
     }
 
     public boolean isEmpty()
     {
-        for (ItemStack itemstack : mainInventory)
-        {
-            if (!itemstack.isEmpty())
-            {
-                return false;
-            }
-        }
-
         for (ItemStack itemstack1 : armorInventory)
         {
             if (!itemstack1.isEmpty())
@@ -704,25 +393,6 @@ public class InventoryTiamatPlayer implements IInventory
     public int getInventoryStackLimit()
     {
         return 64;
-    }
-
-    public boolean canHarvestBlock(IBlockState state)
-    {
-        if (state.getMaterial().isToolNotRequired())
-        {
-            return true;
-        }
-        else
-        {
-            ItemStack itemstack = getStackInSlot(currentItem);
-            return !itemstack.isEmpty() && itemstack.canHarvestBlock(state);
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public ItemStack armorItemInSlot(int slotIn)
-    {
-        return armorInventory.get(slotIn);
     }
 
     public void damageArmor(float damage)
@@ -793,30 +463,14 @@ public class InventoryTiamatPlayer implements IInventory
         }
     }
 
-    public boolean hasItemStack(ItemStack itemStackIn)
+    public boolean hasItemStack(ItemStack itemStack)
     {
-        label23:
-
         for (List<ItemStack> list : allInventories)
         {
-            Iterator iterator = list.iterator();
-
-            while (true)
+            for (ItemStack stack : list)
             {
-                if (!iterator.hasNext())
-                {
-                    continue label23;
-                }
-
-                ItemStack itemstack = (ItemStack) iterator.next();
-
-                if (!itemstack.isEmpty() && itemstack.isItemEqual(itemStackIn))
-                {
-                    break;
-                }
+                if (!stack.isEmpty() && stack.isItemEqual(itemStack)) return true;
             }
-
-            return true;
         }
 
         return false;
@@ -835,14 +489,14 @@ public class InventoryTiamatPlayer implements IInventory
         return true;
     }
 
-    public void copyInventory(net.minecraft.entity.player.InventoryPlayer playerInventory)
+    public void copyInventory(TiamatPlayerInventory tiamatPlayerInventory)
     {
         for (int i = 0; i < getSizeInventory(); ++i)
         {
-            setInventorySlotContents(i, playerInventory.getStackInSlot(i));
+            setInventorySlotContents(i, tiamatPlayerInventory.getStackInSlot(i));
         }
 
-        currentItem = playerInventory.currentItem;
+        currentItem = tiamatPlayerInventory.currentItem;
     }
 
     public int getField(int id)
@@ -869,11 +523,6 @@ public class InventoryTiamatPlayer implements IInventory
 
     public void fillStackedContents(RecipeItemHelper helper, boolean p_194016_2_)
     {
-        for (ItemStack itemstack : mainInventory)
-        {
-            helper.accountStack(itemstack);
-        }
-
         if (p_194016_2_)
         {
             helper.accountStack(offHandInventory.get(0));
@@ -889,7 +538,7 @@ public class InventoryTiamatPlayer implements IInventory
 
     public static void serverStop(FMLServerStoppedEvent event)
     {
-        for (InventoryTiamatPlayer inventory : tiamatInventories.values())
+        for (TiamatPlayerInventory inventory : tiamatInventories.values())
         {
             //TODO save
         }
