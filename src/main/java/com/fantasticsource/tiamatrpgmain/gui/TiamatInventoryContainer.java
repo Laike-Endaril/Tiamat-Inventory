@@ -2,181 +2,112 @@ package com.fantasticsource.tiamatrpgmain.gui;
 
 import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
-import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
-
 public class TiamatInventoryContainer extends Container
 {
-    private static final EntityEquipmentSlot[] VALID_EQUIPMENT_SLOTS = new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
+    private static final EntityEquipmentSlot[] VALID_VANILLA_EQUIPMENT_SLOTS = new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
     public boolean isLocalWorld;
+
     private final EntityPlayer player;
 
     public TiamatInventoryContainer(EntityPlayer playerIn)
     {
         player = playerIn;
         InventoryPlayer playerInventory = playerIn.inventory;
+        InventoryTiamatPlayer tiamatPlayerInventory = InventoryTiamatPlayer.tiamatInventories.get(playerIn.getPersistentID());
         isLocalWorld = !playerIn.world.isRemote;
 
-        //Armor
-        for (int k = 0; k < 4; ++k)
+        //Offhand slots
+        //Index 0 - 1
+        //Internal index 0 (tiamat player inventory; inactive offhand), 40 (vanilla player inventory; active offhand)
+//        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496));
+        addSlotToContainer(new TexturedSlot(playerInventory, 40, 25, 209, 112, 496));
+
+        //Mainhand slots
+        //Index 2 - 3
+        //Internal index 1 (tiamat player inventory; inactive mainhand), 0 (vanilla player inventory; active mainhand)
+//        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 1, 43, 191, 96, 496));
+        addSlotToContainer(new TexturedSlot(playerInventory, 0, 43, 209, 96, 496));
+
+        //Hotbar, other than the first slot (which is done above and reserved for active weaponset
+        //Index 4 - 11
+        //Internal index 1 - 8 (vanilla player inventory)
+        for (int i = 1; i < 9; ++i)
         {
-            final EntityEquipmentSlot entityequipmentslot = VALID_EQUIPMENT_SLOTS[k];
-            addSlotToContainer(new Slot(playerInventory, 36 + (3 - k), 8, 8 + k * 18)
-            {
-                public int getSlotStackLimit()
-                {
-                    return 1;
-                }
-
-                public boolean isItemValid(ItemStack stack)
-                {
-                    return stack.getItem().isValidArmor(stack, entityequipmentslot, player);
-                }
-
-                public boolean canTakeStack(EntityPlayer playerIn)
-                {
-                    ItemStack itemstack = getStack();
-                    return !itemstack.isEmpty() && !playerIn.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.canTakeStack(playerIn);
-                }
-
-                @Nullable
-                @SideOnly(Side.CLIENT)
-                public String getSlotTexture()
-                {
-                    return ItemArmor.EMPTY_SLOT_NAMES[entityequipmentslot.getIndex()];
-                }
-            });
+            addSlotToContainer(new Slot(playerInventory, i, 63 + (i - 1) * 18, 209));
         }
 
         //Main inventory
-        for (int l = 0; l < 3; ++l)
+        //Index 13 - 39
+        //Internal index 9 - 35 (vanilla player inventory)
+        for (int yy = 0; yy < 3; ++yy)
         {
-            for (int j1 = 0; j1 < 9; ++j1)
+            for (int xx = 0; xx < 9; ++xx)
             {
-                addSlotToContainer(new Slot(playerInventory, j1 + (l + 1) * 9, 8 + j1 * 18, 84 + l * 18));
+                addSlotToContainer(new Slot(playerInventory, xx + (yy + 1) * 9, 43 + xx * 18, 133 + yy * 18));
             }
         }
 
-        //Hotbar
-        for (int i1 = 0; i1 < 9; ++i1)
-        {
-            addSlotToContainer(new Slot(playerInventory, i1, 8 + i1 * 18, 142));
-        }
+        //Armor slots
+        //Index 40 - 45
+        //Internal indices...
+        //...39 (vanilla head)
+        //...2 (tiamat shoulders)
+        //...3 (tiamat cape)
+        //...38 (vanilla chest)
+        //...37 (vanilla legs)
+        //...36 (vanilla feet)
+        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.HEAD, 39, 7, 22, 0, 496);
+//        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 2, 7, 40, 16, 496));
+//        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 3, 7, 58, 32, 496));
+        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.CHEST, 38, 7, 76, 48, 496);
+        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.LEGS, 37, 7, 94, 64, 496);
+        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.FEET, 36, 7, 112, 80, 496);
+    }
 
-        //Offhand
-        TexturedSlot slot = new TexturedSlot(playerInventory, 40, 77, 62, 112, 496);
-        addSlotToContainer(slot);
+    private void addVanillaEquipmentSlot(IInventory inventory, EntityEquipmentSlot slotEnum, int index, int x, int y, int u, int v)
+    {
+        addSlotToContainer(new TexturedSlot(inventory, index, x, y, u, v)
+        {
+            public int getSlotStackLimit()
+            {
+                return 1;
+            }
+
+            public boolean isItemValid(ItemStack stack)
+            {
+                return stack.getItem().isValidArmor(stack, slotEnum, player);
+            }
+
+            public boolean canTakeStack(EntityPlayer playerIn)
+            {
+                ItemStack itemstack = getStack();
+                return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(itemstack)) && super.canTakeStack(playerIn);
+            }
+
+            @Nullable
+            @SideOnly(Side.CLIENT)
+            public String getSlotTexture()
+            {
+                return ItemArmor.EMPTY_SLOT_NAMES[slotEnum.getIndex()];
+            }
+        });
     }
 
     public boolean canInteractWith(EntityPlayer playerIn)
     {
         return true;
-    }
-
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
-    {
-        ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = inventorySlots.get(index);
-
-        if (slot != null && slot.getHasStack())
-        {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-            EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(itemstack);
-
-            if (index == 0)
-            {
-                if (!mergeItemStack(itemstack1, 9, 45, true))
-                {
-                    return ItemStack.EMPTY;
-                }
-
-                slot.onSlotChange(itemstack1, itemstack);
-            }
-            else if (index < 5)
-            {
-                if (!mergeItemStack(itemstack1, 9, 45, false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (index < 9)
-            {
-                if (!mergeItemStack(itemstack1, 9, 45, false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.ARMOR && !inventorySlots.get(8 - entityequipmentslot.getIndex()).getHasStack())
-            {
-                int i = 8 - entityequipmentslot.getIndex();
-
-                if (!mergeItemStack(itemstack1, i, i + 1, false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (entityequipmentslot == EntityEquipmentSlot.OFFHAND && !inventorySlots.get(45).getHasStack())
-            {
-                if (!mergeItemStack(itemstack1, 45, 46, false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (index < 36)
-            {
-                if (!mergeItemStack(itemstack1, 36, 45, false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (index < 45)
-            {
-                if (!mergeItemStack(itemstack1, 9, 36, false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (!mergeItemStack(itemstack1, 9, 45, false))
-            {
-                return ItemStack.EMPTY;
-            }
-
-            if (itemstack1.isEmpty())
-            {
-                slot.putStack(ItemStack.EMPTY);
-            }
-            else
-            {
-                slot.onSlotChanged();
-            }
-
-            if (itemstack1.getCount() == itemstack.getCount())
-            {
-                return ItemStack.EMPTY;
-            }
-
-            ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
-
-            if (index == 0)
-            {
-                playerIn.dropItem(itemstack2, false);
-            }
-        }
-
-        return itemstack;
     }
 }

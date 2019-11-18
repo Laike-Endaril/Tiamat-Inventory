@@ -105,21 +105,21 @@ public class TiamatInventoryGUI extends GuiContainer
         {
             case 0:
                 xSize = 250;
-                ySize = 214;
+                ySize = 232;
                 uOffset = 0;
                 vOffset = 0;
                 break;
 
             case 1:
                 xSize = 250;
-                ySize = 214;
+                ySize = 232;
                 uOffset = 0;
                 vOffset = 256;
                 break;
 
             case 2:
                 xSize = 250;
-                ySize = 214;
+                ySize = 232;
                 uOffset = 256;
                 vOffset = 0;
                 break;
