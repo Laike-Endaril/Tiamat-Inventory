@@ -17,9 +17,6 @@ import javax.annotation.Nullable;
 
 public class TiamatInventoryContainer extends Container
 {
-    private static final EntityEquipmentSlot[] VALID_VANILLA_EQUIPMENT_SLOTS = new EntityEquipmentSlot[]{EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
-    public boolean isLocalWorld;
-
     private final EntityPlayer player;
 
     public TiamatInventoryContainer(EntityPlayer playerIn)
@@ -27,7 +24,6 @@ public class TiamatInventoryContainer extends Container
         player = playerIn;
         InventoryPlayer playerInventory = playerIn.inventory;
         InventoryTiamatPlayer tiamatPlayerInventory = InventoryTiamatPlayer.tiamatInventories.get(playerIn.getPersistentID());
-        isLocalWorld = !playerIn.world.isRemote;
 
         //Offhand slots
         //Index 0 - 1
