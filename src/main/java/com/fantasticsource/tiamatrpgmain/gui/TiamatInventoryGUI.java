@@ -210,8 +210,11 @@ public class TiamatInventoryGUI extends GuiContainer
 
         if (itemstack.isEmpty() && slot.isEnabled())
         {
+            GlStateManager.disableLighting();
+
             if (slot instanceof TexturedSlot)
             {
+
                 TexturedSlot texturedSlot = (TexturedSlot) slot;
                 int u = texturedSlot.u, v = texturedSlot.v;
 
@@ -231,13 +234,13 @@ public class TiamatInventoryGUI extends GuiContainer
                 TextureAtlasSprite textureatlassprite = slot.getBackgroundSprite();
                 if (textureatlassprite != null)
                 {
-                    GlStateManager.disableLighting();
                     mc.getTextureManager().bindTexture(slot.getBackgroundLocation());
                     drawTexturedModalRect(x, y, textureatlassprite, 16, 16);
-                    GlStateManager.enableLighting();
-                    flag1 = true;
                 }
             }
+
+            GlStateManager.enableLighting();
+            flag1 = true;
         }
 
         if (!flag1)
