@@ -4,7 +4,10 @@ import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.*;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -112,15 +115,5 @@ public class TiamatInventoryContainer extends Container
     {
         //TODO Shift-click support
         return ItemStack.EMPTY;
-    }
-
-    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player)
-    {
-
-        ItemStack itemstack = super.slotClick(slotId, dragType, clickTypeIn, player);
-
-        System.out.println(itemstack);
-
-        return itemstack;
     }
 }
