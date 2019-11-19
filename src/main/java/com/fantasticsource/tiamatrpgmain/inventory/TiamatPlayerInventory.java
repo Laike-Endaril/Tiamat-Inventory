@@ -574,17 +574,30 @@ public class TiamatPlayerInventory implements IInventory
             NBTTagCompound compound = new NBTTagCompound();
             compound.setTag("inventory", list);
 
-            File file1 = new File(playerDataFolder.getAbsolutePath() + File.separator + MODID + File.separator + player.getPersistentID() + "_inventory.dat.tmp");
-            File file2 = new File(playerDataFolder.getAbsolutePath() + File.separator + MODID + File.separator + player.getPersistentID() + "_inventory.dat");
+            String path = playerDataFolder.getAbsolutePath();
+            File file = new File(path);
+            if (!file.exists()) file.mkdir();
+
+            path += File.separator + MODID;
+            file = new File(path);
+            if (!file.exists()) file.mkdir();
+
+            path += File.separator + player.getPersistentID();
+            file = new File(path);
+            if (!file.exists()) file.mkdir();
+
+            File file1 = new File(path + File.separator + "inventory.dat.tmp");
+            if (!file1.exists()) file1.createNewFile();
             CompressedStreamTools.writeCompressed(compound, new FileOutputStream(file1));
 
+            File file2 = new File(path + File.separator + "inventory.dat.tmp");
             if (file2.exists()) file2.delete();
-
             file1.renameTo(file2);
         }
         catch (Exception e)
         {
             System.err.println("Failed to save player data for " + player.getName());
+            e.printStackTrace();
         }
     }
 }
