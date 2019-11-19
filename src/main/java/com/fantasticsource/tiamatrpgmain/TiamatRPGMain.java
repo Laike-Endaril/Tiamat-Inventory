@@ -43,12 +43,12 @@ public class TiamatRPGMain
         MinecraftForge.EVENT_BUS.register(AffixesConfig.class);
         AffixesConfig.init();
         MinecraftForge.EVENT_BUS.register(Attacks.class);
-        MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
             //Physical client
             Keys.init(event);
+            MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
         }
     }
 

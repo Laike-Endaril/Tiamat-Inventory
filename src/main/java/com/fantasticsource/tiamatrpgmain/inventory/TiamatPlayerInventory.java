@@ -547,11 +547,11 @@ public class TiamatPlayerInventory implements IInventory
         NBTTagCompound compound = null;
         try
         {
-            File file1 = new File(playerDataFolder.getAbsolutePath() + File.separator + MODID + File.separator + player.getPersistentID() + "_inventory.dat");
+            File file = new File(playerDataFolder.getAbsolutePath() + File.separator + MODID + File.separator + player.getPersistentID() + File.separator + "inventory.dat");
 
-            if (file1.exists() && file1.isFile())
+            if (file.exists() && file.isFile())
             {
-                compound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
+                compound = CompressedStreamTools.readCompressed(new FileInputStream(file));
             }
         }
         catch (Exception var4)
@@ -590,7 +590,7 @@ public class TiamatPlayerInventory implements IInventory
             if (!file1.exists()) file1.createNewFile();
             CompressedStreamTools.writeCompressed(compound, new FileOutputStream(file1));
 
-            File file2 = new File(path + File.separator + "inventory.dat.tmp");
+            File file2 = new File(path + File.separator + "inventory.dat");
             if (file2.exists()) file2.delete();
             file1.renameTo(file2);
         }
