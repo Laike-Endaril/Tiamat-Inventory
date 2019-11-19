@@ -34,7 +34,7 @@ import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
 
 public class TiamatPlayerInventory implements IInventory
 {
-    public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatInventories = new LinkedHashMap<>();
+    public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatServerInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
 
     public final NonNullList<ItemStack> offhand = NonNullList.withSize(1, ItemStack.EMPTY);
@@ -62,25 +62,25 @@ public class TiamatPlayerInventory implements IInventory
     {
         EntityPlayer player = event.player;
         TiamatPlayerInventory inventory = new TiamatPlayerInventory(player);
-        tiamatInventories.put(player.getUniqueID(), inventory);
+        tiamatServerInventories.put(player.getUniqueID(), inventory);
 
         inventory.load();
     }
 
     public static void saveUnloadAll(FMLServerStoppedEvent event)
     {
-        for (TiamatPlayerInventory inventory : tiamatInventories.values())
+        for (TiamatPlayerInventory inventory : tiamatServerInventories.values())
         {
             inventory.save();
         }
-        tiamatInventories.clear();
+        tiamatServerInventories.clear();
         playerDataFolder = null;
     }
 
     public static void saveUnload(PlayerEvent.PlayerLoggedOutEvent event)
     {
         EntityPlayer player = event.player;
-        TiamatPlayerInventory inventory = tiamatInventories.remove(player.getUniqueID());
+        TiamatPlayerInventory inventory = tiamatServerInventories.remove(player.getUniqueID());
         if (inventory == null) return;
 
         inventory.save();
