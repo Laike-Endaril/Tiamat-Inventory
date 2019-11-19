@@ -1,5 +1,7 @@
-package com.fantasticsource.tiamatrpgmain.gui;
+package com.fantasticsource.tiamatrpgmain.inventory;
 
+import com.fantasticsource.tiamatrpgmain.Network;
+import com.fantasticsource.tiamatrpgmain.Network.OpenTiamatInventoryPacket;
 import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import moe.plushie.armourers_workshop.common.network.PacketHandler;
 import moe.plushie.armourers_workshop.common.network.messages.client.MessageClientKeyPress;
@@ -52,6 +54,7 @@ public class TiamatInventoryGUI extends GuiContainer
         if (TIAMAT_INVENTORY_KEY.isPressed() && TIAMAT_INVENTORY_KEY.getKeyConflictContext().isActive())
         {
             Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
+            Network.WRAPPER.sendToServer(new OpenTiamatInventoryPacket());
         }
     }
 

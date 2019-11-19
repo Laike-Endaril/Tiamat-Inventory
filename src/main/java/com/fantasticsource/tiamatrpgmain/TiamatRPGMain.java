@@ -1,8 +1,8 @@
 package com.fantasticsource.tiamatrpgmain;
 
 import com.fantasticsource.tiamatrpgmain.config.server.items.AffixesConfig;
-import com.fantasticsource.tiamatrpgmain.gui.TiamatInventoryGUI;
-import com.fantasticsource.tiamatrpgmain.gui.TiamatPlayerInventory;
+import com.fantasticsource.tiamatrpgmain.inventory.TiamatInventoryGUI;
+import com.fantasticsource.tiamatrpgmain.inventory.TiamatPlayerInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;

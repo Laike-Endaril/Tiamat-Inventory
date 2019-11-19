@@ -228,7 +228,7 @@ public class Attacks
     public static void attackAir(PlayerInteractEvent.LeftClickEmpty event)
     {
         //This event normally only happens client-side; need to send to server
-        Network.WRAPPER.sendToServer(new Network.LeftClickEmptyPacket());
+        Network.WRAPPER.sendToServer(new Network.OpenTiamatInventoryPacket());
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)

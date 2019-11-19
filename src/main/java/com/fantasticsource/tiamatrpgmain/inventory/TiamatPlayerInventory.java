@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain.gui;
+package com.fantasticsource.tiamatrpgmain.inventory;
 
 import com.fantasticsource.mctools.MCTools;
 import net.minecraft.entity.player.EntityPlayer;
