@@ -19,22 +19,26 @@ public class TiamatInventoryContainer extends Container
 {
     private final EntityPlayer player;
 
-    public TiamatInventoryContainer(EntityPlayer playerIn)
+    public TiamatInventoryContainer(EntityPlayer player)
     {
-        player = playerIn;
-        InventoryPlayer playerInventory = playerIn.inventory;
-        TiamatPlayerInventory tiamatPlayerInventory = TiamatPlayerInventory.tiamatInventories.get(playerIn.getPersistentID());
+        this.player = player;
+        InventoryPlayer playerInventory = player.inventory;
+        TiamatPlayerInventory tiamatPlayerInventory = TiamatPlayerInventory.tiamatInventories.get(player.getPersistentID());
+        if (tiamatPlayerInventory == null)
+        {
+            tiamatPlayerInventory = new TiamatPlayerInventory(player);
+        }
 
         //Offhand slots
         //Index 0 - 1
         //Internal index 0 (tiamat player inventory; inactive offhand), 40 (vanilla player inventory; active offhand)
-//        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496));
+        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496));
         addSlotToContainer(new TexturedSlot(playerInventory, 40, 25, 209, 112, 496));
 
         //Mainhand slots
         //Index 2 - 3
         //Internal index 1 (tiamat player inventory; inactive mainhand), 0 (vanilla player inventory; active mainhand)
-//        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 1, 43, 191, 96, 496));
+        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 1, 43, 191, 96, 496));
         addSlotToContainer(new TexturedSlot(playerInventory, 0, 43, 209, 96, 496));
 
         //Hotbar, other than the first slot (which is done above and reserved for active weaponset
@@ -66,8 +70,8 @@ public class TiamatInventoryContainer extends Container
         //...37 (vanilla legs)
         //...36 (vanilla feet)
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.HEAD, 39, 7, 22, 0, 496);
-//        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 2, 7, 40, 16, 496));
-//        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 3, 7, 58, 32, 496));
+        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 2, 7, 40, 16, 496));
+        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 3, 7, 58, 32, 496));
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.CHEST, 38, 7, 76, 48, 496);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.LEGS, 37, 7, 94, 64, 496);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.FEET, 36, 7, 112, 80, 496);

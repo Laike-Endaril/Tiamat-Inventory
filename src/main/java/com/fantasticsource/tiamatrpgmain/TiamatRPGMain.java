@@ -2,6 +2,7 @@ package com.fantasticsource.tiamatrpgmain;
 
 import com.fantasticsource.tiamatrpgmain.config.server.items.AffixesConfig;
 import com.fantasticsource.tiamatrpgmain.gui.TiamatInventoryGUI;
+import com.fantasticsource.tiamatrpgmain.gui.TiamatPlayerInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
@@ -13,8 +14,11 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
@@ -74,5 +78,30 @@ public class TiamatRPGMain
             //Edit existing attributes
             Attributes.editAttributes((EntityLivingBase) entity);
         }
+    }
+
+
+    @Mod.EventHandler
+    public static void serverStart(FMLServerStartingEvent event)
+    {
+        TiamatPlayerInventory.init(event);
+    }
+
+    @SubscribeEvent
+    public static void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        TiamatPlayerInventory.load(event);
+    }
+
+    @SubscribeEvent
+    public static void playerLogout(PlayerEvent.PlayerLoggedOutEvent event)
+    {
+        TiamatPlayerInventory.saveUnload(event);
+    }
+
+    @Mod.EventHandler
+    public static void serverStop(FMLServerStoppedEvent event)
+    {
+        TiamatPlayerInventory.saveUnloadAll(event);
     }
 }

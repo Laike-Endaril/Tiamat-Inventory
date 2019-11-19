@@ -31,13 +31,14 @@ import static org.lwjgl.opengl.GL11.GL_QUADS;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
 {
-    private static int tab = 0;
     private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
     private static final int TEXTURE_W = 512, TEXTURE_H = 512;
     private static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
+    private static int tab = 0;
     private static boolean reopen = false;
 
     private int uOffset, vOffset;
+    private boolean buttonClicked;
 
     public TiamatInventoryGUI()
     {
@@ -45,7 +46,24 @@ public class TiamatInventoryGUI extends GuiContainer
         allowUserInput = true;
     }
 
-    private boolean buttonClicked;
+    @SubscribeEvent
+    public static void keyPress(InputEvent.KeyInputEvent event)
+    {
+        if (TIAMAT_INVENTORY_KEY.isPressed() && TIAMAT_INVENTORY_KEY.getKeyConflictContext().isActive())
+        {
+            Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
+        }
+    }
+
+    @SubscribeEvent
+    public static void clientTick(TickEvent.ClientTickEvent event)
+    {
+        if (reopen && Minecraft.getMinecraft().currentScreen == null)
+        {
+            reopen = false;
+            Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
+        }
+    }
 
     public void initGui()
     {
@@ -83,16 +101,6 @@ public class TiamatInventoryGUI extends GuiContainer
     {
         if (buttonClicked) buttonClicked = false;
         else super.mouseReleased(mouseX, mouseY, state);
-    }
-
-
-    @SubscribeEvent
-    public static void keyPress(InputEvent.KeyInputEvent event)
-    {
-        if (TIAMAT_INVENTORY_KEY.isPressed() && TIAMAT_INVENTORY_KEY.getKeyConflictContext().isActive())
-        {
-            Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
-        }
     }
 
     private void setTab(int tab)
@@ -151,16 +159,6 @@ public class TiamatInventoryGUI extends GuiContainer
         {
             reopen = true;
             PacketHandler.networkWrapper.sendToServer(new MessageClientKeyPress(MessageClientKeyPress.Button.OPEN_WARDROBE));
-        }
-    }
-
-    @SubscribeEvent
-    public static void clientTick(TickEvent.ClientTickEvent event)
-    {
-        if (reopen && Minecraft.getMinecraft().currentScreen == null)
-        {
-            reopen = false;
-            Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
         }
     }
 

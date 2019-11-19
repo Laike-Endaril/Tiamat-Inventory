@@ -1,13 +1,13 @@
 package com.fantasticsource.tiamatrpgmain.gui;
 
 import com.fantasticsource.mctools.MCTools;
-import net.minecraft.client.util.RecipeItemHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -17,23 +17,29 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
+
+import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
 
 public class TiamatPlayerInventory implements IInventory
 {
     public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
 
-    public final NonNullList<ItemStack> armorInventory = NonNullList.withSize(4, ItemStack.EMPTY);
-    public final NonNullList<ItemStack> offHandInventory = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> offhand = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> mainhand = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> armor = NonNullList.withSize(2, ItemStack.EMPTY);
     private final List<NonNullList<ItemStack>> allInventories;
     public int currentItem;
     public EntityPlayer player;
@@ -42,9 +48,42 @@ public class TiamatPlayerInventory implements IInventory
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
-        allInventories = Arrays.asList(armorInventory, offHandInventory);
+        allInventories = Arrays.asList(offhand, mainhand, armor);
         itemStack = ItemStack.EMPTY;
         player = playerIn;
+    }
+
+    public static void init(FMLServerStartingEvent event)
+    {
+        playerDataFolder = new File(MCTools.getPlayerDataDir(event.getServer()));
+    }
+
+    public static void load(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        EntityPlayer player = event.player;
+        TiamatPlayerInventory inventory = new TiamatPlayerInventory(player);
+        tiamatInventories.put(player.getUniqueID(), inventory);
+
+        inventory.load();
+    }
+
+    public static void saveUnloadAll(FMLServerStoppedEvent event)
+    {
+        for (TiamatPlayerInventory inventory : tiamatInventories.values())
+        {
+            inventory.save();
+        }
+        tiamatInventories.clear();
+        playerDataFolder = null;
+    }
+
+    public static void saveUnload(PlayerEvent.PlayerLoggedOutEvent event)
+    {
+        EntityPlayer player = event.player;
+        TiamatPlayerInventory inventory = tiamatInventories.remove(player.getUniqueID());
+        if (inventory == null) return;
+
+        inventory.save();
     }
 
     private boolean canMergeStacks(ItemStack stack1, ItemStack stack2)
@@ -204,7 +243,7 @@ public class TiamatPlayerInventory implements IInventory
                 }
             }
         }
-        for (ItemStack is : armorInventory) // FORGE: Tick armor on animation ticks
+        for (ItemStack is : armor) // FORGE: Tick armor on animation ticks
         {
             if (!is.isEmpty())
             {
@@ -281,26 +320,9 @@ public class TiamatPlayerInventory implements IInventory
 
     public NBTTagList writeToNBT(NBTTagList nbtTagListIn)
     {
-        for (int j = 0; j < armorInventory.size(); ++j)
+        for (int i = 0; i < getSizeInventory(); i++)
         {
-            if (!armorInventory.get(j).isEmpty())
-            {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte) (j + 100));
-                armorInventory.get(j).writeToNBT(nbttagcompound1);
-                nbtTagListIn.appendTag(nbttagcompound1);
-            }
-        }
-
-        for (int k = 0; k < offHandInventory.size(); ++k)
-        {
-            if (!offHandInventory.get(k).isEmpty())
-            {
-                NBTTagCompound nbttagcompound2 = new NBTTagCompound();
-                nbttagcompound2.setByte("Slot", (byte) (k + 150));
-                offHandInventory.get(k).writeToNBT(nbttagcompound2);
-                nbtTagListIn.appendTag(nbttagcompound2);
-            }
+            nbtTagListIn.appendTag(getStackInSlot(i).serializeNBT());
         }
 
         return nbtTagListIn;
@@ -308,47 +330,43 @@ public class TiamatPlayerInventory implements IInventory
 
     public void readFromNBT(NBTTagList nbtTagListIn)
     {
-        armorInventory.clear();
-        offHandInventory.clear();
+        clear();
 
-        for (int i = 0; i < nbtTagListIn.tagCount(); ++i)
+        for (int i = 0; i < getSizeInventory(); i++)
         {
-            NBTTagCompound nbttagcompound = nbtTagListIn.getCompoundTagAt(i);
-            int j = nbttagcompound.getByte("Slot") & 255;
-            ItemStack itemstack = new ItemStack(nbttagcompound);
+            NBTTagCompound compound = nbtTagListIn.getCompoundTagAt(i);
+            if (compound.hasNoTags()) return;
 
-            if (!itemstack.isEmpty())
-            {
-                if (j >= 100 && j < armorInventory.size() + 100)
-                {
-                    armorInventory.set(j - 100, itemstack);
-                }
-                else if (j >= 150 && j < offHandInventory.size() + 150)
-                {
-                    offHandInventory.set(j - 150, itemstack);
-                }
-            }
+            setInventorySlotContents(i, new ItemStack(compound));
         }
     }
 
     public int getSizeInventory()
     {
-        return armorInventory.size() + offHandInventory.size();
+        return offhand.size() + mainhand.size() + armor.size();
     }
 
     public boolean isEmpty()
     {
-        for (ItemStack itemstack1 : armorInventory)
+        for (ItemStack stack : offhand)
         {
-            if (!itemstack1.isEmpty())
+            if (!stack.isEmpty())
             {
                 return false;
             }
         }
 
-        for (ItemStack itemstack2 : offHandInventory)
+        for (ItemStack stack : mainhand)
         {
-            if (!itemstack2.isEmpty())
+            if (!stack.isEmpty())
+            {
+                return false;
+            }
+        }
+
+        for (ItemStack stack : armor)
+        {
+            if (!stack.isEmpty())
             {
                 return false;
             }
@@ -404,7 +422,7 @@ public class TiamatPlayerInventory implements IInventory
             damage = 1.0F;
         }
 
-        for (ItemStack itemstack : armorInventory)
+        for (ItemStack itemstack : armor)
         {
             if (itemstack.getItem() instanceof ItemArmor)
             {
@@ -441,14 +459,14 @@ public class TiamatPlayerInventory implements IInventory
         return timesChanged;
     }
 
-    public void setItemStack(ItemStack itemStackIn)
-    {
-        itemStack = itemStackIn;
-    }
-
     public ItemStack getItemStack()
     {
         return itemStack;
+    }
+
+    public void setItemStack(ItemStack itemStackIn)
+    {
+        itemStack = itemStackIn;
     }
 
     public boolean isUsableByPlayer(EntityPlayer player)
@@ -517,32 +535,56 @@ public class TiamatPlayerInventory implements IInventory
     {
         for (List<ItemStack> list : allInventories)
         {
-            list.clear();
+            for (int i = 0; i < list.size(); i++)
+            {
+                list.set(i, ItemStack.EMPTY);
+            }
         }
     }
 
-    public void fillStackedContents(RecipeItemHelper helper, boolean p_194016_2_)
+    private void load()
     {
-        if (p_194016_2_)
+        NBTTagCompound compound = null;
+        try
         {
-            helper.accountStack(offHandInventory.get(0));
+            File file1 = new File(playerDataFolder.getAbsolutePath() + File.separator + MODID + File.separator + player.getPersistentID() + "_inventory.dat");
+
+            if (file1.exists() && file1.isFile())
+            {
+                compound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
+            }
         }
-    }
-
-
-    public static void serverStart(FMLServerStartingEvent event)
-    {
-        playerDataFolder = new File(MCTools.getPlayerDataDir(event.getServer()));
-        //TODO load
-    }
-
-    public static void serverStop(FMLServerStoppedEvent event)
-    {
-        for (TiamatPlayerInventory inventory : tiamatInventories.values())
+        catch (Exception var4)
         {
-            //TODO save
+            System.err.println("Failed to load player data for" + player.getName());
         }
-        tiamatInventories.clear();
-        playerDataFolder = null;
+
+        if (compound != null)
+        {
+            readFromNBT((NBTTagList) compound.getTag("inventory"));
+        }
+    }
+
+    private void save()
+    {
+        try
+        {
+            NBTTagList list = new NBTTagList();
+            writeToNBT(list);
+            NBTTagCompound compound = new NBTTagCompound();
+            compound.setTag("inventory", list);
+
+            File file1 = new File(playerDataFolder.getAbsolutePath() + File.separator + MODID + File.separator + player.getPersistentID() + "_inventory.dat.tmp");
+            File file2 = new File(playerDataFolder.getAbsolutePath() + File.separator + MODID + File.separator + player.getPersistentID() + "_inventory.dat");
+            CompressedStreamTools.writeCompressed(compound, new FileOutputStream(file1));
+
+            if (file2.exists()) file2.delete();
+
+            file1.renameTo(file2);
+        }
+        catch (Exception e)
+        {
+            System.err.println("Failed to save player data for " + player.getName());
+        }
     }
 }
