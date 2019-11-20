@@ -40,6 +40,12 @@ public class TiamatPlayerInventory implements IInventory
     public final NonNullList<ItemStack> offhand = NonNullList.withSize(1, ItemStack.EMPTY);
     public final NonNullList<ItemStack> mainhand = NonNullList.withSize(1, ItemStack.EMPTY);
     public final NonNullList<ItemStack> armor = NonNullList.withSize(2, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> pet = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> classes = NonNullList.withSize(2, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> skills = NonNullList.withSize(18, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> gatherProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> craftingProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> craftingRecipes = NonNullList.withSize(15, ItemStack.EMPTY);
     private final List<NonNullList<ItemStack>> allInventories;
     public int currentItem;
     public EntityPlayer player;
@@ -48,7 +54,7 @@ public class TiamatPlayerInventory implements IInventory
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
-        allInventories = Arrays.asList(offhand, mainhand, armor);
+        allInventories = Arrays.asList(offhand, mainhand, armor, pet, classes, skills, gatherProfessions, craftingProfessions, craftingRecipes);
         itemStack = ItemStack.EMPTY;
         player = playerIn;
     }
@@ -343,32 +349,21 @@ public class TiamatPlayerInventory implements IInventory
 
     public int getSizeInventory()
     {
-        return offhand.size() + mainhand.size() + armor.size();
+        int i = 0;
+        for (List list : allInventories) i += list.size();
+        return i;
     }
 
     public boolean isEmpty()
     {
-        for (ItemStack stack : offhand)
+        for (List<ItemStack> list : allInventories)
         {
-            if (!stack.isEmpty())
+            for (ItemStack stack : list)
             {
-                return false;
-            }
-        }
-
-        for (ItemStack stack : mainhand)
-        {
-            if (!stack.isEmpty())
-            {
-                return false;
-            }
-        }
-
-        for (ItemStack stack : armor)
-        {
-            if (!stack.isEmpty())
-            {
-                return false;
+                if (!stack.isEmpty())
+                {
+                    return false;
+                }
             }
         }
 

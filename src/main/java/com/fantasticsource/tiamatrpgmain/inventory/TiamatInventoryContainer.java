@@ -3,7 +3,6 @@ package com.fantasticsource.tiamatrpgmain.inventory;
 import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -122,50 +121,37 @@ public class TiamatInventoryContainer extends Container
 
         ItemStack stack = slot.getStack();
 
-        //MAINHAND is the default value, and should be treated as if it were null
-        EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(stack);
-
         if (index <= 3)
         {
-            //From offhand or mainhand of either weaponset
+            //From any weaponset slot
             //To main inventory or hotbar, in that order
-            mergeItemStackRanges(stack, 12, 38);
-            mergeItemStackRanges(stack, 4, 11);
+            tryMergeItemStackRanges(stack, 12, 38);
+            tryMergeItemStackRanges(stack, 4, 11);
         }
         else if (index <= 11)
         {
             //From hotbar
-            //To any equipment slot, if applicable, or to a weaponset slot or main inventory otherwise
-            if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.HAND)
-            {
-                mergeItemStackRanges(stack, 0, 3);
-                mergeItemStackRanges(stack, 12, 38);
-            }
-            else
-            {
-                //TODO
-            }
+            //To any armor slot, if applicable, or to a weaponset slot or main inventory otherwise
+
+            tryMergeItemStackRanges(stack, 39, 44);
+            tryMergeItemStackRanges(stack, 0, 3);
+            tryMergeItemStackRanges(stack, 12, 38);
         }
         else if (index <= 38)
         {
             //From main inventory
             //To any equipment slot, if applicable, or to a weaponset slot or hotbar otherwise
-            if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.HAND)
-            {
-                mergeItemStackRanges(stack, 0, 3);
-                mergeItemStackRanges(stack, 4, 11);
-            }
-            else
-            {
-                //TODO
-            }
+            tryMergeItemStackRanges(stack, 39, 44);
+            tryMergeItemStackRanges(stack, 0, 3);
+            tryMergeItemStackRanges(stack, 4, 11);
         }
         else if (index <= 44)
         {
             //From armor slots
-            //To main inventory or hotbar, in that order
-            mergeItemStackRanges(stack, 12, 38);
-            mergeItemStackRanges(stack, 4, 11);
+            //To main inventory, hotbar, or weaponset slot, in that order
+            tryMergeItemStackRanges(stack, 12, 38);
+            tryMergeItemStackRanges(stack, 4, 11);
+            tryMergeItemStackRanges(stack, 0, 3);
         }
 
 
@@ -177,7 +163,7 @@ public class TiamatInventoryContainer extends Container
     }
 
 
-    public void mergeItemStackRanges(ItemStack stackFrom, int... ranges)
+    public void tryMergeItemStackRanges(ItemStack stackFrom, int... ranges)
     {
         if (stackFrom.isEmpty()) return;
 
@@ -192,6 +178,8 @@ public class TiamatInventoryContainer extends Container
                 for (int i = startIndex; i <= endIndex; i++)
                 {
                     Slot slot = this.inventorySlots.get(i);
+                    if (!slot.isItemValid(stackFrom)) continue;
+
                     ItemStack stackTo = slot.getStack();
                     if (!canCombine(stackFrom, stackTo)) continue;
 
@@ -221,6 +209,8 @@ public class TiamatInventoryContainer extends Container
                 for (int i = startIndex; i >= endIndex; i--)
                 {
                     Slot slot = this.inventorySlots.get(i);
+                    if (!slot.isItemValid(stackFrom)) continue;
+
                     ItemStack stackTo = slot.getStack();
                     if (!canCombine(stackFrom, stackTo)) continue;
 
