@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain.config.server.items;
+package com.fantasticsource.tiamatrpgmain.inventory;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;

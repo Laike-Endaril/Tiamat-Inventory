@@ -1,6 +1,5 @@
 package com.fantasticsource.tiamatrpgmain.inventory;
 
-import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,14 +32,14 @@ public class TiamatInventoryContainer extends Container
         //Vanilla mainhand and offhand
         //Index 0 - 1
         //Internal index 0 and 40 (vanilla player inventory; active mainhand and offhand)
-        addSlotToContainer(new TexturedSlot(playerInventory, 0, 43, 209, 96, 496));
-        addSlotToContainer(new TexturedSlot(playerInventory, 40, 25, 209, 112, 496));
+        addSlotToContainer(new TexturedFilteredSlot(playerInventory, 0, 43, 209, 96, 496, true, 1, stack -> getSlot(1).getStack().isEmpty() || !Equipment.isTwoHanded(stack)));
+        addSlotToContainer(new TexturedFilteredSlot(playerInventory, 40, 25, 209, 112, 496, true, 1, stack -> getSlot(0).getStack().isEmpty() || !Equipment.isTwoHanded(stack)));
 
         //Tiamat extra mainhand and offhand
         //Index 2 - 3
         //Internal index 1 and 0 (tiamat player inventory; inactive mainhand and offhand)
-        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 1, 43, 191, 96, 496));
-        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 1, 43, 191, 96, 496, false, 1, stack -> getSlot(3).getStack().isEmpty() || !Equipment.isTwoHanded(stack)));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496, false, 1, stack -> getSlot(2).getStack().isEmpty() || !Equipment.isTwoHanded(stack)));
 
         //Hotbar, other than the first slot (which is done above and reserved for active weaponset
         //Index 4 - 11
@@ -71,8 +70,8 @@ public class TiamatInventoryContainer extends Container
         //...37 (vanilla legs)
         //...36 (vanilla feet)
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.HEAD, 39, 7, 22, 0, 496);
-        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 2, 7, 40, 16, 496));
-        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 3, 7, 58, 32, 496));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 2, 7, 40, 16, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Shoulder")));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 3, 7, 58, 32, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Cape")));
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.CHEST, 38, 7, 76, 48, 496);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.LEGS, 37, 7, 94, 64, 496);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.FEET, 36, 7, 112, 80, 496);
@@ -95,7 +94,7 @@ public class TiamatInventoryContainer extends Container
             public boolean canTakeStack(EntityPlayer playerIn)
             {
                 ItemStack itemstack = getStack();
-                return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(itemstack)) && super.canTakeStack(playerIn);
+                return (itemstack.isEmpty() || playerIn.isCreative() || !EnchantmentHelper.hasBindingCurse(itemstack));
             }
 
             @Nullable

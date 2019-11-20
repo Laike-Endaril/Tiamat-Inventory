@@ -2,7 +2,6 @@ package com.fantasticsource.tiamatrpgmain.inventory;
 
 import com.fantasticsource.tiamatrpgmain.Network;
 import com.fantasticsource.tiamatrpgmain.Network.OpenTiamatInventoryPacket;
-import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import moe.plushie.armourers_workshop.common.network.PacketHandler;
 import moe.plushie.armourers_workshop.common.network.messages.client.MessageClientKeyPress;
 import net.minecraft.client.Minecraft;
