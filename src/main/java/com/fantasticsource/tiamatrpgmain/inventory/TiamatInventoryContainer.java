@@ -2,6 +2,7 @@ package com.fantasticsource.tiamatrpgmain.inventory;
 
 import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -29,17 +30,17 @@ public class TiamatInventoryContainer extends Container
             tiamatPlayerInventory = new TiamatPlayerInventory(player);
         }
 
-        //Offhand slots
+        //Vanilla mainhand and offhand
         //Index 0 - 1
-        //Internal index 0 (tiamat player inventory; inactive offhand), 40 (vanilla player inventory; active offhand)
-        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496));
+        //Internal index 0 and 40 (vanilla player inventory; active mainhand and offhand)
+        addSlotToContainer(new TexturedSlot(playerInventory, 0, 43, 209, 96, 496));
         addSlotToContainer(new TexturedSlot(playerInventory, 40, 25, 209, 112, 496));
 
-        //Mainhand slots
+        //Tiamat extra mainhand and offhand
         //Index 2 - 3
-        //Internal index 1 (tiamat player inventory; inactive mainhand), 0 (vanilla player inventory; active mainhand)
+        //Internal index 1 and 0 (tiamat player inventory; inactive mainhand and offhand)
         addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 1, 43, 191, 96, 496));
-        addSlotToContainer(new TexturedSlot(playerInventory, 0, 43, 209, 96, 496));
+        addSlotToContainer(new TexturedSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496));
 
         //Hotbar, other than the first slot (which is done above and reserved for active weaponset
         //Index 4 - 11
@@ -50,7 +51,7 @@ public class TiamatInventoryContainer extends Container
         }
 
         //Main inventory
-        //Index 13 - 39
+        //Index 12 - 38
         //Internal index 9 - 35 (vanilla player inventory)
         for (int yy = 0; yy < 3; ++yy)
         {
@@ -61,7 +62,7 @@ public class TiamatInventoryContainer extends Container
         }
 
         //Armor slots
-        //Index 40 - 45
+        //Index 39 - 44
         //Internal indices...
         //...39 (vanilla head)
         //...2 (tiamat shoulders)
@@ -113,7 +114,75 @@ public class TiamatInventoryContainer extends Container
 
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
     {
-        //TODO Shift-click support
-        return ItemStack.EMPTY;
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.inventorySlots.get(index);
+
+        if (slot != null && slot.getHasStack())
+        {
+            ItemStack itemstack1 = slot.getStack();
+            itemstack = itemstack1.copy();
+
+            //MAINHAND is the default value, and should be treated as if it were null
+            EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(itemstack);
+
+            if (index <= 3)
+            {
+                //From offhand or mainhand of either weaponset
+                //To main inventory or hotbar, in that order
+                if (!this.mergeItemStack(itemstack1, 4, 39, true))
+                {
+                    return ItemStack.EMPTY;
+                }
+            }
+            else if (index <= 11)
+            {
+                //From hotbar
+                //To any equipment slot, if applicable, or to main inventory otherwise
+                if (entityequipmentslot != EntityEquipmentSlot.MAINHAND)
+                {
+                    //TODO
+                }
+                else
+                {
+                    if (!this.mergeItemStack(itemstack1, 12, 39, true))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+            }
+            else if (index <= 38)
+            {
+                //From main inventory
+                //To any equipment slot, if applicable, or to a hand or the hotbar otherwise
+                if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.HAND)
+                {
+                    if (!this.mergeItemStack(itemstack1, 0, 12, false))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+                }
+                else
+                {
+                    //TODO
+                }
+            }
+            else if (index <= 44)
+            {
+                //From armor slots
+                //To main inventory or hotbar, in that order
+                if (!this.mergeItemStack(itemstack1, 4, 39, true))
+                {
+                    return ItemStack.EMPTY;
+                }
+            }
+
+
+            if (itemstack1.isEmpty()) slot.putStack(ItemStack.EMPTY);
+            else slot.onSlotChanged();
+
+            if (itemstack1.getCount() == itemstack.getCount()) return ItemStack.EMPTY;
+        }
+
+        return itemstack;
     }
 }
