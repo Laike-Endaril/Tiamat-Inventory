@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatrpgmain.inventory;
 
 import com.fantasticsource.tiamatrpgmain.config.server.items.TexturedSlot;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -112,77 +113,145 @@ public class TiamatInventoryContainer extends Container
         return true;
     }
 
+    //Returning ItemStack.EMPTY from this method indicates that we are done with the transfer.  Mine always finishes in one go, so it always returns ItemStack.EMPTY
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
     {
-        ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = inventorySlots.get(index);
+        if (slot == null || !slot.getHasStack()) return ItemStack.EMPTY;
 
-        if (slot != null && slot.getHasStack())
+
+        ItemStack stack = slot.getStack();
+
+        //MAINHAND is the default value, and should be treated as if it were null
+        EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(stack);
+
+        if (index <= 3)
         {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-
-            //MAINHAND is the default value, and should be treated as if it were null
-            EntityEquipmentSlot entityequipmentslot = EntityLiving.getSlotForItemStack(itemstack);
-
-            if (index <= 3)
+            //From offhand or mainhand of either weaponset
+            //To main inventory or hotbar, in that order
+            mergeItemStackRanges(stack, 12, 38);
+            mergeItemStackRanges(stack, 4, 11);
+        }
+        else if (index <= 11)
+        {
+            //From hotbar
+            //To any equipment slot, if applicable, or to a weaponset slot or main inventory otherwise
+            if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.HAND)
             {
-                //From offhand or mainhand of either weaponset
-                //To main inventory or hotbar, in that order
-                if (!this.mergeItemStack(itemstack1, 4, 39, true))
-                {
-                    return ItemStack.EMPTY;
-                }
+                mergeItemStackRanges(stack, 0, 3);
+                mergeItemStackRanges(stack, 12, 38);
             }
-            else if (index <= 11)
+            else
             {
-                //From hotbar
-                //To any equipment slot, if applicable, or to main inventory otherwise
-                if (entityequipmentslot != EntityEquipmentSlot.MAINHAND)
-                {
-                    //TODO
-                }
-                else
-                {
-                    if (!this.mergeItemStack(itemstack1, 12, 39, true))
-                    {
-                        return ItemStack.EMPTY;
-                    }
-                }
+                //TODO
             }
-            else if (index <= 38)
+        }
+        else if (index <= 38)
+        {
+            //From main inventory
+            //To any equipment slot, if applicable, or to a weaponset slot or hotbar otherwise
+            if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.HAND)
             {
-                //From main inventory
-                //To any equipment slot, if applicable, or to a hand or the hotbar otherwise
-                if (entityequipmentslot.getSlotType() == EntityEquipmentSlot.Type.HAND)
-                {
-                    if (!this.mergeItemStack(itemstack1, 0, 12, false))
-                    {
-                        return ItemStack.EMPTY;
-                    }
-                }
-                else
-                {
-                    //TODO
-                }
+                mergeItemStackRanges(stack, 0, 3);
+                mergeItemStackRanges(stack, 4, 11);
             }
-            else if (index <= 44)
+            else
             {
-                //From armor slots
-                //To main inventory or hotbar, in that order
-                if (!this.mergeItemStack(itemstack1, 4, 39, true))
-                {
-                    return ItemStack.EMPTY;
-                }
+                //TODO
             }
-
-
-            if (itemstack1.isEmpty()) slot.putStack(ItemStack.EMPTY);
-            else slot.onSlotChanged();
-
-            if (itemstack1.getCount() == itemstack.getCount()) return ItemStack.EMPTY;
+        }
+        else if (index <= 44)
+        {
+            //From armor slots
+            //To main inventory or hotbar, in that order
+            mergeItemStackRanges(stack, 12, 38);
+            mergeItemStackRanges(stack, 4, 11);
         }
 
-        return itemstack;
+
+        if (stack.isEmpty()) slot.putStack(ItemStack.EMPTY);
+        else slot.putStack(stack);
+
+        slot.onSlotChanged();
+        return ItemStack.EMPTY;
+    }
+
+
+    public void mergeItemStackRanges(ItemStack stackFrom, int... ranges)
+    {
+        if (stackFrom.isEmpty()) return;
+
+
+        for (int ii = 0; ii < ranges.length; ii += 2)
+        {
+            int startIndex = ranges[ii];
+            int endIndex = ranges[ii + 1];
+
+            if (startIndex <= endIndex)
+            {
+                for (int i = startIndex; i <= endIndex; i++)
+                {
+                    Slot slot = this.inventorySlots.get(i);
+                    ItemStack stackTo = slot.getStack();
+                    if (!canCombine(stackFrom, stackTo)) continue;
+
+                    int limit = Tools.min(stackTo.getMaxStackSize(), slot.getSlotStackLimit());
+                    if (!stackTo.isEmpty() && stackTo.getCount() >= limit) continue;
+
+
+                    int sum = stackTo.isEmpty() ? stackFrom.getCount() : stackFrom.getCount() + stackTo.getCount();
+
+                    if (stackTo.isEmpty()) slot.putStack(stackFrom.copy());
+
+                    if (sum <= limit)
+                    {
+                        stackTo.setCount(sum);
+                        stackFrom.setCount(0);
+                        return;
+                    }
+
+                    stackTo.setCount(limit);
+                    stackFrom.setCount(sum - limit);
+
+                    slot.onSlotChanged();
+                }
+            }
+            else
+            {
+                for (int i = startIndex; i >= endIndex; i--)
+                {
+                    Slot slot = this.inventorySlots.get(i);
+                    ItemStack stackTo = slot.getStack();
+                    if (!canCombine(stackFrom, stackTo)) continue;
+
+                    int limit = Tools.min(stackTo.getMaxStackSize(), slot.getSlotStackLimit());
+                    if (!stackTo.isEmpty() && stackTo.getCount() >= limit) continue;
+
+
+                    int sum = stackTo.isEmpty() ? stackFrom.getCount() : stackFrom.getCount() + stackTo.getCount();
+
+                    if (stackTo.isEmpty()) slot.putStack(stackFrom.copy());
+
+                    if (sum <= limit)
+                    {
+                        stackTo.setCount(sum);
+                        stackFrom.setCount(0);
+                        return;
+                    }
+
+                    stackTo.setCount(limit);
+                    stackFrom.setCount(sum - limit);
+
+                    slot.onSlotChanged();
+                }
+            }
+        }
+    }
+
+    public static boolean canCombine(ItemStack from, ItemStack to)
+    {
+        if (from.isEmpty()) return false;
+        if (to.isEmpty()) return true;
+        return from.getItem() == to.getItem() && (!to.getHasSubtypes() || to.getMetadata() == from.getMetadata()) && ItemStack.areItemStackTagsEqual(to, from);
     }
 }
