@@ -14,10 +14,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 
 public class TiamatInventoryContainer extends Container
 {
     private final EntityPlayer player;
+
+    public ArrayList<TexturedSlot> classTabSlots = new ArrayList<>(), professionTabSlots = new ArrayList<>();
 
     public TiamatInventoryContainer(EntityPlayer player)
     {
@@ -80,6 +83,69 @@ public class TiamatInventoryContainer extends Container
         //Index 45
         //Internal index 4 (tiamat pet slot)
         addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 4, 97, 22, 128, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Pet")));
+
+
+        //Class slots
+        //Index 46 - 47
+        //Internal index 5 - 6 (tiamat class slots)
+        TexturedSlot slot = new TexturedFilteredSlot(tiamatPlayerInventory, 5, 135, 37, 160, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Class"));
+        classTabSlots.add(slot);
+        addSlotToContainer(slot);
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 6, 191, 37, 160, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Class"));
+        classTabSlots.add(slot);
+        addSlotToContainer(slot);
+
+        //Skill slots
+        //Index 48 - 65
+        //Internal index 7 - 24 (tiamat skill slots)
+        for (int yy = 0; yy < 3; yy++)
+        {
+            for (int xx = 0; xx < 3; xx++)
+            {
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 7 + yy * 3 + xx, 117 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Skill"));
+                classTabSlots.add(slot);
+                addSlotToContainer(slot);
+            }
+        }
+        for (int yy = 0; yy < 3; yy++)
+        {
+            for (int xx = 0; xx < 3; xx++)
+            {
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 16 + yy * 3 + xx, 173 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Skill"));
+                classTabSlots.add(slot);
+                addSlotToContainer(slot);
+            }
+        }
+
+
+        //Profession slots
+        //Index 66 - 69
+        //Internal index 25 - 28 (tiamat profession slots; 2 gathering, then 2 crafting)
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 25, 135, 37, 192, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "ProfessionGather"));
+        professionTabSlots.add(slot);
+        addSlotToContainer(slot);
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 26, 153, 37, 192, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "ProfessionGather"));
+        professionTabSlots.add(slot);
+        addSlotToContainer(slot);
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 27, 173, 37, 208, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "ProfessionCraft"));
+        professionTabSlots.add(slot);
+        addSlotToContainer(slot);
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 28, 191, 37, 208, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "ProfessionCraft"));
+        professionTabSlots.add(slot);
+        addSlotToContainer(slot);
+
+        //Recipe slots
+        //Index 70 - 84
+        //Internal index 29 - 43 (tiamat recipe slots)
+        for (int yy = 0; yy < 3; yy++)
+        {
+            for (int xx = 0; xx < 5; xx++)
+            {
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 29 + yy * 5 + xx, 127 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Recipe"));
+                professionTabSlots.add(slot);
+                addSlotToContainer(slot);
+            }
+        }
     }
 
     private void addVanillaEquipmentSlot(IInventory inventory, EntityEquipmentSlot slotEnum, int index, int x, int y, int u, int v)

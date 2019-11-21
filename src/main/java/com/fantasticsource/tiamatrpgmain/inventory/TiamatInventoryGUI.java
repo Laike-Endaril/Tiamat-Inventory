@@ -69,6 +69,7 @@ public class TiamatInventoryGUI extends GuiContainer
 
     public void initGui()
     {
+        inventorySlots = new TiamatInventoryContainer(Minecraft.getMinecraft().player);
         setTab(tab);
         super.initGui();
     }
@@ -111,27 +112,48 @@ public class TiamatInventoryGUI extends GuiContainer
 
         buttonList.clear();
 
+        TiamatInventoryContainer container = (TiamatInventoryContainer) inventorySlots;
+
         switch (tab)
         {
             case 0:
+                //Stats
                 xSize = 250;
                 ySize = 232;
                 uOffset = 0;
                 vOffset = 0;
+                for (TexturedSlot slot : container.classTabSlots) slot.disable();
+                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
                 break;
 
             case 1:
+                //Classes and skills
                 xSize = 250;
                 ySize = 232;
                 uOffset = 0;
                 vOffset = 256;
+                for (TexturedSlot slot : container.classTabSlots) slot.enable();
+                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
                 break;
 
             case 2:
+                //Crafting
                 xSize = 250;
                 ySize = 232;
                 uOffset = 256;
                 vOffset = 0;
+                for (TexturedSlot slot : container.classTabSlots) slot.disable();
+                for (TexturedSlot slot : container.professionTabSlots) slot.enable();
+                break;
+
+            case 3:
+                //Party
+                xSize = 250;
+                ySize = 232;
+                uOffset = 256;
+                vOffset = 256;
+                for (TexturedSlot slot : container.classTabSlots) slot.disable();
+                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
                 break;
         }
 
@@ -139,25 +161,24 @@ public class TiamatInventoryGUI extends GuiContainer
         guiLeft = (width - xSize) >> 1;
 
         //Tab buttons
-        GuiButtonImage button = new GuiButtonImage(0, guiLeft + 230, guiTop + 4, 19, 31, TEXTURE_W - 19, TEXTURE_H - 31, 0, TEXTURE);
+        GuiButtonImage button = new GuiButtonImage(0, guiLeft + 231, guiTop + 7, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
         buttonList.add(button);
-        button = new GuiButtonImage(1, guiLeft + 230, guiTop + 36, 19, 31, TEXTURE_W - 19, TEXTURE_H - 31, 0, TEXTURE);
+        button = new GuiButtonImage(1, guiLeft + 231, guiTop + 32, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
         buttonList.add(button);
-        button = new GuiButtonImage(2, guiLeft + 230, guiTop + 68, 19, 31, TEXTURE_W - 19, TEXTURE_H - 31, 0, TEXTURE);
+        button = new GuiButtonImage(2, guiLeft + 231, guiTop + 57, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
         buttonList.add(button);
-        button = new GuiButtonImage(3, guiLeft + 230, guiTop + 100, 19, 31, TEXTURE_W - 19, TEXTURE_H - 31, 0, TEXTURE);
+        button = new GuiButtonImage(3, guiLeft + 231, guiTop + 82, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
         buttonList.add(button);
-
-        //Container
-        inventorySlots = new TiamatInventoryContainer(Minecraft.getMinecraft().player);
+        button = new GuiButtonImage(4, guiLeft + 231, guiTop + 107, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
+        buttonList.add(button);
     }
 
     protected void actionPerformed(GuiButton button)
     {
         buttonClicked = true;
 
-        if (button.id <= 2) setTab(button.id);
-        else if (button.id == 3)
+        if (button.id <= 3) setTab(button.id);
+        else if (button.id == 4)
         {
             reopen = true;
             PacketHandler.networkWrapper.sendToServer(new MessageClientKeyPress(MessageClientKeyPress.Button.OPEN_WARDROBE));
@@ -165,8 +186,36 @@ public class TiamatInventoryGUI extends GuiContainer
     }
 
     @Override
+    protected void renderHoveredToolTip(int mouseX, int mouseY)
+    {
+        if (mc.player.inventory.getItemStack().isEmpty() && hoveredSlot != null && hoveredSlot.getHasStack() && (!(hoveredSlot instanceof TexturedSlot) || ((TexturedSlot) hoveredSlot).enabled))
+        {
+            renderToolTip(hoveredSlot.getStack(), mouseX, mouseY);
+        }
+    }
+
+    @Override
+    public void drawWorldBackground(int tint)
+    {
+        if (mc.world == null) drawBackground(tint);
+    }
+
+    @Override
+    protected void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor)
+    {
+        //In this case, this is used for item slot highlighting only
+        if (hoveredSlot == null || (hoveredSlot instanceof TexturedSlot && !((TexturedSlot) hoveredSlot).enabled)) return;
+
+        //TODO Rarity color highlighting
+        super.drawGradientRect(left, top, right, bottom, startColor, endColor);
+    }
+
+    @Override
     public void drawSlot(Slot slot)
     {
+        if (slot instanceof TexturedSlot && !((TexturedSlot) slot).enabled) return;
+
+
         int x = slot.xPos;
         int y = slot.yPos;
         ItemStack itemstack = slot.getStack();
