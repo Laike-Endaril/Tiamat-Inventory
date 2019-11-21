@@ -125,10 +125,7 @@ public class TiamatInventoryGUI extends GuiContainer
         if (tab == 0)
         {
             //Render stats
-            GL11.glEnable(GL_SCISSOR_TEST);
-            ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-            int scale = sr.getScaleFactor();
-            GL11.glScissor((guiLeft + STAT_WINDOW_X) * scale, (sr.getScaledHeight() - (guiTop + STAT_WINDOW_Y + STAT_WINDOW_H)) * scale, STAT_WINDOW_W * scale, STAT_WINDOW_H * scale);
+            scissor(STAT_WINDOW_X, STAT_WINDOW_Y, STAT_WINDOW_W, STAT_WINDOW_H);
 
             int yy = STAT_WINDOW_Y;
 
@@ -141,7 +138,7 @@ public class TiamatInventoryGUI extends GuiContainer
             }
             GlStateManager.popMatrix();
 
-            GL11.glDisable(GL_SCISSOR_TEST);
+            unScissor();
 
             //Render scrollknob
             GlStateManager.color(1, 1, 1, 1);
@@ -174,7 +171,9 @@ public class TiamatInventoryGUI extends GuiContainer
         bufferbuilder.pos(guiLeft, guiTop, zLevel).tex(uOffset * U_PIXEL, vOffset * V_PIXEL).endVertex();
         tessellator.draw();
 
-        drawEntityOnScreen(guiLeft + 60, guiTop + 66 + 30, modelScale, modelYaw, modelPitch, mc.player);
+        scissor(MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_W, MODEL_WINDOW_H);
+        drawEntityOnScreen(guiLeft + MODEL_WINDOW_X + (MODEL_WINDOW_W >> 1), guiTop + MODEL_WINDOW_Y + (MODEL_WINDOW_H >> 1), modelScale, modelYaw, modelPitch, mc.player);
+        unScissor();
     }
 
     private void setTab(int tab)
@@ -288,7 +287,7 @@ public class TiamatInventoryGUI extends GuiContainer
 
         if (mouseButton == 0 && Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_SCROLLBAR_X, STAT_SCROLLBAR_Y, STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, STAT_SCROLLBAR_Y + STAT_SCROLLBAR_H))
         {
-            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) STAT_SCROLLKNOB_H / 2) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
+            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) (STAT_SCROLLKNOB_H >> 1)) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
             statsScrollGrabbed = true;
         }
         else if (Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_X + MODEL_WINDOW_W, MODEL_WINDOW_Y + MODEL_WINDOW_H))
@@ -306,7 +305,7 @@ public class TiamatInventoryGUI extends GuiContainer
 
         if (statsScrollGrabbed)
         {
-            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) STAT_SCROLLKNOB_H / 2) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
+            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) (STAT_SCROLLKNOB_H >> 1)) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
         }
         else if (modelGrabbed)
         {
@@ -369,7 +368,7 @@ public class TiamatInventoryGUI extends GuiContainer
         if (slot == this.clickedSlot && !this.draggedStack.isEmpty() && this.isRightMouseClick && !itemstack.isEmpty())
         {
             itemstack = itemstack.copy();
-            itemstack.setCount(itemstack.getCount() / 2);
+            itemstack.setCount(itemstack.getCount() >> 1);
         }
         else if (this.dragSplitting && this.dragSplittingSlots.contains(slot) && !itemstack1.isEmpty())
         {
@@ -494,7 +493,6 @@ public class TiamatInventoryGUI extends GuiContainer
         GlStateManager.scale((float) (-30), (float) 30, (float) 30);
         GlStateManager.rotate(180, 0, 0, 1);
 
-        GlStateManager.translate(0, ent.height / 2, 0);
         GlStateManager.rotate((float) pitch, 1, 0, 0);
         GlStateManager.rotate((float) yaw + ent.renderYawOffset, 0, 1, 0);
         GlStateManager.scale((float) (scale), (float) scale, (float) scale);
@@ -511,5 +509,18 @@ public class TiamatInventoryGUI extends GuiContainer
         GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
         GlStateManager.disableTexture2D();
         GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+    }
+
+    private void scissor(int x, int y, int w, int h)
+    {
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+        int scale = sr.getScaleFactor();
+        GL11.glEnable(GL_SCISSOR_TEST);
+        GL11.glScissor((guiLeft + x) * scale, (sr.getScaledHeight() - (guiTop + y + h)) * scale, w * scale, h * scale);
+    }
+
+    private void unScissor()
+    {
+        GL11.glDisable(GL_SCISSOR_TEST);
     }
 }
