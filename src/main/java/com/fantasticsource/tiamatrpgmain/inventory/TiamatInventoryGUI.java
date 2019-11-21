@@ -11,12 +11,11 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -44,6 +43,7 @@ public class TiamatInventoryGUI extends GuiContainer
     private static double statsScroll = 0;
     private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
     private static final int TEXTURE_W = 512, TEXTURE_H = 512;
+    private static final int MODEL_WINDOW_X = 25, MODEL_WINDOW_Y = 22, MODEL_WINDOW_W = 70, MODEL_WINDOW_H = 88;
     private static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
     private static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
     private static final int STAT_SCROLLKNOB_H = 5;
@@ -52,8 +52,9 @@ public class TiamatInventoryGUI extends GuiContainer
     private static int tab = 0;
     private static boolean reopen = false;
 
-    private int uOffset, vOffset;
-    private boolean buttonClicked, statsScrollGrabbed = false;
+    private boolean buttonClicked, statsScrollGrabbed = false, modelGrabbed = false;
+    private int uOffset, vOffset, modelGrabX, modelGrabY;
+    private double modelYaw = 0, modelPitch = 0, modelScale = 1;
 
     public TiamatInventoryGUI()
     {
@@ -173,7 +174,7 @@ public class TiamatInventoryGUI extends GuiContainer
         bufferbuilder.pos(guiLeft, guiTop, zLevel).tex(uOffset * U_PIXEL, vOffset * V_PIXEL).endVertex();
         tessellator.draw();
 
-        GuiInventory.drawEntityOnScreen(guiLeft + 60, guiTop + 66 + 30, 30, 0, 0, mc.player);
+        drawEntityOnScreen(guiLeft + 60, guiTop + 66 + 30, 30 * modelScale, modelYaw, modelPitch, mc.player);
     }
 
     private void setTab(int tab)
@@ -285,6 +286,12 @@ public class TiamatInventoryGUI extends GuiContainer
             statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) STAT_SCROLLKNOB_H / 2) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
             statsScrollGrabbed = true;
         }
+        else if (Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_X + MODEL_WINDOW_W, MODEL_WINDOW_Y + MODEL_WINDOW_H))
+        {
+            modelGrabbed = true;
+            modelGrabX = mouseX;
+            modelGrabY = mouseY;
+        }
     }
 
     @Override
@@ -296,6 +303,14 @@ public class TiamatInventoryGUI extends GuiContainer
         {
             statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) STAT_SCROLLKNOB_H / 2) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
         }
+        else if (modelGrabbed)
+        {
+            modelYaw += mouseX - modelGrabX;
+            modelPitch += mouseY - modelGrabY;
+
+            modelGrabX = mouseX;
+            modelGrabY = mouseY;
+        }
     }
 
     protected void mouseReleased(int mouseX, int mouseY, int state)
@@ -304,6 +319,7 @@ public class TiamatInventoryGUI extends GuiContainer
         else super.mouseReleased(mouseX, mouseY, state);
 
         statsScrollGrabbed = false;
+        modelGrabbed = false;
     }
 
     @Override
@@ -377,8 +393,8 @@ public class TiamatInventoryGUI extends GuiContainer
             }
         }
 
-        this.zLevel = 100.0F;
-        this.itemRender.zLevel = 100.0F;
+        this.zLevel = 100;
+        this.itemRender.zLevel = 100;
 
         if (itemstack.isEmpty() && slot.isEnabled())
         {
@@ -427,8 +443,8 @@ public class TiamatInventoryGUI extends GuiContainer
             this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, itemstack, x, y, s);
         }
 
-        this.itemRender.zLevel = 0.0F;
-        this.zLevel = 0.0F;
+        this.itemRender.zLevel = 0;
+        this.zLevel = 0;
     }
 
     public void updateDragSplitting()
@@ -462,5 +478,32 @@ public class TiamatInventoryGUI extends GuiContainer
                 }
             }
         }
+    }
+
+    public static void drawEntityOnScreen(int posX, int posY, double scale, double yaw, double pitch, EntityLivingBase ent)
+    {
+        GlStateManager.enableColorMaterial();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float) posX, (float) posY, 50);
+        GlStateManager.scale((float) (-scale), (float) scale, (float) scale);
+        GlStateManager.rotate(180, 0, 0, 1);
+
+        GlStateManager.translate(0, ent.height / 2, 0);
+        GlStateManager.rotate((float) pitch, 1, 0, 0);
+        GlStateManager.rotate((float) yaw + ent.renderYawOffset, 0, 1, 0);
+
+        RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
+        rendermanager.setPlayerViewY(180);
+        rendermanager.setRenderShadow(false);
+        rendermanager.renderEntity(ent, 0, -ent.height / 2, 0, 0, 1, false);
+        rendermanager.setRenderShadow(true);
+
+        GlStateManager.popMatrix();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GlStateManager.disableTexture2D();
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
     }
 }
