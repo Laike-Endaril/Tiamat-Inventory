@@ -141,7 +141,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 5; xx++)
             {
-                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 29 + yy * 5 + xx, 127 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Recipe"));
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 29 + yy * 5 + xx, 127 + xx * 18, 58 + yy * 18, 224, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Recipe"));
                 professionTabSlots.add(slot);
                 addSlotToContainer(slot);
             }

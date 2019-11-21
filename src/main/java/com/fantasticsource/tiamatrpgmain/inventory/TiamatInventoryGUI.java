@@ -2,6 +2,8 @@ package com.fantasticsource.tiamatrpgmain.inventory;
 
 import com.fantasticsource.tiamatrpgmain.Network;
 import com.fantasticsource.tiamatrpgmain.Network.OpenTiamatInventoryPacket;
+import com.fantasticsource.tools.Collision;
+import com.fantasticsource.tools.Tools;
 import moe.plushie.armourers_workshop.common.network.PacketHandler;
 import moe.plushie.armourers_workshop.common.network.messages.client.MessageClientKeyPress;
 import net.minecraft.client.Minecraft;
@@ -25,7 +27,10 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
 
 import static com.fantasticsource.tiamatrpgmain.Keys.TIAMAT_INVENTORY_KEY;
 import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
@@ -35,8 +40,11 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
 {
+    private final String[] stats;
+    private static double statsScroll = 0;
     private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
-    private static final int TEXTURE_W = 512, TEXTURE_H = 512;
+    private static final int TEXTURE_W = 512, TEXTURE_H = 512, STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
+    private static int lineHeight, statsHeight, difHeight;
     private static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
     private static int tab = 0;
     private static boolean reopen = false;
@@ -48,6 +56,27 @@ public class TiamatInventoryGUI extends GuiContainer
     {
         super(new TiamatInventoryContainer(Minecraft.getMinecraft().player));
         allowUserInput = true;
+        stats = new String[]{
+                "Level",
+                "",
+                "HP",
+                "MP",
+                "Stamina",
+                "Hunger",
+                "",
+                "Strength",
+                "Dexterity",
+                "Constitution",
+                "Intelligence",
+                "Wisdom",
+                "Charisma",
+        };
+
+        mc = Minecraft.getMinecraft();
+        fontRenderer = mc.fontRenderer;
+        lineHeight = fontRenderer.FONT_HEIGHT + 1;
+        statsHeight = lineHeight * stats.length;
+        difHeight = Tools.max(0, statsHeight - STAT_WINDOW_H);
     }
 
     @SubscribeEvent
@@ -95,16 +124,18 @@ public class TiamatInventoryGUI extends GuiContainer
             GL11.glEnable(GL_SCISSOR_TEST);
             ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
             int scale = sr.getScaleFactor();
-            int h = 106;
-            GL11.glScissor((guiLeft + 118) * scale, (sr.getScaledHeight() - (guiTop + 22 + h)) * scale, 99 * scale, h * scale);
+            GL11.glScissor((guiLeft + STAT_WINDOW_X) * scale, (sr.getScaledHeight() - (guiTop + STAT_WINDOW_Y + STAT_WINDOW_H)) * scale, STAT_WINDOW_W * scale, STAT_WINDOW_H * scale);
 
-            for (int xx = 0; xx <= 1000; xx += 10)
+            int yy = STAT_WINDOW_Y;
+
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0, -statsScroll * difHeight, 0);
+            for (String stat : stats)
             {
-                for (int yy = 0; yy <= 1000; yy += 10)
-                {
-                    drawString(fontRenderer, "F", xx, yy, 0xffffffff);
-                }
+                drawString(fontRenderer, stat, STAT_WINDOW_X, yy, 0xffffffff);
+                yy += lineHeight;
             }
+            GlStateManager.popMatrix();
 
             GL11.glDisable(GL_SCISSOR_TEST);
         }
@@ -209,6 +240,25 @@ public class TiamatInventoryGUI extends GuiContainer
         {
             reopen = true;
             PacketHandler.networkWrapper.sendToServer(new MessageClientKeyPress(MessageClientKeyPress.Button.OPEN_WARDROBE));
+        }
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException
+    {
+        super.handleMouseInput();
+
+        int scroll = Mouse.getDWheel();
+        if (scroll != 0)
+        {
+            ScaledResolution sr = new ScaledResolution(mc);
+
+            int mouseX = Mouse.getX() / sr.getScaleFactor(), mouseY = sr.getScaledHeight() - Mouse.getY() / sr.getScaleFactor();
+            if (Collision.pointRectangle(mouseX, mouseY, guiLeft + STAT_WINDOW_X, guiTop + STAT_WINDOW_Y, guiLeft + STAT_WINDOW_X + STAT_WINDOW_W, guiTop + STAT_WINDOW_Y + STAT_WINDOW_H))
+            {
+                if (scroll > 0) statsScroll = Tools.max(0, statsScroll - (double) lineHeight / difHeight);
+                else statsScroll = Tools.min(1, statsScroll + (double) lineHeight / difHeight);
+            }
         }
     }
 
