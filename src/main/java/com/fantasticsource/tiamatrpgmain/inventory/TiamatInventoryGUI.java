@@ -174,7 +174,7 @@ public class TiamatInventoryGUI extends GuiContainer
         bufferbuilder.pos(guiLeft, guiTop, zLevel).tex(uOffset * U_PIXEL, vOffset * V_PIXEL).endVertex();
         tessellator.draw();
 
-        drawEntityOnScreen(guiLeft + 60, guiTop + 66 + 30, 30 * modelScale, modelYaw, modelPitch, mc.player);
+        drawEntityOnScreen(guiLeft + 60, guiTop + 66 + 30, modelScale, modelYaw, modelPitch, mc.player);
     }
 
     private void setTab(int tab)
@@ -272,6 +272,11 @@ public class TiamatInventoryGUI extends GuiContainer
             {
                 if (scroll > 0) statsScroll = Tools.max(0, statsScroll - (double) lineHeight / difHeight);
                 else statsScroll = Tools.min(1, statsScroll + (double) lineHeight / difHeight);
+            }
+            else if (Collision.pointRectangle(mouseX, mouseY, guiLeft + MODEL_WINDOW_X, guiTop + MODEL_WINDOW_Y, guiLeft + MODEL_WINDOW_X + MODEL_WINDOW_W, guiTop + MODEL_WINDOW_Y + MODEL_WINDOW_H))
+            {
+                if (scroll > 0) modelScale *= 1.1;
+                else modelScale /= 1.1;
             }
         }
     }
@@ -486,12 +491,13 @@ public class TiamatInventoryGUI extends GuiContainer
         RenderHelper.enableStandardItemLighting();
         GlStateManager.pushMatrix();
         GlStateManager.translate((float) posX, (float) posY, 50);
-        GlStateManager.scale((float) (-scale), (float) scale, (float) scale);
+        GlStateManager.scale((float) (-30), (float) 30, (float) 30);
         GlStateManager.rotate(180, 0, 0, 1);
 
         GlStateManager.translate(0, ent.height / 2, 0);
         GlStateManager.rotate((float) pitch, 1, 0, 0);
         GlStateManager.rotate((float) yaw + ent.renderYawOffset, 0, 1, 0);
+        GlStateManager.scale((float) (scale), (float) scale, (float) scale);
 
         RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
         rendermanager.setPlayerViewY(180);
