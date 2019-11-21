@@ -7,6 +7,7 @@ import moe.plushie.armourers_workshop.common.network.messages.client.MessageClie
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -24,10 +25,12 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 import static com.fantasticsource.tiamatrpgmain.Keys.TIAMAT_INVENTORY_KEY;
 import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
@@ -81,6 +84,30 @@ public class TiamatInventoryGUI extends GuiContainer
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         renderHoveredToolTip(mouseX, mouseY);
+    }
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
+    {
+        if (tab == 0)
+        {
+            //Render stats
+            GL11.glEnable(GL_SCISSOR_TEST);
+            ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+            int scale = sr.getScaleFactor();
+            int h = 106;
+            GL11.glScissor((guiLeft + 118) * scale, (sr.getScaledHeight() - (guiTop + 22 + h)) * scale, 99 * scale, h * scale);
+
+            for (int xx = 0; xx <= 1000; xx += 10)
+            {
+                for (int yy = 0; yy <= 1000; yy += 10)
+                {
+                    drawString(fontRenderer, "F", xx, yy, 0xffffffff);
+                }
+            }
+
+            GL11.glDisable(GL_SCISSOR_TEST);
+        }
     }
 
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
