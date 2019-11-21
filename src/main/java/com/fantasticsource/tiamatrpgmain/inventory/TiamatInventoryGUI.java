@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatrpgmain.inventory;
 
+import com.fantasticsource.tiamatrpgmain.Attributes;
 import com.fantasticsource.tiamatrpgmain.Network;
 import com.fantasticsource.tiamatrpgmain.Network.OpenTiamatInventoryPacket;
 import com.fantasticsource.tools.Collision;
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import scala.actors.threadpool.Arrays;
 
 import java.io.IOException;
 
@@ -39,7 +41,7 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
 {
-    private final String[] stats;
+    private final String[] stats, statTooltips;
     private static double statsScroll = 0;
     private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
     private static final int TEXTURE_W = 512, TEXTURE_H = 512;
@@ -47,7 +49,7 @@ public class TiamatInventoryGUI extends GuiContainer
     private static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
     private static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
     private static final int STAT_SCROLLKNOB_H = 5;
-    private static int lineHeight, statsHeight, difHeight;
+    private static int statLineHeight, statsHeight, statHeightDif;
     private static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
     private static int tab = 0;
     private static boolean reopen = false;
@@ -60,27 +62,16 @@ public class TiamatInventoryGUI extends GuiContainer
     {
         super(new TiamatInventoryContainer(Minecraft.getMinecraft().player));
         allowUserInput = true;
-        stats = new String[]{
-                "Level",
-                "",
-                "HP",
-                "MP",
-                "Stamina",
-                "Hunger",
-                "",
-                "Strength",
-                "Dexterity",
-                "Constitution",
-                "Intelligence",
-                "Wisdom",
-                "Charisma",
-        };
 
         mc = Minecraft.getMinecraft();
+        String[][] statDisplayList = Attributes.getDisplayList(mc.player);
+        stats = statDisplayList[0];
+        statTooltips = statDisplayList[1];
+
         fontRenderer = mc.fontRenderer;
-        lineHeight = fontRenderer.FONT_HEIGHT + 1;
-        statsHeight = lineHeight * stats.length;
-        difHeight = Tools.max(0, statsHeight - STAT_WINDOW_H);
+        statLineHeight = fontRenderer.FONT_HEIGHT + 1;
+        statsHeight = statLineHeight * stats.length;
+        statHeightDif = Tools.max(0, statsHeight - STAT_WINDOW_H);
     }
 
     @SubscribeEvent
@@ -124,22 +115,6 @@ public class TiamatInventoryGUI extends GuiContainer
     {
         if (tab == 0)
         {
-            //Render stats
-            scissor(STAT_WINDOW_X, STAT_WINDOW_Y, STAT_WINDOW_W, STAT_WINDOW_H);
-
-            int yy = STAT_WINDOW_Y;
-
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(0, -statsScroll * difHeight, 0);
-            for (String stat : stats)
-            {
-                drawString(fontRenderer, stat, STAT_WINDOW_X, yy, 0xffffffff);
-                yy += lineHeight;
-            }
-            GlStateManager.popMatrix();
-
-            unScissor();
-
             //Render scrollknob
             GlStateManager.color(1, 1, 1, 1);
             mc.getTextureManager().bindTexture(TEXTURE);
@@ -154,6 +129,34 @@ public class TiamatInventoryGUI extends GuiContainer
             bufferbuilder.pos(STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, scrollKnobY, zLevel).tex((288 + STAT_SCROLLBAR_W) * U_PIXEL, 240 * V_PIXEL).endVertex();
             bufferbuilder.pos(STAT_SCROLLBAR_X, scrollKnobY, zLevel).tex(288 * U_PIXEL, 240 * V_PIXEL).endVertex();
             tessellator.draw();
+
+
+            //Render stats
+            scissor(STAT_WINDOW_X, STAT_WINDOW_Y, STAT_WINDOW_W, STAT_WINDOW_H);
+
+            int yy = STAT_WINDOW_Y;
+
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0, -statsScroll * statHeightDif, 0);
+            for (String stat : stats)
+            {
+                drawString(fontRenderer, stat, STAT_WINDOW_X, yy, 0xffffffff);
+                yy += statLineHeight;
+            }
+            GlStateManager.popMatrix();
+
+            unScissor();
+
+
+            //Render stat tooltips
+            if (Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_WINDOW_X, STAT_WINDOW_Y, STAT_WINDOW_X + STAT_WINDOW_W, STAT_WINDOW_Y + STAT_WINDOW_H))
+            {
+                int index = (int) ((mouseY - guiTop - STAT_WINDOW_Y + statHeightDif * statsScroll) / statLineHeight);
+                if (index >= 0 && index < statTooltips.length)
+                {
+                    drawHoveringText(Arrays.asList(Tools.fixedSplit(statTooltips[index], "\n")), mouseX - guiLeft, mouseY - guiTop, fontRenderer);
+                }
+            }
         }
     }
 
@@ -269,8 +272,8 @@ public class TiamatInventoryGUI extends GuiContainer
             if (Collision.pointRectangle(mouseX, mouseY, guiLeft + STAT_WINDOW_X, guiTop + STAT_WINDOW_Y, guiLeft + STAT_WINDOW_X + STAT_WINDOW_W, guiTop + STAT_WINDOW_Y + STAT_WINDOW_H)
                     || Collision.pointRectangle(mouseX, mouseY, guiLeft + STAT_SCROLLBAR_X, guiTop + STAT_SCROLLBAR_Y, guiLeft + STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, guiTop + STAT_SCROLLBAR_Y + STAT_SCROLLBAR_H))
             {
-                if (scroll > 0) statsScroll = Tools.max(0, statsScroll - (double) lineHeight / difHeight);
-                else statsScroll = Tools.min(1, statsScroll + (double) lineHeight / difHeight);
+                if (scroll > 0) statsScroll = Tools.max(0, statsScroll - (double) statLineHeight / statHeightDif);
+                else statsScroll = Tools.min(1, statsScroll + (double) statLineHeight / statHeightDif);
             }
             else if (Collision.pointRectangle(mouseX, mouseY, guiLeft + MODEL_WINDOW_X, guiTop + MODEL_WINDOW_Y, guiLeft + MODEL_WINDOW_X + MODEL_WINDOW_W, guiTop + MODEL_WINDOW_Y + MODEL_WINDOW_H))
             {

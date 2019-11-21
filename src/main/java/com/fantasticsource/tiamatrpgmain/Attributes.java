@@ -86,4 +86,52 @@ public class Attributes
         attributeMap.getAttributeInstance(PARRY).setBaseValue(PARRY.getDefaultValue());
         attributeMap.getAttributeInstance(DODGE).setBaseValue(DODGE.getDefaultValue());
     }
+
+    public static String[][] getDisplayList(EntityLivingBase livingBase)
+    {
+        String[][] result = new String[2][];
+
+        result[0] = new String[]{
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Strength",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+        };
+        result[1] = new String[]{
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "How much you lift\nlift\nlift\nlift\nlift\nlift\nlift\nlift\nlift\nlift\nlift\nlift",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+                "Test",
+        };
+
+        return result;
+    }
 }
