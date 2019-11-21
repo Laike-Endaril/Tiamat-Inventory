@@ -75,6 +75,11 @@ public class TiamatInventoryContainer extends Container
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.CHEST, 38, 7, 76, 48, 496);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.LEGS, 37, 7, 94, 64, 496);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.FEET, 36, 7, 112, 80, 496);
+
+        //Pet slot
+        //Index 45
+        //Internal index 4 (tiamat pet slot)
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 4, 97, 22, 128, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Pet")));
     }
 
     private void addVanillaEquipmentSlot(IInventory inventory, EntityEquipmentSlot slotEnum, int index, int x, int y, int u, int v)
