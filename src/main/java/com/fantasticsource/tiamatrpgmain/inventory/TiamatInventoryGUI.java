@@ -53,7 +53,7 @@ public class TiamatInventoryGUI extends GuiContainer
     private static boolean reopen = false;
 
     private int uOffset, vOffset;
-    private boolean buttonClicked;
+    private boolean buttonClicked, statsScrollGrabbed = false;
 
     public TiamatInventoryGUI()
     {
@@ -176,12 +176,6 @@ public class TiamatInventoryGUI extends GuiContainer
         GuiInventory.drawEntityOnScreen(guiLeft + 60, guiTop + 66 + 30, 30, 0, 0, mc.player);
     }
 
-    protected void mouseReleased(int mouseX, int mouseY, int state)
-    {
-        if (buttonClicked) buttonClicked = false;
-        else super.mouseReleased(mouseX, mouseY, state);
-    }
-
     private void setTab(int tab)
     {
         TiamatInventoryGUI.tab = tab;
@@ -279,6 +273,37 @@ public class TiamatInventoryGUI extends GuiContainer
                 else statsScroll = Tools.min(1, statsScroll + (double) lineHeight / difHeight);
             }
         }
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+
+        if (mouseButton == 0 && Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_SCROLLBAR_X, STAT_SCROLLBAR_Y, STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, STAT_SCROLLBAR_Y + STAT_SCROLLBAR_H))
+        {
+            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) STAT_SCROLLKNOB_H / 2) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
+            statsScrollGrabbed = true;
+        }
+    }
+
+    @Override
+    protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick)
+    {
+        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+
+        if (statsScrollGrabbed)
+        {
+            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) STAT_SCROLLKNOB_H / 2) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
+        }
+    }
+
+    protected void mouseReleased(int mouseX, int mouseY, int state)
+    {
+        if (buttonClicked) buttonClicked = false;
+        else super.mouseReleased(mouseX, mouseY, state);
+
+        statsScrollGrabbed = false;
     }
 
     @Override
