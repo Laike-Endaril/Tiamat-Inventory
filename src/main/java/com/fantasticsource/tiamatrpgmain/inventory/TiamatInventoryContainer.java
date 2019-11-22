@@ -82,7 +82,7 @@ public class TiamatInventoryContainer extends Container
         //Pet slot
         //Index 45
         //Internal index 4 (tiamat pet slot)
-        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 4, 97, 22, 128, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Pet")));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 4, 52, 112, 128, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Pet")));
 
 
         //Class slots
@@ -102,7 +102,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 3; xx++)
             {
-                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 7 + yy * 3 + xx, 117 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Skill"));
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 7 + yy * 3 + xx, 117 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && (Equipment.isType(stack, "ActiveSkill") || Equipment.isType(stack, "PassiveSkill")));
                 classTabSlots.add(slot);
                 addSlotToContainer(slot);
             }
@@ -111,7 +111,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 3; xx++)
             {
-                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 16 + yy * 3 + xx, 173 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "Skill"));
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 16 + yy * 3 + xx, 173 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && (Equipment.isType(stack, "ActiveSkill") || Equipment.isType(stack, "PassiveSkill")));
                 classTabSlots.add(slot);
                 addSlotToContainer(slot);
             }
@@ -145,6 +145,15 @@ public class TiamatInventoryContainer extends Container
                 professionTabSlots.add(slot);
                 addSlotToContainer(slot);
             }
+        }
+
+
+        //Ready skill slots
+        //Index 85 - 90
+        //Internal index 44 - 49 (tiamat active skill slots)
+        for (int yy = 0; yy < 6; yy++)
+        {
+            addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 44 + yy, 97, 22 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && Equipment.isType(stack, "ActiveSkill")));
         }
     }
 

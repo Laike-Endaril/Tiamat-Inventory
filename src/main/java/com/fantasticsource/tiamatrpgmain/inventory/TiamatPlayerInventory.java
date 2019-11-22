@@ -46,6 +46,7 @@ public class TiamatPlayerInventory implements IInventory
     public final NonNullList<ItemStack> gatherProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
     public final NonNullList<ItemStack> craftingProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
     public final NonNullList<ItemStack> craftingRecipes = NonNullList.withSize(15, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> readySkills = NonNullList.withSize(6, ItemStack.EMPTY);
     private final List<NonNullList<ItemStack>> allInventories;
     public int currentItem;
     public EntityPlayer player;
@@ -54,7 +55,7 @@ public class TiamatPlayerInventory implements IInventory
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
-        allInventories = Arrays.asList(offhand, mainhand, armor, pet, classes, skills, gatherProfessions, craftingProfessions, craftingRecipes);
+        allInventories = Arrays.asList(offhand, mainhand, armor, pet, classes, skills, gatherProfessions, craftingProfessions, craftingRecipes, readySkills);
         itemStack = ItemStack.EMPTY;
         player = playerIn;
     }

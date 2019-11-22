@@ -41,7 +41,7 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
 {
-    private final String[] stats, statTooltips;
+    private String[] stats, statTooltips;
     private static double statsScroll = 0;
     private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
     private static final int TEXTURE_W = 512, TEXTURE_H = 512;
@@ -115,6 +115,11 @@ public class TiamatInventoryGUI extends GuiContainer
     {
         if (tab == 0)
         {
+            //Update stats
+            String[][] statDisplayList = Attributes.getDisplayList(mc.player);
+            stats = statDisplayList[0];
+            statTooltips = statDisplayList[1];
+
             //Render scrollknob
             GlStateManager.color(1, 1, 1, 1);
             mc.getTextureManager().bindTexture(TEXTURE);

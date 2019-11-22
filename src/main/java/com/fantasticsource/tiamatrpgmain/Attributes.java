@@ -90,9 +90,8 @@ public class Attributes
     public static String[][] getDisplayList(EntityLivingBase livingBase)
     {
         String[][] result = new String[2][];
-
         result[0] = new String[]{
-                "Test",
+                "Level",
                 "Test",
                 "Test",
                 "Test",
