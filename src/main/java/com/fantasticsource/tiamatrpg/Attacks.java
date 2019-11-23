@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain;
+package com.fantasticsource.tiamatrpg;
 
 import com.fantasticsource.mctools.ImprovedRayTracing;
 import com.fantasticsource.mctools.MCTools;
@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import static com.fantasticsource.mctools.MCTools.TRIG_TABLE;
-import static com.fantasticsource.tiamatrpgmain.Attributes.*;
+import static com.fantasticsource.tiamatrpg.Attributes.*;
 import static net.minecraft.entity.SharedMonsterAttributes.KNOCKBACK_RESISTANCE;
 
 public class Attacks

@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain.inventory;
+package com.fantasticsource.tiamatrpg.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -7,7 +7,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IInteractionObject;
 
-import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
+import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
 public class InterfaceTiamatInventory implements IInteractionObject
 {

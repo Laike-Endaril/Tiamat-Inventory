@@ -1,7 +1,7 @@
-package com.fantasticsource.tiamatrpgmain;
+package com.fantasticsource.tiamatrpg;
 
-import com.fantasticsource.tiamatrpgmain.inventory.InterfaceTiamatInventory;
-import com.fantasticsource.tiamatrpgmain.inventory.TiamatInventoryContainer;
+import com.fantasticsource.tiamatrpg.inventory.InterfaceTiamatInventory;
+import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryContainer;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
-import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
+import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
 public class Network
 {

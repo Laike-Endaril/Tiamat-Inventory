@@ -1,6 +1,6 @@
-package com.fantasticsource.tiamatrpgmain.config.server;
+package com.fantasticsource.tiamatrpg.config.server;
 
-import com.fantasticsource.tiamatrpgmain.config.server.items.ItemsConfig;
+import com.fantasticsource.tiamatrpg.config.server.items.ItemsConfig;
 import net.minecraftforge.common.config.Config;
 
 public class ServerConfig

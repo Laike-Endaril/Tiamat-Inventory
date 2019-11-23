@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain;
+package com.fantasticsource.tiamatrpg;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -8,7 +8,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
-import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
+import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
 @SideOnly(Side.CLIENT)
 public class Keys

@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain.inventory;
+package com.fantasticsource.tiamatrpg.inventory;
 
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelManager;

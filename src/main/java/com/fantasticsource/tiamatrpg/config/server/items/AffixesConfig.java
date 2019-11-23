@@ -1,8 +1,8 @@
-package com.fantasticsource.tiamatrpgmain.config.server.items;
+package com.fantasticsource.tiamatrpg.config.server.items;
 
 import com.fantasticsource.mctools.ConfigHandler;
 import com.fantasticsource.mctools.MCTools;
-import com.fantasticsource.tiamatrpgmain.config.TiamatConfig;
+import com.fantasticsource.tiamatrpg.config.TiamatConfig;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
+import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
 public class AffixesConfig
 {

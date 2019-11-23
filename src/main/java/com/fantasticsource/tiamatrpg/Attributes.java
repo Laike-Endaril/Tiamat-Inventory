@@ -1,10 +1,10 @@
-package com.fantasticsource.tiamatrpgmain;
+package com.fantasticsource.tiamatrpg;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
 
-import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
+import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
 public class Attributes
 {

@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain.config.server.items;
+package com.fantasticsource.tiamatrpg.config.server.items;
 
 import net.minecraftforge.common.config.Config;
 

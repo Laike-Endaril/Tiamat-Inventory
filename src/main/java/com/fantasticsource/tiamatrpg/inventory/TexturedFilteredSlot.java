@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain.inventory;
+package com.fantasticsource.tiamatrpg.inventory;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;

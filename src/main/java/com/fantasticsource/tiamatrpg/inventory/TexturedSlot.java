@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain.inventory;
+package com.fantasticsource.tiamatrpg.inventory;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -13,13 +13,6 @@ public class TexturedSlot extends Slot
         super(inventoryIn, index, x, y);
         this.u = u;
         this.v = v;
-    }
-
-    public TexturedSlot setEnabled(boolean enabled)
-    {
-        if (enabled) enable();
-        else disable();
-        return this;
     }
 
     public TexturedSlot enable()
@@ -38,5 +31,12 @@ public class TexturedSlot extends Slot
     public boolean isEnabled()
     {
         return enabled;
+    }
+
+    public TexturedSlot setEnabled(boolean enabled)
+    {
+        if (enabled) enable();
+        else disable();
+        return this;
     }
 }

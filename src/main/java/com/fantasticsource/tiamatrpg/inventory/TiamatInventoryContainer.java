@@ -1,4 +1,4 @@
-package com.fantasticsource.tiamatrpgmain.inventory;
+package com.fantasticsource.tiamatrpg.inventory;
 
 import com.fantasticsource.tools.Tools;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -157,6 +157,13 @@ public class TiamatInventoryContainer extends Container
         }
     }
 
+    public static boolean canCombine(ItemStack from, ItemStack to)
+    {
+        if (from.isEmpty()) return false;
+        if (to.isEmpty()) return true;
+        return from.getItem() == to.getItem() && (!to.getHasSubtypes() || to.getMetadata() == from.getMetadata()) && ItemStack.areItemStackTagsEqual(to, from);
+    }
+
     private void addVanillaEquipmentSlot(IInventory inventory, EntityEquipmentSlot slotEnum, int index, int x, int y, int u, int v)
     {
         addSlotToContainer(new TexturedSlot(inventory, index, x, y, u, v)
@@ -241,7 +248,6 @@ public class TiamatInventoryContainer extends Container
         return ItemStack.EMPTY;
     }
 
-
     public void tryMergeItemStackRanges(ItemStack stackFrom, int... ranges)
     {
         if (stackFrom.isEmpty()) return;
@@ -315,12 +321,5 @@ public class TiamatInventoryContainer extends Container
                 }
             }
         }
-    }
-
-    public static boolean canCombine(ItemStack from, ItemStack to)
-    {
-        if (from.isEmpty()) return false;
-        if (to.isEmpty()) return true;
-        return from.getItem() == to.getItem() && (!to.getHasSubtypes() || to.getMetadata() == from.getMetadata()) && ItemStack.areItemStackTagsEqual(to, from);
     }
 }

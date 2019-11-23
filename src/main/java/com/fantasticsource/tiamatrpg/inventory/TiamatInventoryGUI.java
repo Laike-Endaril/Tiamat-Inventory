@@ -1,8 +1,8 @@
-package com.fantasticsource.tiamatrpgmain.inventory;
+package com.fantasticsource.tiamatrpg.inventory;
 
-import com.fantasticsource.tiamatrpgmain.Attributes;
-import com.fantasticsource.tiamatrpgmain.Network;
-import com.fantasticsource.tiamatrpgmain.Network.OpenTiamatInventoryPacket;
+import com.fantasticsource.tiamatrpg.Attributes;
+import com.fantasticsource.tiamatrpg.Network;
+import com.fantasticsource.tiamatrpg.Network.OpenTiamatInventoryPacket;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
 import moe.plushie.armourers_workshop.common.network.PacketHandler;
@@ -33,27 +33,26 @@ import scala.actors.threadpool.Arrays;
 
 import java.io.IOException;
 
-import static com.fantasticsource.tiamatrpgmain.Keys.TIAMAT_INVENTORY_KEY;
-import static com.fantasticsource.tiamatrpgmain.TiamatRPGMain.MODID;
+import static com.fantasticsource.tiamatrpg.Keys.TIAMAT_INVENTORY_KEY;
+import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
 {
-    private String[] stats, statTooltips;
-    private static double statsScroll = 0;
     private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
     private static final int TEXTURE_W = 512, TEXTURE_H = 512;
     private static final int MODEL_WINDOW_X = 25, MODEL_WINDOW_Y = 22, MODEL_WINDOW_W = 70, MODEL_WINDOW_H = 88;
     private static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
     private static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
     private static final int STAT_SCROLLKNOB_H = 5;
-    private static int statLineHeight, statsHeight, statHeightDif;
     private static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
+    private static double statsScroll = 0;
+    private static int statLineHeight, statsHeight, statHeightDif;
     private static int tab = 0;
     private static boolean reopen = false;
-
+    private String[] stats, statTooltips;
     private boolean buttonClicked, statsScrollGrabbed = false, modelGrabbed = false;
     private int uOffset, vOffset, modelGrabX, modelGrabY;
     private double modelYaw = 0, modelPitch = 0, modelScale = 1;
@@ -92,6 +91,33 @@ public class TiamatInventoryGUI extends GuiContainer
             reopen = false;
             Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
         }
+    }
+
+    public static void drawEntityOnScreen(int posX, int posY, double scale, double yaw, double pitch, EntityLivingBase ent)
+    {
+        GlStateManager.enableColorMaterial();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float) posX, (float) posY, 50);
+        GlStateManager.scale((float) (-30), (float) 30, (float) 30);
+        GlStateManager.rotate(180, 0, 0, 1);
+
+        GlStateManager.rotate((float) pitch, 1, 0, 0);
+        GlStateManager.rotate((float) yaw + ent.renderYawOffset, 0, 1, 0);
+        GlStateManager.scale((float) (scale), (float) scale, (float) scale);
+
+        RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
+        rendermanager.setPlayerViewY(180);
+        rendermanager.setRenderShadow(false);
+        rendermanager.renderEntity(ent, 0, -ent.height / 2, 0, 0, 1, false);
+        rendermanager.setRenderShadow(true);
+
+        GlStateManager.popMatrix();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GlStateManager.disableTexture2D();
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
     }
 
     public void initGui()
@@ -490,33 +516,6 @@ public class TiamatInventoryGUI extends GuiContainer
                 }
             }
         }
-    }
-
-    public static void drawEntityOnScreen(int posX, int posY, double scale, double yaw, double pitch, EntityLivingBase ent)
-    {
-        GlStateManager.enableColorMaterial();
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) posX, (float) posY, 50);
-        GlStateManager.scale((float) (-30), (float) 30, (float) 30);
-        GlStateManager.rotate(180, 0, 0, 1);
-
-        GlStateManager.rotate((float) pitch, 1, 0, 0);
-        GlStateManager.rotate((float) yaw + ent.renderYawOffset, 0, 1, 0);
-        GlStateManager.scale((float) (scale), (float) scale, (float) scale);
-
-        RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
-        rendermanager.setPlayerViewY(180);
-        rendermanager.setRenderShadow(false);
-        rendermanager.renderEntity(ent, 0, -ent.height / 2, 0, 0, 1, false);
-        rendermanager.setRenderShadow(true);
-
-        GlStateManager.popMatrix();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-        GlStateManager.disableTexture2D();
-        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
     }
 
     private void scissor(int x, int y, int w, int h)

@@ -1,8 +1,8 @@
-package com.fantasticsource.tiamatrpgmain;
+package com.fantasticsource.tiamatrpg;
 
-import com.fantasticsource.tiamatrpgmain.config.server.items.AffixesConfig;
-import com.fantasticsource.tiamatrpgmain.inventory.TiamatInventoryGUI;
-import com.fantasticsource.tiamatrpgmain.inventory.TiamatPlayerInventory;
+import com.fantasticsource.tiamatrpg.config.server.items.AffixesConfig;
+import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
+import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,14 +23,14 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-@Mod(modid = TiamatRPGMain.MODID, name = TiamatRPGMain.NAME, version = TiamatRPGMain.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.026b,)")
-public class TiamatRPGMain
+@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.026b,)")
+public class TiamatRPG
 {
-    public static final String MODID = "tiamatrpgmain";
+    public static final String MODID = "tiamatrpg";
     public static final String NAME = "Tiamat RPG - Main";
     public static final String VERSION = "1.12.2.000";
 
-    public TiamatRPGMain()
+    public TiamatRPG()
     {
         Attributes.init();
     }
@@ -39,7 +39,7 @@ public class TiamatRPGMain
     public static void preInit(FMLPreInitializationEvent event) throws IllegalAccessException, IOException
     {
         Network.init();
-        MinecraftForge.EVENT_BUS.register(TiamatRPGMain.class);
+        MinecraftForge.EVENT_BUS.register(TiamatRPG.class);
         MinecraftForge.EVENT_BUS.register(AffixesConfig.class);
         AffixesConfig.init();
         MinecraftForge.EVENT_BUS.register(Attacks.class);
