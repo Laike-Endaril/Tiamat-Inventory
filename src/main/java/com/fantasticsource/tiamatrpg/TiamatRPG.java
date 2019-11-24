@@ -42,6 +42,7 @@ public class TiamatRPG
         MinecraftForge.EVENT_BUS.register(TiamatRPG.class);
         MinecraftForge.EVENT_BUS.register(AffixesConfig.class);
         AffixesConfig.init();
+        MinecraftForge.EVENT_BUS.register(CustomMouseHandler.class);
         MinecraftForge.EVENT_BUS.register(Attacks.class);
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)

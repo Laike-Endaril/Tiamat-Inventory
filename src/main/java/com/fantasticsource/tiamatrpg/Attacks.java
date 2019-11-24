@@ -7,14 +7,11 @@ import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.ExplicitPriorityQueue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.util.vector.Quaternion;
@@ -44,6 +41,7 @@ public class Attacks
             e.printStackTrace();
         }
     }
+
 
     public static boolean tryAttack(EntityPlayerMP attacker, Class filter) throws IllegalAccessException
     {
@@ -216,30 +214,40 @@ public class Attacks
     }
 
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackEntity(AttackEntityEvent event) throws IllegalAccessException
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void vanillaKnockback(LivingKnockBackEvent event)
     {
-        EntityPlayer player = event.getEntityPlayer();
-        if (player.inventory.currentItem != 0 || !(player instanceof EntityPlayerMP) || !Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
+        event.setCanceled(true);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackBlock(PlayerInteractEvent.LeftClickBlock event) throws IllegalAccessException
+    public static void knockback(EntityLivingBase target, Entity source, double force)
     {
-        EntityPlayer player = event.getEntityPlayer();
-        if (player.inventory.currentItem == 0)
-        {
-            event.setCanceled(true);
-            if (player instanceof EntityPlayerMP) Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class);
-        }
+        knockback(target, source, source != null ? target.getPositionVector().subtract(source.getPositionVector()) : new Vec3d(0, 0, 0).subtract(target.getLookVec()), force);
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackAir(PlayerInteractEvent.LeftClickEmpty event)
+    public static void knockback(EntityLivingBase target, Entity source, double xRatio, double yRatio, double zRatio, double force)
     {
-        //This event normally only happens client-side; need to send to server
-        EntityPlayer player = event.getEntityPlayer();
-        if (player.inventory.currentItem == 0) Network.WRAPPER.sendToServer(new Network.LeftClickEmptyPacket());
+        knockback(target, source, new Vec3d(xRatio, yRatio, zRatio), force);
+    }
+
+    public static void knockback(EntityLivingBase target, Entity source, Vec3d directionVector, double force)
+    {
+        //TODO add source's knockback bonus
+
+        double ratio = 1 - MCTools.getAttribute(target, KNOCKBACK_RESISTANCE);
+        if (ratio <= 0) return;
+
+        Vec3d motion = new Vec3d(target.motionX, target.motionY, target.motionZ);
+        if (!target.onGround) force *= 2;
+        else motion.scale(0.5);
+
+        target.isAirBorne = true;
+
+        motion = motion.add(directionVector.normalize().scale(force * ratio));
+
+        target.motionX = motion.x;
+        target.motionY = motion.y;
+        target.motionZ = motion.z;
     }
 
 
@@ -290,42 +298,5 @@ public class Attacks
             }
         }
         //If mode is not set, just do full damage at all distances in range
-    }
-
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void vanillaKnockback(LivingKnockBackEvent event)
-    {
-        event.setCanceled(true);
-    }
-
-    public static void knockback(EntityLivingBase target, Entity source, double force)
-    {
-        knockback(target, source, source != null ? target.getPositionVector().subtract(source.getPositionVector()) : new Vec3d(0, 0, 0).subtract(target.getLookVec()), force);
-    }
-
-    public static void knockback(EntityLivingBase target, Entity source, double xRatio, double yRatio, double zRatio, double force)
-    {
-        knockback(target, source, new Vec3d(xRatio, yRatio, zRatio), force);
-    }
-
-    public static void knockback(EntityLivingBase target, Entity source, Vec3d directionVector, double force)
-    {
-        //TODO add source's knockback bonus
-
-        double ratio = 1 - MCTools.getAttribute(target, KNOCKBACK_RESISTANCE);
-        if (ratio <= 0) return;
-
-        Vec3d motion = new Vec3d(target.motionX, target.motionY, target.motionZ);
-        if (!target.onGround) force *= 2;
-        else motion.scale(0.5);
-
-        target.isAirBorne = true;
-
-        motion = motion.add(directionVector.normalize().scale(force * ratio));
-
-        target.motionX = motion.x;
-        target.motionY = motion.y;
-        target.motionZ = motion.z;
     }
 }
