@@ -2,9 +2,12 @@ package com.fantasticsource.tiamatrpg;
 
 import com.fantasticsource.tiamatrpg.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryContainer;
+import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketOpenWindow;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.StatList;
@@ -27,6 +30,7 @@ public class Network
     {
         WRAPPER.registerMessage(LeftClickEmptyPacketHandler.class, LeftClickEmptyPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(SwapWeaponsetPacketHandler.class, SwapWeaponsetPacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -99,6 +103,45 @@ public class Network
                 net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, new TiamatInventoryContainer(player)));
 
                 player.addStat(StatList.CRAFTING_TABLE_INTERACTION);
+            });
+            return null;
+        }
+    }
+
+
+    public static class SwapWeaponsetPacket implements IMessage
+    {
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+        }
+    }
+
+    public static class SwapWeaponsetPacketHandler implements IMessageHandler<SwapWeaponsetPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(SwapWeaponsetPacket packet, MessageContext ctx)
+        {
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            server.addScheduledTask(() ->
+            {
+                EntityPlayerMP player = ctx.getServerHandler().player;
+                InventoryPlayer inventory = player.inventory;
+                TiamatPlayerInventory tiamatInventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+                if (inventory == null || tiamatInventory == null) return;
+
+
+                ItemStack mainhand = tiamatInventory.mainhand.get(0);
+                ItemStack offhand = tiamatInventory.offhand.get(0);
+                tiamatInventory.mainhand.set(0, inventory.mainInventory.get(0));
+                tiamatInventory.offhand.set(0, inventory.offHandInventory.get(0));
+                inventory.mainInventory.set(0, mainhand);
+                inventory.offHandInventory.set(0, offhand);
             });
             return null;
         }

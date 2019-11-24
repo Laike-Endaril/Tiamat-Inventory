@@ -48,6 +48,7 @@ public class TiamatRPG
         {
             //Physical client
             Keys.init(event);
+            MinecraftForge.EVENT_BUS.register(Keys.class);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
         }
     }

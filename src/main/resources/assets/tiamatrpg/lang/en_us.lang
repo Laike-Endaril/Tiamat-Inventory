@@ -1,5 +1,10 @@
 tiamatrpg.keyCategory=Tiamat RPG
 tiamatrpg.key.inventory=Inventory
+tiamatrpg.key.swapWeaponsets=Swap Weaponsets
+tiamatrpg.key.sheatheUnsheathe=Sheathe / unsheathe weapons
+tiamatrpg.key.skillset1=Skills/Spells 1
+tiamatrpg.key.skillset2=Skills/Spells 2
+tiamatrpg.key.dodge=Sheathe / unsheathe weapons
 
 
 

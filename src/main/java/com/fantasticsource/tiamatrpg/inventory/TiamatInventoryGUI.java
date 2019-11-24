@@ -1,8 +1,6 @@
 package com.fantasticsource.tiamatrpg.inventory;
 
 import com.fantasticsource.tiamatrpg.Attributes;
-import com.fantasticsource.tiamatrpg.Network;
-import com.fantasticsource.tiamatrpg.Network.OpenTiamatInventoryPacket;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
 import moe.plushie.armourers_workshop.common.network.PacketHandler;
@@ -23,7 +21,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -33,7 +30,6 @@ import scala.actors.threadpool.Arrays;
 
 import java.io.IOException;
 
-import static com.fantasticsource.tiamatrpg.Keys.TIAMAT_INVENTORY_KEY;
 import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
@@ -71,16 +67,6 @@ public class TiamatInventoryGUI extends GuiContainer
         statLineHeight = fontRenderer.FONT_HEIGHT + 1;
         statsHeight = statLineHeight * stats.length;
         statHeightDif = Tools.max(0, statsHeight - STAT_WINDOW_H);
-    }
-
-    @SubscribeEvent
-    public static void keyPress(InputEvent.KeyInputEvent event)
-    {
-        if (TIAMAT_INVENTORY_KEY.isPressed() && TIAMAT_INVENTORY_KEY.getKeyConflictContext().isActive())
-        {
-            Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
-            Network.WRAPPER.sendToServer(new OpenTiamatInventoryPacket());
-        }
     }
 
     @SubscribeEvent
