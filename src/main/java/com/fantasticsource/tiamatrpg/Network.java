@@ -53,7 +53,8 @@ public class Network
             {
                 try
                 {
-                    Attacks.tryAttack(ctx.getServerHandler().player, EntityLivingBase.class);
+                    EntityPlayerMP player = ctx.getServerHandler().player;
+                    if (player.inventory.currentItem == 0) Attacks.tryAttack(player, EntityLivingBase.class);
                 }
                 catch (IllegalAccessException e)
                 {

@@ -217,24 +217,29 @@ public class Attacks
 
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void attackEntity(AttackEntityEvent event) throws IllegalAccessException
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (player.inventory.currentItem != 0 || !(player instanceof EntityPlayerMP) || !Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void attackBlock(PlayerInteractEvent.LeftClickBlock event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
-        if (player instanceof EntityPlayerMP && Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
+        if (player.inventory.currentItem == 0)
+        {
+            event.setCanceled(true);
+            if (player instanceof EntityPlayerMP) Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class);
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public static void attackAir(PlayerInteractEvent.LeftClickEmpty event)
     {
         //This event normally only happens client-side; need to send to server
-        Network.WRAPPER.sendToServer(new Network.LeftClickEmptyPacket());
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackEntity(AttackEntityEvent event) throws IllegalAccessException
-    {
         EntityPlayer player = event.getEntityPlayer();
-        if (player instanceof EntityPlayerMP && !Attacks.tryAttack((EntityPlayerMP) player, EntityLivingBase.class)) event.setCanceled(true);
+        if (player.inventory.currentItem == 0) Network.WRAPPER.sendToServer(new Network.LeftClickEmptyPacket());
     }
 
 

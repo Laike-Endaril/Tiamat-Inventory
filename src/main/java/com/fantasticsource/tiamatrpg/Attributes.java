@@ -9,7 +9,7 @@ import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 public class Attributes
 {
     public static final double
-            DEFAULT_MELEE_ANGLE = 0,
+            DEFAULT_MELEE_ANGLE = 45,
             DEFAULT_MELEE_TARGETS = 1,
             DEFAULT_MELEE_MODE = 0,
             DEFAULT_MELEE_BEST_DISTANCE = 1.5,
