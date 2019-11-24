@@ -108,7 +108,6 @@ public class Attacks
             //Final check: "shotgun" check (cone of distributed raytraces) (mostly useful for detection vs. large mobs)
             //Find evenly distributed points on evenly distributed subcones
             //Transforms are: player yaw, player pitch, roll (theta along circular intersection of cone and sphere), subConeAngle(angle of current cone)
-            MCTools.spawnDebugSnowball(attacker.world, playerEyes.x, playerEyes.y, playerEyes.z);
             double distance = Math.sqrt(squareDist);
             double subConeStep = Tools.radtodeg(TRIG_TABLE.arctan(DISTRIBUTED_RAYTRACE_SPACING / distance));
             int subConeCount = (int) (angle / subConeStep);
