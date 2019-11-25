@@ -1,3 +1,11 @@
+Should the custom inventory slots...
+...be added to the vanilla inventory?
+...be in a custom inventory which replaces the vanilla inventory?
+...be in a custom inventory separate from the vanilla inventory (current setup)?
+Maybe see how baubles is doing it
+
+
+
 Normal movement
 WASD
 
