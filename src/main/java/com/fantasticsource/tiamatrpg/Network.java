@@ -27,37 +27,50 @@ public class Network
 
     public static void init()
     {
-        WRAPPER.registerMessage(LeftClickEmptyPacketHandler.class, LeftClickEmptyPacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(ClickEmptyPacketHandler.class, ClickEmptyPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(SwapWeaponsetPacketHandler.class, SwapWeaponsetPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(ControlAndActionPacketHandler.class, ControlAndActionPacket.class, discriminator++, Side.SERVER);
     }
 
 
-    public static class LeftClickEmptyPacket implements IMessage
+    public static class ClickEmptyPacket implements IMessage
     {
+        boolean isRightClick;
+
+        public ClickEmptyPacket()
+        {
+        }
+
+        public ClickEmptyPacket(boolean isRightClick)
+        {
+            this.isRightClick = isRightClick;
+        }
+
         @Override
         public void toBytes(ByteBuf buf)
         {
+            buf.writeBoolean(isRightClick);
         }
 
         @Override
         public void fromBytes(ByteBuf buf)
         {
+            isRightClick = buf.readBoolean();
         }
     }
 
-    public static class LeftClickEmptyPacketHandler implements IMessageHandler<LeftClickEmptyPacket, IMessage>
+    public static class ClickEmptyPacketHandler implements IMessageHandler<ClickEmptyPacket, IMessage>
     {
         @Override
-        public IMessage onMessage(LeftClickEmptyPacket packet, MessageContext ctx)
+        public IMessage onMessage(ClickEmptyPacket packet, MessageContext ctx)
         {
             MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
             server.addScheduledTask(() ->
             {
                 try
                 {
-                    CustomMouseHandler.customClickAction(ctx.getServerHandler().player);
+                    CustomMouseHandler.customClickAction(ctx.getServerHandler().player, packet.isRightClick);
                 }
                 catch (IllegalAccessException e)
                 {

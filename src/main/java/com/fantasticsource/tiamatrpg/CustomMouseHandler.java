@@ -4,6 +4,7 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumActionResult;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
@@ -44,7 +45,7 @@ public class CustomMouseHandler
         if (Attacks.tiamatAttackActive) return; //Allow subattacks to pass through normally
 
         event.setCanceled(true);
-        customClickAction((EntityPlayerMP) player);
+        customClickAction((EntityPlayerMP) player, false);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
@@ -72,7 +73,7 @@ public class CustomMouseHandler
 
 
         //Server
-        if (customClickAction((EntityPlayerMP) player)) event.setCanceled(true);
+        if (customClickAction((EntityPlayerMP) player, false)) event.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
@@ -91,7 +92,129 @@ public class CustomMouseHandler
 
             KeyBinding.setKeyBindState(-100, false);
 
-            Network.WRAPPER.sendToServer(new Network.LeftClickEmptyPacket());
+            Network.WRAPPER.sendToServer(new Network.ClickEmptyPacket(false));
+        }
+    }
+
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void rightClickEntitySpecific(PlayerInteractEvent.EntityInteractSpecific event) throws IllegalAccessException
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (!(player instanceof EntityPlayerMP))
+        {
+            //Client
+            if (Keys.controlModifier != 0)
+            {
+                if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
+                else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
+
+                Keys.controlModifier = 0;
+                Keys.skillset1Pressed = false;
+                Keys.skillset2Pressed = false;
+
+                event.setCanceled(true);
+                event.setCancellationResult(EnumActionResult.SUCCESS);
+
+                KeyBinding.setKeyBindState(-99, false);
+            }
+
+            return;
+        }
+
+
+        //Server
+        if (customClickAction((EntityPlayerMP) player, true))
+        {
+            event.setCanceled(true);
+            event.setCancellationResult(EnumActionResult.SUCCESS);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) throws IllegalAccessException
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (!(player instanceof EntityPlayerMP))
+        {
+            //Client
+            if (Keys.controlModifier != 0)
+            {
+                if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
+                else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
+
+                Keys.controlModifier = 0;
+                Keys.skillset1Pressed = false;
+                Keys.skillset2Pressed = false;
+
+                event.setCanceled(true);
+                event.setCancellationResult(EnumActionResult.SUCCESS);
+
+                KeyBinding.setKeyBindState(-99, false);
+            }
+
+            return;
+        }
+
+
+        //Server
+        if (customClickAction((EntityPlayerMP) player, true))
+        {
+            event.setCanceled(true);
+            event.setCancellationResult(EnumActionResult.SUCCESS);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void rightClickItem(PlayerInteractEvent.RightClickItem event) throws IllegalAccessException
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        if (!(player instanceof EntityPlayerMP))
+        {
+            //Client
+            if (Keys.controlModifier != 0)
+            {
+                if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
+                else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
+
+                Keys.controlModifier = 0;
+                Keys.skillset1Pressed = false;
+                Keys.skillset2Pressed = false;
+
+                event.setCanceled(true);
+                event.setCancellationResult(EnumActionResult.SUCCESS);
+
+                KeyBinding.setKeyBindState(-99, false);
+            }
+
+            return;
+        }
+
+
+        //Server
+        if (customClickAction((EntityPlayerMP) player, true))
+        {
+            event.setCanceled(true);
+            event.setCancellationResult(EnumActionResult.SUCCESS);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void rightClickEmpty(PlayerInteractEvent.RightClickEmpty event)
+    {
+        //This event normally only happens client-side; need to send to server
+        if (Keys.controlModifier != 0)
+        {
+            if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
+            else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
+
+            Keys.controlModifier = 0;
+            Keys.skillset1Pressed = false;
+            Keys.skillset2Pressed = false;
+
+            KeyBinding.setKeyBindState(-99, false);
+
+            Network.WRAPPER.sendToServer(new Network.ClickEmptyPacket(false));
         }
     }
 
@@ -113,25 +236,27 @@ public class CustomMouseHandler
     }
 
 
-    public static boolean customClickAction(EntityPlayerMP player) throws IllegalAccessException
+    public static boolean customClickAction(EntityPlayerMP player, boolean isRightClick) throws IllegalAccessException
     {
         switch (getControlModifier(player))
         {
             case 1:
                 //TODO
-                System.out.println("Skill 1");
+                if (isRightClick) System.out.println("Skill 2");
+                else System.out.println("Skill 1");
                 playerControlModifiers.remove(player.getPersistentID());
                 return true;
 
             case 2:
                 //TODO
-                System.out.println("Skill 4");
+                if (isRightClick) System.out.println("Skill 5");
+                else System.out.println("Skill 4");
                 playerControlModifiers.remove(player.getPersistentID());
                 return true;
 
             case 0:
             default:
-                if (player.inventory.currentItem == 0)
+                if (!isRightClick && player.inventory.currentItem == 0)
                 {
                     Attacks.tiamatAttack(player, EntityLivingBase.class);
                     return true;
