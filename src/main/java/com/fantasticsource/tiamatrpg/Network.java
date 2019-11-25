@@ -189,14 +189,15 @@ public class Network
                 if (packet.action >= 0)
                 {
                     TiamatPlayerInventory tiamatInventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
-                    if (tiamatInventory == null) return;
-
-
-                    System.out.println("Skill " + packet.action);
-                    ItemStack skillStack = tiamatInventory.readySkills.get(packet.action);
-                    if (skillStack.isEmpty()) return;
-
-                    //TODO
+                    if (tiamatInventory != null)
+                    {
+                        System.out.println("Skill " + packet.action);
+                        ItemStack skillStack = tiamatInventory.readySkills.get(packet.action);
+                        if (!skillStack.isEmpty())
+                        {
+                            //TODO
+                        }
+                    }
                 }
 
                 CustomMouseHandler.playerControlModifiers.put(player.getPersistentID(), packet.controlModifier);
