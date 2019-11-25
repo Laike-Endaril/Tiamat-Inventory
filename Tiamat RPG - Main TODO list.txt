@@ -1,4 +1,4 @@
-Fix attack auto-repeat when looking at blocks
+Fix skillset not closing after release skill
 
 
 

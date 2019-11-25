@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatrpg;
 
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -33,6 +34,8 @@ public class CustomMouseHandler
             Keys.skillset2Pressed = false;
             event.setCanceled(true);
 
+            KeyBinding.setKeyBindState(-100, false);
+
             return;
         }
 
@@ -60,6 +63,8 @@ public class CustomMouseHandler
                 Keys.skillset1Pressed = false;
                 Keys.skillset2Pressed = false;
                 event.setCanceled(true);
+
+                KeyBinding.setKeyBindState(-100, false);
             }
 
             return;
@@ -83,6 +88,8 @@ public class CustomMouseHandler
             Keys.controlModifier = 0;
             Keys.skillset1Pressed = false;
             Keys.skillset2Pressed = false;
+
+            KeyBinding.setKeyBindState(-100, false);
 
             Network.WRAPPER.sendToServer(new Network.LeftClickEmptyPacket());
         }
