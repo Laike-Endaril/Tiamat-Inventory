@@ -28,7 +28,7 @@ public class Attacks
     private static final double DISTRIBUTED_RAYTRACE_SPACING = 0.5;
 
     private static Field entityLivingBaseTicksSinceLastSwingField;
-    private static boolean recursive = false;
+    public static boolean tiamatAttackActive = false;
 
     static
     {
@@ -43,23 +43,17 @@ public class Attacks
     }
 
 
-    public static boolean tryAttack(EntityPlayerMP attacker, Class filter) throws IllegalAccessException
+    public static void tiamatAttack(EntityPlayerMP attacker, Class filter) throws IllegalAccessException
     {
-        if (recursive) return true;
-
-
-        recursive = true;
-
-
         //Possible hit count
         double hitsRemaining = MCTools.getAttribute(attacker, MELEE_TARGETS);
-        if (hitsRemaining <= 0) return false;
+        if (hitsRemaining <= 0) return;
 
 
         //Cube distance check
         double range = MCTools.getAttribute(attacker, MELEE_BEST_DISTANCE) + MCTools.getAttribute(attacker, MELEE_TOLERANCE);
         List<Entity> entityList = attacker.world.getEntitiesWithinAABBExcludingEntity(attacker, attacker.getEntityBoundingBox().grow(range));
-        if (entityList.size() == 0) return false;
+        if (entityList.size() == 0) return;
 
 
         double angle = MCTools.getAttribute(attacker, MELEE_ANGLE);
@@ -154,7 +148,7 @@ public class Attacks
 
             //I feel a wall between us (or we're facing the wrong direction, etc)
         }
-        if (entityList.size() == 0) return false;
+        if (entityList.size() == 0) return;
 
 
         //Attack sequence
@@ -200,17 +194,14 @@ public class Attacks
                 }
             }
 
+            tiamatAttackActive = true;
             attacker.attackTargetEntityWithCurrentItem(target);
+            tiamatAttackActive = false;
+
             entityLivingBaseTicksSinceLastSwingField.set(attacker, lastSwingTime);
             if (--hitsRemaining <= 0) break;
         }
         attacker.resetCooldown();
-
-
-        recursive = false;
-
-
-        return false;
     }
 
 

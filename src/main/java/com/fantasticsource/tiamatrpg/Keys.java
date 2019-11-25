@@ -9,6 +9,7 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
@@ -25,6 +26,16 @@ public class Keys
             SKILLSET_1 = new KeyBinding(MODID + ".key.skillset1", KeyConflictContext.UNIVERSAL, Keyboard.KEY_Q, MODID + ".keyCategory"),
             SKILLSET_2 = new KeyBinding(MODID + ".key.skillset2", KeyConflictContext.UNIVERSAL, Keyboard.KEY_E, MODID + ".keyCategory"),
             DODGE = new KeyBinding(MODID + ".key.dodge", KeyConflictContext.UNIVERSAL, Keyboard.KEY_V, MODID + ".keyCategory");
+
+
+    public static boolean
+            skillset1Pressed = false,
+            skillset2Pressed = false,
+            skillset1Locked = false,
+            skillset2Locked = false;
+
+    public static int controlModifier = 0;
+
 
     public static void init(FMLPreInitializationEvent event)
     {
@@ -44,12 +55,56 @@ public class Keys
 
         if (isPressed(SKILLSET_1))
         {
-            //TODO
+            if (!skillset1Locked)
+            {
+                if (!skillset1Pressed)
+                {
+                    skillset2Pressed = false;
+                    controlModifier = 1;
+                    Network.WRAPPER.sendToServer(new Network.ControlAndActionPacket(1, -1));
+                }
+                skillset1Pressed = true;
+            }
+        }
+        else
+        {
+            if (skillset1Pressed)
+            {
+                if (controlModifier == 1)
+                {
+                    controlModifier = 0;
+                    Network.WRAPPER.sendToServer(new Network.ControlAndActionPacket(0, 0));
+                }
+            }
+            skillset1Pressed = false;
+            skillset1Locked = false;
         }
 
         if (isPressed(SKILLSET_2))
         {
-            //TODO
+            if (!skillset2Locked)
+            {
+                if (!skillset2Pressed)
+                {
+                    skillset1Pressed = false;
+                    controlModifier = 2;
+                    Network.WRAPPER.sendToServer(new Network.ControlAndActionPacket(2, -1));
+                }
+                skillset2Pressed = true;
+            }
+        }
+        else
+        {
+            if (skillset2Pressed)
+            {
+                if (controlModifier == 2)
+                {
+                    controlModifier = 0;
+                    Network.WRAPPER.sendToServer(new Network.ControlAndActionPacket(0, 3));
+                }
+            }
+            skillset2Pressed = false;
+            skillset2Locked = false;
         }
 
         if (isPressed(SHEATHE_UNSHEATHE))
@@ -69,8 +124,16 @@ public class Keys
         }
     }
 
-    private static boolean isPressed(KeyBinding keyBinding)
+    public static boolean isPressed(KeyBinding keyBinding)
     {
         return keyBinding.isPressed() && keyBinding.getKeyConflictContext().isActive();
+    }
+
+    @SubscribeEvent
+    public static void disconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
+    {
+        skillset1Pressed = false;
+        skillset2Pressed = false;
+        controlModifier = 0;
     }
 }

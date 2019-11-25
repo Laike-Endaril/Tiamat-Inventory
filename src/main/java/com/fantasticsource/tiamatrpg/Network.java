@@ -4,7 +4,6 @@ import com.fantasticsource.tiamatrpg.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -31,6 +30,7 @@ public class Network
         WRAPPER.registerMessage(LeftClickEmptyPacketHandler.class, LeftClickEmptyPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(SwapWeaponsetPacketHandler.class, SwapWeaponsetPacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(ControlAndActionPacketHandler.class, ControlAndActionPacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -57,8 +57,7 @@ public class Network
             {
                 try
                 {
-                    EntityPlayerMP player = ctx.getServerHandler().player;
-                    if (player.inventory.currentItem == 0) Attacks.tryAttack(player, EntityLivingBase.class);
+                    CustomMouseHandler.customClickAction(ctx.getServerHandler().player);
                 }
                 catch (IllegalAccessException e)
                 {
@@ -142,6 +141,65 @@ public class Network
                 tiamatInventory.offhand.set(0, inventory.offHandInventory.get(0));
                 inventory.mainInventory.set(0, mainhand);
                 inventory.offHandInventory.set(0, offhand);
+            });
+            return null;
+        }
+    }
+
+
+    public static class ControlAndActionPacket implements IMessage
+    {
+        int controlModifier, action;
+
+        public ControlAndActionPacket()
+        {
+        }
+
+        public ControlAndActionPacket(int controlModifier, int action)
+        {
+            this.controlModifier = controlModifier;
+            this.action = action;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeInt(controlModifier);
+            buf.writeInt(action);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            controlModifier = buf.readInt();
+            action = buf.readInt();
+        }
+    }
+
+    public static class ControlAndActionPacketHandler implements IMessageHandler<ControlAndActionPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(ControlAndActionPacket packet, MessageContext ctx)
+        {
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            server.addScheduledTask(() ->
+            {
+                EntityPlayerMP player = ctx.getServerHandler().player;
+
+                if (packet.action >= 0)
+                {
+                    TiamatPlayerInventory tiamatInventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+                    if (tiamatInventory == null) return;
+
+
+                    System.out.println("Skill " + packet.action);
+                    ItemStack skillStack = tiamatInventory.readySkills.get(packet.action);
+                    if (skillStack.isEmpty()) return;
+
+                    //TODO
+                }
+
+                CustomMouseHandler.playerControlModifiers.put(player.getPersistentID(), packet.controlModifier);
             });
             return null;
         }

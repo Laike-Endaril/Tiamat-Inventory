@@ -99,11 +99,13 @@ public class TiamatRPG
     public static void playerLogout(PlayerEvent.PlayerLoggedOutEvent event)
     {
         TiamatPlayerInventory.saveUnload(event);
+        CustomMouseHandler.unload(event);
     }
 
     @Mod.EventHandler
     public static void serverStop(FMLServerStoppedEvent event)
     {
         TiamatPlayerInventory.saveUnloadAll(event);
+        CustomMouseHandler.unloadAll(event);
     }
 }
