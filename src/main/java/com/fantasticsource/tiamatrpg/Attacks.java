@@ -163,9 +163,9 @@ public class Attacks
                 EntityLivingBase targetLivingBase = (EntityLivingBase) target;
 
                 //Block
-                if (Math.random() < MCTools.getAttribute(targetLivingBase, BLOCK))
+                if (Math.random() < MCTools.getAttribute(targetLivingBase, AUTO_BLOCK))
                 {
-                    //TODO make knockback use damage amount (need to do damage first!)
+                    //TODO make knockback use damage amount (need to do damage calcs first!)
                     knockback(targetLivingBase, attacker, 100);
                     //TODO particle effect
 
@@ -185,7 +185,7 @@ public class Attacks
                 }
 
                 //Dodge
-                if (Math.random() < MCTools.getAttribute(targetLivingBase, DODGE))
+                if (Math.random() < MCTools.getAttribute(targetLivingBase, AUTO_DODGE))
                 {
                     //TODO 1 second of 2x movement speed
 

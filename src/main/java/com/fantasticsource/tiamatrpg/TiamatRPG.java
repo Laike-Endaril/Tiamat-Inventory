@@ -51,6 +51,7 @@ public class TiamatRPG
             Keys.init(event);
             MinecraftForge.EVENT_BUS.register(Keys.class);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
+            Attributes.clientInit(event);
         }
     }
 
@@ -58,6 +59,12 @@ public class TiamatRPG
     public static void saveConfig(ConfigChangedEvent.OnConfigChangedEvent event)
     {
         if (event.getModID().equals(MODID)) ConfigManager.sync(MODID, Config.Type.INSTANCE);
+    }
+
+    @SubscribeEvent
+    public static void syncConfig(ConfigChangedEvent.PostConfigChangedEvent event)
+    {
+        Attributes.configChanged(event);
     }
 
     @SubscribeEvent

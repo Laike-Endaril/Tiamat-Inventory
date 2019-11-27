@@ -17,7 +17,12 @@ import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 public class AffixesConfig
 {
     @Config.Name("Affix Type Names")
-    @Config.Comment({"Each name entered here will create an affix type group to add affixes to (need to completely close and reopen config menu to populate)"})
+    @Config.LangKey(MODID + ".config.affixTypeNames")
+    @Config.Comment(
+            {
+                    "Each name entered here will create an affix type group to add affixes to",
+                    "Need to completely close and reopen config menu to populate)"
+            })
     public String[] affixTypeNames = new String[0];
 
     public static void init() throws IllegalAccessException, IOException
@@ -27,7 +32,7 @@ public class AffixesConfig
         {
             String name = category.getName();
             boolean found = false;
-            for (String s : TiamatConfig.server.items.affixes.affixTypeNames)
+            for (String s : TiamatConfig.serverSettings.items.affixes.affixTypeNames)
             {
                 if (s.toLowerCase().equals(name))
                 {
@@ -42,7 +47,7 @@ public class AffixesConfig
         }
         handler.save().sync();
 
-        for (String typeName : TiamatConfig.server.items.affixes.affixTypeNames)
+        for (String typeName : TiamatConfig.serverSettings.items.affixes.affixTypeNames)
         {
             MCTools.addLangKey(typeName.toLowerCase(), typeName);
         }
@@ -54,16 +59,16 @@ public class AffixesConfig
         if (event.getModID().equals(MODID))
         {
             ConfigHandler handler = new ConfigHandler(MODID).load();
-            for (ConfigCategory category : MCTools.getConfig(MODID).getCategory("general.server.items.affixes").getChildren())
+            for (ConfigCategory category : MCTools.getConfig(MODID).getCategory("general.serverSettings.items.affixes").getChildren())
             {
-                if (!Arrays.asList(TiamatConfig.server.items.affixes.affixTypeNames).contains(category.getName().toLowerCase()))
+                if (!Arrays.asList(TiamatConfig.serverSettings.items.affixes.affixTypeNames).contains(category.getName().toLowerCase()))
                 {
                     handler.removeCategory(category.getQualifiedName());
                 }
             }
-            for (String typeName : TiamatConfig.server.items.affixes.affixTypeNames)
+            for (String typeName : TiamatConfig.serverSettings.items.affixes.affixTypeNames)
             {
-                handler.addCategory("general.server.items.affixes." + typeName).addProperty("general.server.items.affixes." + typeName + ".Test", "Stuff!");
+                handler.addCategory("general.server settings.items.affixes." + typeName).addProperty("general.server settings.items.affixes." + typeName + ".Test", "Stuff!");
             }
             handler.save().sync();
         }

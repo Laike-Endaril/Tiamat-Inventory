@@ -8,6 +8,23 @@ tiamatrpg.key.dodge=Sheathe / unsheathe weapons
 
 
 
+tiamatrpg.config.serverSettings=Server Settings
+tiamatrpg.config.clientSettings=Client Settings
+
+tiamatrpg.config.clientInventory=Inventory
+
+tiamatrpg.config.displayAttributes=Attributes To Display
+tiamatrpg.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Which attributes to display in the inventory, and their descriptions\neg. tiamatrpg.autoBlock, How likely you are to automatically block an attack\n \n
+
+tiamatrpg.config.serverItems=Items
+
+tiamatrpg.config.affixes=Affixes
+
+tiamatrpg.config.affixTypeNames=Affix Type Names
+tiamatrpg.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Each name entered here will create an affix type group to add affixes to\n(Need to completely close and reopen config menu to populate)\n \n
+
+
+
 server=Server
 client=Client
 

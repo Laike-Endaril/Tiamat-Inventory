@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatrpg.inventory;
 
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatrpg.Attributes;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
@@ -15,11 +16,13 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -45,7 +48,8 @@ public class TiamatInventoryGUI extends GuiContainer
     private static final int STAT_SCROLLKNOB_H = 5;
     private static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
     private static double statsScroll = 0;
-    private static int statLineHeight, statsHeight, statHeightDif;
+    private static int statLineHeight;
+    private static int statHeightDif;
     private static int tab = 0;
     private static boolean reopen = false;
     private String[] stats, statTooltips;
@@ -59,14 +63,17 @@ public class TiamatInventoryGUI extends GuiContainer
         allowUserInput = true;
 
         mc = Minecraft.getMinecraft();
-        String[][] statDisplayList = Attributes.getDisplayList(mc.player);
-        stats = statDisplayList[0];
-        statTooltips = statDisplayList[1];
+        stats = new String[Attributes.displayAttributes.length];
+        statTooltips = new String[stats.length];
+        for (int i = 0; i < stats.length; i++)
+        {
+            stats[i] = I18n.translateToLocal("attribute.name." + Attributes.displayAttributes[i]);
+            statTooltips[i] = I18n.translateToLocal(Attributes.displayAttributeDescriptions[i]);
+        }
 
         fontRenderer = mc.fontRenderer;
         statLineHeight = fontRenderer.FONT_HEIGHT + 1;
-        statsHeight = statLineHeight * stats.length;
-        statHeightDif = Tools.max(0, statsHeight - STAT_WINDOW_H);
+        statHeightDif = Tools.max(0, statLineHeight * stats.length - STAT_WINDOW_H);
     }
 
     @SubscribeEvent
@@ -127,11 +134,6 @@ public class TiamatInventoryGUI extends GuiContainer
     {
         if (tab == 0)
         {
-            //Update stats
-            String[][] statDisplayList = Attributes.getDisplayList(mc.player);
-            stats = statDisplayList[0];
-            statTooltips = statDisplayList[1];
-
             //Render scrollknob
             GlStateManager.color(1, 1, 1, 1);
             mc.getTextureManager().bindTexture(TEXTURE);
@@ -157,7 +159,10 @@ public class TiamatInventoryGUI extends GuiContainer
             GlStateManager.translate(0, -statsScroll * statHeightDif, 0);
             for (String stat : stats)
             {
-                drawString(fontRenderer, stat, STAT_WINDOW_X, yy, 0xffffffff);
+                IAttributeInstance attributeInstance = mc.player.getAttributeMap().getAttributeInstanceByName(stat);
+                if (attributeInstance == null) continue;
+
+                drawString(fontRenderer, stat + ": " + attributeInstance.getAttributeValue(), STAT_WINDOW_X, yy, 0xffffffff);
                 yy += statLineHeight;
             }
             GlStateManager.popMatrix();

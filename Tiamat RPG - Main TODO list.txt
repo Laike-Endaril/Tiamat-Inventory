@@ -6,28 +6,22 @@ Maybe see how baubles is doing it
 
 
 
-Normal movement
-WASD
 
 Special movement
-Jump - Space
 Active dodge - V
 
-Movement modifiers
-Sneak - ctrl
-Sprint - shift
-
 Actions
-Combos - LMB
-Weapon/item abilities (includes blocking and magic barrier) - RMB
-Skills/spells - Q (on release), E (on release), Q+LMB, Q+RMB, E+LMB, E+RMB
-Swap weaponsets - F
-Sheathe/unsheathe - Ctrl + F (moving slow for a second while starting to sheathe is fine)
+Weapon/item abilities (includes combos, block, and barrier) - LMB, RMB
+
+Dodge - Purely a quick movement ability with a stamina cost
+Block - 250* frontal, no damage to you from attack, and the attack is stopped.  Knockback based on TOTAL damage (damage * targets), stability, etc
+Barrier - 250* frontal, constant MP drain while held, blocks all magic cast on you, costing MP equal to the MP used to cast the spell
 
 
-Passive Dodge - No damage to you from attack, but attack may hit other targets in the AOE.  2x speed for 1s, LoM evade effect and sound
-Passive Block - No damage to you from attack, and the attack is stopped (will not hit any other targets).  Get knocked back, major sparks effect and sound
-Passive Parry - No damage to you from attack, and the attack's damage is reduced for all other targets it may hit.  Get slowed, minor sparks effect and sound
+Standing Dodge - 250* frontal, no damage to you from attack, but attack may hit other targets in the AOE.  2x speed for 1s, LoM evade effect and sound
+Parry - No damage to you from attack, and the attack is stopped.  Get slowed, minor sparks effect and sound (powerful ability; low chance)
+
+
 
 Dynamically defined rarities
 ...Color
