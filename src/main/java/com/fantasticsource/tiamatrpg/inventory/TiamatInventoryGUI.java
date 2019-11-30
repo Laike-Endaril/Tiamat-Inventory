@@ -1,6 +1,5 @@
 package com.fantasticsource.tiamatrpg.inventory;
 
-import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatrpg.Attributes;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
@@ -29,9 +28,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import scala.actors.threadpool.Arrays;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
