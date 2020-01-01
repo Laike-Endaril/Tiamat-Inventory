@@ -1,10 +1,13 @@
 package com.fantasticsource.tiamatrpg;
 
+import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.tiamatrpg.config.server.items.AffixesConfig;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
+import com.fantasticsource.tiamatrpg.inventory.TiamatItems;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -115,4 +118,16 @@ public class TiamatRPG
         TiamatPlayerInventory.saveUnloadAll(event);
         CustomMouseHandler.unloadAll(event);
     }
+//
+//    @SubscribeEvent
+//    public static void test(PlayerEvent.PlayerLoggedInEvent event)
+//    {
+//        System.out.println(1);
+//        ServerTickTimer.schedule(10, () ->
+//        {
+//            System.out.println(2);
+//            ItemStack stack = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers().get(0).getHeldItemMainhand();
+//            TiamatItems.setTwoHanded(stack, true);
+//        });
+//    }
 }

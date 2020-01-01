@@ -35,14 +35,14 @@ public class TiamatInventoryContainer extends Container
         //Vanilla mainhand and offhand
         //Index 0 - 1
         //Internal index 0 and 40 (vanilla player inventory; active mainhand and offhand)
-        addSlotToContainer(new TexturedFilteredSlot(playerInventory, 0, 43, 209, 96, 496, true, 1, stack -> getSlot(1).getStack().isEmpty() || !TiamatItems.isTwoHanded(stack)));
-        addSlotToContainer(new TexturedFilteredSlot(playerInventory, 40, 25, 209, 112, 496, true, 1, stack -> getSlot(0).getStack().isEmpty() || !TiamatItems.isTwoHanded(stack)));
+        addSlotToContainer(new TexturedFilteredSlot(playerInventory, 0, 43, 209, 96, 496, true, 1, stack -> getSlot(1).getStack().isEmpty() || (!TiamatItems.isTwoHanded(stack) && !TiamatItems.isTwoHanded(getSlot(1).getStack()))));
+        addSlotToContainer(new TexturedFilteredSlot(playerInventory, 40, 25, 209, 112, 496, true, 1, stack -> getSlot(0).getStack().isEmpty() || (!TiamatItems.isTwoHanded(stack) && !TiamatItems.isTwoHanded(getSlot(0).getStack()))));
 
         //Tiamat extra mainhand and offhand
         //Index 2 - 3
         //Internal index 1 and 0 (tiamat player inventory; inactive mainhand and offhand)
-        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 1, 43, 191, 96, 496, false, 1, stack -> getSlot(3).getStack().isEmpty() || !TiamatItems.isTwoHanded(stack)));
-        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496, false, 1, stack -> getSlot(2).getStack().isEmpty() || !TiamatItems.isTwoHanded(stack)));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 1, 43, 191, 96, 496, false, 1, stack -> getSlot(3).getStack().isEmpty() || (!TiamatItems.isTwoHanded(stack) && !TiamatItems.isTwoHanded(getSlot(3).getStack()))));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 0, 25, 191, 112, 496, false, 1, stack -> getSlot(2).getStack().isEmpty() || (!TiamatItems.isTwoHanded(stack) && !TiamatItems.isTwoHanded(getSlot(2).getStack()))));
 
         //Hotbar, other than the first slot (which is done above and reserved for active weaponset
         //Index 4 - 11
