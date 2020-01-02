@@ -1,8 +1,11 @@
 package com.fantasticsource.tiamatrpg.inventory;
 
+import com.fantasticsource.tiamatrpg.nbt.SlottingTags;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+
+import java.util.ArrayList;
 
 import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
@@ -108,24 +111,6 @@ public class TiamatItems
     }
 
 
-    public static String getItemType(ItemStack stack)
-    {
-        return getString(stack, "ItemType");
-    }
-
-    public static void setItemType(ItemStack stack, String itemType)
-    {
-        setString(stack, "ItemType", itemType);
-    }
-
-    public static boolean isItemType(ItemStack stack, String itemType)
-    {
-        String type = getString(stack, "ItemType");
-        if (itemType == null) return type == null;
-        return type != null && type.equals(itemType);
-    }
-
-
     public static String getWeaponType(ItemStack stack)
     {
         return getString(stack, "WeaponType");
@@ -144,15 +129,42 @@ public class TiamatItems
     }
 
 
-    public static boolean isTwoHanded(ItemStack stack)
+    public static boolean stackFitsSlot(ItemStack stack, String slot)
     {
-        if (stack.getItem() == Items.BOW) return true;
-        return hasFlag(stack, "2H");
+        ArrayList<String> slottings = SlottingTags.getItemSlottings(stack);
+        if (slottings.contains("Any") || slottings.contains(slot)) return true;
+
+        switch (slot)
+        {
+            case "Head":
+            case "Chest":
+            case "Legs":
+            case "Feet":
+            case "Tiamat Shoulders":
+            case "Tiamat Cape":
+            case "Armor":
+                return slottings.contains("Armor");
+
+            case "Mainhand":
+            case "Offhand":
+            case "Hand":
+                return slottings.contains("Hand") || slottings.contains("Tiamat 2H");
+
+            case "Baubles Amulet":
+            case "Baubles Ring":
+            case "Baubles Belt":
+            case "Baubles Head":
+            case "Baubles Body":
+            case "Baubles Charm":
+                return slottings.contains("Baubles Trinket");
+        }
+
+        return false;
     }
 
-    public static void setTwoHanded(ItemStack stack, boolean twoHanded)
+
+    public static boolean isTwoHanded(ItemStack stack)
     {
-        if (twoHanded) setFlag(stack, "2H");
-        else removeTag(stack, "2H");
+        return stack.getItem() == Items.BOW || SlottingTags.getItemSlottings(stack).contains("Tiamat 2H");
     }
 }

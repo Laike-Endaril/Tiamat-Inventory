@@ -385,27 +385,27 @@ public class TiamatInventoryGUI extends GuiContainer
         int y = slot.yPos;
         ItemStack itemstack = slot.getStack();
         boolean flag = false;
-        boolean flag1 = slot == this.clickedSlot && !this.draggedStack.isEmpty() && !this.isRightMouseClick;
-        ItemStack itemstack1 = this.mc.player.inventory.getItemStack();
+        boolean flag1 = slot == clickedSlot && !draggedStack.isEmpty() && !isRightMouseClick;
+        ItemStack itemstack1 = mc.player.inventory.getItemStack();
         String s = null;
 
-        if (slot == this.clickedSlot && !this.draggedStack.isEmpty() && this.isRightMouseClick && !itemstack.isEmpty())
+        if (slot == clickedSlot && !draggedStack.isEmpty() && isRightMouseClick && !itemstack.isEmpty())
         {
             itemstack = itemstack.copy();
             itemstack.setCount(itemstack.getCount() >> 1);
         }
-        else if (this.dragSplitting && this.dragSplittingSlots.contains(slot) && !itemstack1.isEmpty())
+        else if (dragSplitting && dragSplittingSlots.contains(slot) && !itemstack1.isEmpty())
         {
-            if (this.dragSplittingSlots.size() == 1)
+            if (dragSplittingSlots.size() == 1)
             {
                 return;
             }
 
-            if (Container.canAddItemToSlot(slot, itemstack1, true) && this.inventorySlots.canDragIntoSlot(slot))
+            if (Container.canAddItemToSlot(slot, itemstack1, true) && inventorySlots.canDragIntoSlot(slot))
             {
                 itemstack = itemstack1.copy();
                 flag = true;
-                Container.computeStackSize(this.dragSplittingSlots, this.dragSplittingLimit, itemstack, slot.getStack().isEmpty() ? 0 : slot.getStack().getCount());
+                Container.computeStackSize(dragSplittingSlots, dragSplittingLimit, itemstack, slot.getStack().isEmpty() ? 0 : slot.getStack().getCount());
                 int k = Math.min(itemstack.getMaxStackSize(), slot.getItemStackLimit(itemstack));
 
                 if (itemstack.getCount() > k)
@@ -416,13 +416,13 @@ public class TiamatInventoryGUI extends GuiContainer
             }
             else
             {
-                this.dragSplittingSlots.remove(slot);
-                this.updateDragSplitting();
+                dragSplittingSlots.remove(slot);
+                updateDragSplitting();
             }
         }
 
-        this.zLevel = 100;
-        this.itemRender.zLevel = 100;
+        zLevel = 100;
+        itemRender.zLevel = 100;
 
         if (itemstack.isEmpty() && slot.isEnabled())
         {
@@ -467,34 +467,34 @@ public class TiamatInventoryGUI extends GuiContainer
             }
 
             GlStateManager.enableDepth();
-            this.itemRender.renderItemAndEffectIntoGUI(this.mc.player, itemstack, x, y);
-            this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, itemstack, x, y, s);
+            itemRender.renderItemAndEffectIntoGUI(mc.player, itemstack, x, y);
+            itemRender.renderItemOverlayIntoGUI(fontRenderer, itemstack, x, y, s);
         }
 
-        this.itemRender.zLevel = 0;
-        this.zLevel = 0;
+        itemRender.zLevel = 0;
+        zLevel = 0;
     }
 
     public void updateDragSplitting()
     {
-        ItemStack itemstack = this.mc.player.inventory.getItemStack();
+        ItemStack itemstack = mc.player.inventory.getItemStack();
 
-        if (!itemstack.isEmpty() && this.dragSplitting)
+        if (!itemstack.isEmpty() && dragSplitting)
         {
-            if (this.dragSplittingLimit == 2)
+            if (dragSplittingLimit == 2)
             {
-                this.dragSplittingRemnant = itemstack.getMaxStackSize();
+                dragSplittingRemnant = itemstack.getMaxStackSize();
             }
             else
             {
-                this.dragSplittingRemnant = itemstack.getCount();
+                dragSplittingRemnant = itemstack.getCount();
 
-                for (Slot slot : this.dragSplittingSlots)
+                for (Slot slot : dragSplittingSlots)
                 {
                     ItemStack itemstack1 = itemstack.copy();
                     ItemStack itemstack2 = slot.getStack();
                     int i = itemstack2.isEmpty() ? 0 : itemstack2.getCount();
-                    Container.computeStackSize(this.dragSplittingSlots, this.dragSplittingLimit, itemstack1, i);
+                    Container.computeStackSize(dragSplittingSlots, dragSplittingLimit, itemstack1, i);
                     int j = Math.min(itemstack1.getMaxStackSize(), slot.getItemStackLimit(itemstack1));
 
                     if (itemstack1.getCount() > j)
@@ -502,7 +502,7 @@ public class TiamatInventoryGUI extends GuiContainer
                         itemstack1.setCount(j);
                     }
 
-                    this.dragSplittingRemnant -= itemstack1.getCount() - i;
+                    dragSplittingRemnant -= itemstack1.getCount() - i;
                 }
             }
         }

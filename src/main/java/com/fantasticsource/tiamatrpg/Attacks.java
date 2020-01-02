@@ -27,20 +27,8 @@ public class Attacks
 {
     private static final double DISTRIBUTED_RAYTRACE_SPACING = 0.5;
 
-    private static Field entityLivingBaseTicksSinceLastSwingField;
+    private static Field entityLivingBaseTicksSinceLastSwingField = ReflectionTool.getField(EntityLivingBase.class, "field_184617_aD", "ticksSinceLastSwing");
     public static boolean tiamatAttackActive = false;
-
-    static
-    {
-        try
-        {
-            entityLivingBaseTicksSinceLastSwingField = ReflectionTool.getField(EntityLivingBase.class, "field_184617_aD", "ticksSinceLastSwing");
-        }
-        catch (NoSuchFieldException | IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
-    }
 
 
     public static void tiamatAttack(EntityPlayerMP attacker, Class filter) throws IllegalAccessException

@@ -1,3 +1,7 @@
+Change or add left click, right click keybinds "mainhand" and "offhand"
+
+
+
 Add boolean config
 "Tiamat attacks in creative mode" t/f
 So a client can choose whether the first mainhand / offhand slot act in tiamat or vanilla mode when in creative gamemode

@@ -1,13 +1,10 @@
 package com.fantasticsource.tiamatrpg;
 
-import com.fantasticsource.mctools.ServerTickTimer;
 import com.fantasticsource.tiamatrpg.config.server.items.AffixesConfig;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
-import com.fantasticsource.tiamatrpg.inventory.TiamatItems;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -26,7 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.026b,)")
+@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.031a,)")
 public class TiamatRPG
 {
     public static final String MODID = "tiamatrpg";

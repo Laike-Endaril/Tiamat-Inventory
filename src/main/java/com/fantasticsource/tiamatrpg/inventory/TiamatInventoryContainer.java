@@ -73,8 +73,8 @@ public class TiamatInventoryContainer extends Container
         //...37 (vanilla legs)
         //...36 (vanilla feet)
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.HEAD, 39, 7, 22, 0, 496);
-        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 2, 7, 40, 16, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "Shoulder")));
-        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 3, 7, 58, 32, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "Cape")));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 2, 7, 40, 16, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Shoulders")));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 3, 7, 58, 32, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Cape")));
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.CHEST, 38, 7, 76, 48, 496);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.LEGS, 37, 7, 94, 64, 496);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.FEET, 36, 7, 112, 80, 496);
@@ -82,16 +82,16 @@ public class TiamatInventoryContainer extends Container
         //Pet slot
         //Index 45
         //Internal index 4 (tiamat pet slot)
-        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 4, 52, 112, 128, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "Pet")));
+        addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 4, 52, 112, 128, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Pet")));
 
 
         //Class slots
         //Index 46 - 47
         //Internal index 5 - 6 (tiamat class slots)
-        TexturedSlot slot = new TexturedFilteredSlot(tiamatPlayerInventory, 5, 135, 37, 160, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "Class"));
+        TexturedSlot slot = new TexturedFilteredSlot(tiamatPlayerInventory, 5, 135, 37, 160, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Class"));
         classTabSlots.add(slot);
         addSlotToContainer(slot);
-        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 6, 191, 37, 160, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "Class"));
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 6, 191, 37, 160, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Class"));
         classTabSlots.add(slot);
         addSlotToContainer(slot);
 
@@ -102,7 +102,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 3; xx++)
             {
-                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 7 + yy * 3 + xx, 117 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && (TiamatItems.isItemType(stack, "ActiveSkill") || TiamatItems.isItemType(stack, "PassiveSkill")));
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 7 + yy * 3 + xx, 117 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && (TiamatItems.stackFitsSlot(stack, "Tiamat Skill")));
                 classTabSlots.add(slot);
                 addSlotToContainer(slot);
             }
@@ -111,7 +111,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 3; xx++)
             {
-                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 16 + yy * 3 + xx, 173 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && (TiamatItems.isItemType(stack, "ActiveSkill") || TiamatItems.isItemType(stack, "PassiveSkill")));
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 16 + yy * 3 + xx, 173 + xx * 18, 58 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && (TiamatItems.stackFitsSlot(stack, "Tiamat Skill")));
                 classTabSlots.add(slot);
                 addSlotToContainer(slot);
             }
@@ -121,16 +121,16 @@ public class TiamatInventoryContainer extends Container
         //Profession slots
         //Index 66 - 69
         //Internal index 25 - 28 (tiamat profession slots; 2 gathering, then 2 crafting)
-        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 25, 135, 37, 192, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "ProfessionGather"));
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 25, 135, 37, 192, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Gathering Profession"));
         professionTabSlots.add(slot);
         addSlotToContainer(slot);
-        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 26, 153, 37, 192, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "ProfessionGather"));
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 26, 153, 37, 192, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Gathering Profession"));
         professionTabSlots.add(slot);
         addSlotToContainer(slot);
-        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 27, 173, 37, 208, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "ProfessionCraft"));
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 27, 173, 37, 208, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Gathering Profession"));
         professionTabSlots.add(slot);
         addSlotToContainer(slot);
-        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 28, 191, 37, 208, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "ProfessionCraft"));
+        slot = new TexturedFilteredSlot(tiamatPlayerInventory, 28, 191, 37, 208, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Gathering Profession"));
         professionTabSlots.add(slot);
         addSlotToContainer(slot);
 
@@ -141,7 +141,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 5; xx++)
             {
-                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 29 + yy * 5 + xx, 127 + xx * 18, 58 + yy * 18, 224, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "Recipe"));
+                slot = new TexturedFilteredSlot(tiamatPlayerInventory, 29 + yy * 5 + xx, 127 + xx * 18, 58 + yy * 18, 224, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Recipe"));
                 professionTabSlots.add(slot);
                 addSlotToContainer(slot);
             }
@@ -153,7 +153,7 @@ public class TiamatInventoryContainer extends Container
         //Internal index 44 - 49 (tiamat active skill slots)
         for (int yy = 0; yy < 6; yy++)
         {
-            addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 44 + yy, 97, 22 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.isItemType(stack, "ActiveSkill")));
+            addSlotToContainer(new TexturedFilteredSlot(tiamatPlayerInventory, 44 + yy, 97, 22 + yy * 18, 176, 496, true, 1, stack -> stack.hasTagCompound() && TiamatItems.stackFitsSlot(stack, "Tiamat Active Skill")));
         }
     }
 
