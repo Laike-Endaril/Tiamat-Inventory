@@ -157,6 +157,9 @@ public class TiamatItems
             case "Baubles Body":
             case "Baubles Charm":
                 return slottings.contains("Baubles Trinket");
+
+            case "Tiamat Skill":
+                return slottings.contains("Tiamat Active Skill");
         }
 
         return false;
