@@ -24,6 +24,10 @@ public class CustomMouseHandler
     {
         EntityPlayer player = event.getEntityPlayer();
 
+        //Early exit for creative mode
+        if (player.isCreative()) return;
+
+
         if (!(player instanceof EntityPlayerMP))
         {
             //Client
@@ -52,6 +56,11 @@ public class CustomMouseHandler
     public static void attackBlock(PlayerInteractEvent.LeftClickBlock event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
+
+        //Early exit for creative mode
+        if (player.isCreative()) return;
+
+
         if (!(player instanceof EntityPlayerMP))
         {
             //Client
@@ -81,6 +90,11 @@ public class CustomMouseHandler
     {
         //This event normally only happens client-side; need to send to server
         EntityPlayer player = event.getEntityPlayer();
+
+        //Early exit for creative mode
+        if (player.isCreative()) return;
+
+
         if (Keys.controlModifier != 0 || player.inventory.currentItem == 0)
         {
             if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
@@ -101,6 +115,11 @@ public class CustomMouseHandler
     public static void rightClickEntitySpecific(PlayerInteractEvent.EntityInteractSpecific event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
+
+        //Early exit for creative mode
+        if (player.isCreative()) return;
+
+
         if (!(player instanceof EntityPlayerMP))
         {
             //Client
@@ -135,6 +154,11 @@ public class CustomMouseHandler
     public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
+
+        //Early exit for creative mode
+        if (player.isCreative()) return;
+
+
         if (!(player instanceof EntityPlayerMP))
         {
             //Client
@@ -169,6 +193,11 @@ public class CustomMouseHandler
     public static void rightClickItem(PlayerInteractEvent.RightClickItem event) throws IllegalAccessException
     {
         EntityPlayer player = event.getEntityPlayer();
+
+        //Early exit for creative mode
+        if (player.isCreative()) return;
+
+
         if (!(player instanceof EntityPlayerMP))
         {
             //Client
@@ -203,6 +232,11 @@ public class CustomMouseHandler
     public static void rightClickEmpty(PlayerInteractEvent.RightClickEmpty event)
     {
         //This event normally only happens client-side; need to send to server
+
+        //Early exit for creative mode
+        if (event.getEntityPlayer().isCreative()) return;
+
+
         if (Keys.controlModifier != 0)
         {
             if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
