@@ -46,7 +46,7 @@ public class Keys
     }
 
     @SubscribeEvent
-    public static void keyPress(InputEvent.KeyInputEvent event)
+    public static void keyPress(InputEvent event)
     {
         if (isPressed(DODGE))
         {
