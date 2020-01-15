@@ -27,19 +27,19 @@ public class ControlHandler
                     //Mainhand / left click
                     if (Keys.SKILLSET_1.isKeyDown() && !skillset1Locked)
                     {
-                        System.out.println("Skill 1");
+                        Network.WRAPPER.sendToServer(new Network.ActionPacket(1));
                         skillset1Locked = true;
                         event.cancelOriginal();
                     }
                     else if (Keys.SKILLSET_2.isKeyDown() && !skillset2Locked)
                     {
-                        System.out.println("Skill 4");
+                        Network.WRAPPER.sendToServer(new Network.ActionPacket(4));
                         skillset2Locked = true;
                         event.cancelOriginal();
                     }
                     else if (Minecraft.getMinecraft().player.inventory.currentItem == 0)
                     {
-                        System.out.println("Mainhand");
+                        Network.WRAPPER.sendToServer(new Network.ActionPacket(Network.ACTION_MAINHAND));
                         event.cancelOriginal();
                     }
                 }
@@ -48,19 +48,19 @@ public class ControlHandler
                     //Offhand / right click
                     if (Keys.SKILLSET_1.isKeyDown() && !skillset1Locked)
                     {
-                        System.out.println("Skill 2");
+                        Network.WRAPPER.sendToServer(new Network.ActionPacket(2));
                         skillset1Locked = true;
                         event.cancelOriginal();
                     }
                     else if (Keys.SKILLSET_2.isKeyDown() && !skillset2Locked)
                     {
-                        System.out.println("Skill 5");
+                        Network.WRAPPER.sendToServer(new Network.ActionPacket(5));
                         skillset2Locked = true;
                         event.cancelOriginal();
                     }
                     else if (Minecraft.getMinecraft().player.inventory.currentItem == 0)
                     {
-                        System.out.println("Offhand");
+                        Network.WRAPPER.sendToServer(new Network.ActionPacket(Network.ACTION_OFFHAND));
                         event.cancelOriginal();
                     }
                 }
@@ -69,12 +69,12 @@ public class ControlHandler
             {
                 if (event.name.equals(MODID + ".key.skillset1"))
                 {
-                    if (!skillset1Locked) System.out.println("Skill 0");
+                    if (!skillset1Locked) Network.WRAPPER.sendToServer(new Network.ActionPacket(0));
                     skillset1Locked = false;
                 }
                 else if (event.name.equals(MODID + ".key.skillset2"))
                 {
-                    if (!skillset2Locked) System.out.println("Skill 3");
+                    if (!skillset2Locked) Network.WRAPPER.sendToServer(new Network.ActionPacket(3));
                     skillset2Locked = false;
                 }
             }

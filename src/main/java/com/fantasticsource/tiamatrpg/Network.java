@@ -22,6 +22,10 @@ import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
 public class Network
 {
+    public static final int
+            ACTION_MAINHAND = -1,
+            ACTION_OFFHAND = -2;
+
     public static final SimpleNetworkWrapper WRAPPER = new SimpleNetworkWrapper(MODID);
     private static int discriminator = 0;
 
@@ -29,6 +33,7 @@ public class Network
     {
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(SwapWeaponsetPacketHandler.class, SwapWeaponsetPacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(ActionPacketHandler.class, ActionPacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -104,6 +109,59 @@ public class Network
                 tiamatInventory.offhand.set(0, inventory.offHandInventory.get(0));
                 inventory.mainInventory.set(0, mainhand);
                 inventory.offHandInventory.set(0, offhand);
+            });
+            return null;
+        }
+    }
+
+
+    public static class ActionPacket implements IMessage
+    {
+        public int action;
+
+        public ActionPacket()
+        {
+        }
+
+        public ActionPacket(int action)
+        {
+            this.action = action;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeInt(action);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            action = buf.readInt();
+        }
+    }
+
+    public static class ActionPacketHandler implements IMessageHandler<ActionPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(ActionPacket packet, MessageContext ctx)
+        {
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            server.addScheduledTask(() ->
+            {
+                switch (packet.action)
+                {
+                    case ACTION_MAINHAND:
+                        System.out.println("mainhand");
+                        break;
+
+                    case ACTION_OFFHAND:
+                        System.out.println("offhand");
+                        break;
+
+                    default:
+                        System.out.println("skill " + packet.action);
+                }
             });
             return null;
         }
