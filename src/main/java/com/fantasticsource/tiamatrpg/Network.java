@@ -27,58 +27,8 @@ public class Network
 
     public static void init()
     {
-        WRAPPER.registerMessage(ClickEmptyPacketHandler.class, ClickEmptyPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(SwapWeaponsetPacketHandler.class, SwapWeaponsetPacket.class, discriminator++, Side.SERVER);
-        WRAPPER.registerMessage(ControlAndActionPacketHandler.class, ControlAndActionPacket.class, discriminator++, Side.SERVER);
-    }
-
-
-    public static class ClickEmptyPacket implements IMessage
-    {
-        boolean isRightClick;
-
-        public ClickEmptyPacket()
-        {
-        }
-
-        public ClickEmptyPacket(boolean isRightClick)
-        {
-            this.isRightClick = isRightClick;
-        }
-
-        @Override
-        public void toBytes(ByteBuf buf)
-        {
-            buf.writeBoolean(isRightClick);
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buf)
-        {
-            isRightClick = buf.readBoolean();
-        }
-    }
-
-    public static class ClickEmptyPacketHandler implements IMessageHandler<ClickEmptyPacket, IMessage>
-    {
-        @Override
-        public IMessage onMessage(ClickEmptyPacket packet, MessageContext ctx)
-        {
-            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-            server.addScheduledTask(() ->
-            {
-                try
-                {
-                    CustomMouseHandler.customClickAction(ctx.getServerHandler().player, packet.isRightClick);
-                }
-                catch (IllegalAccessException e)
-                {
-                    e.printStackTrace();
-                }
-            });
-            return null;
-        }
     }
 
 
@@ -154,66 +104,6 @@ public class Network
                 tiamatInventory.offhand.set(0, inventory.offHandInventory.get(0));
                 inventory.mainInventory.set(0, mainhand);
                 inventory.offHandInventory.set(0, offhand);
-            });
-            return null;
-        }
-    }
-
-
-    public static class ControlAndActionPacket implements IMessage
-    {
-        int controlModifier, action;
-
-        public ControlAndActionPacket()
-        {
-        }
-
-        public ControlAndActionPacket(int controlModifier, int action)
-        {
-            this.controlModifier = controlModifier;
-            this.action = action;
-        }
-
-        @Override
-        public void toBytes(ByteBuf buf)
-        {
-            buf.writeInt(controlModifier);
-            buf.writeInt(action);
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buf)
-        {
-            controlModifier = buf.readInt();
-            action = buf.readInt();
-        }
-    }
-
-    public static class ControlAndActionPacketHandler implements IMessageHandler<ControlAndActionPacket, IMessage>
-    {
-        @Override
-        public IMessage onMessage(ControlAndActionPacket packet, MessageContext ctx)
-        {
-            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-            server.addScheduledTask(() ->
-            {
-                EntityPlayerMP player = ctx.getServerHandler().player;
-
-                if (packet.action >= 0)
-                {
-                    TiamatPlayerInventory tiamatInventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
-                    if (tiamatInventory != null)
-                    {
-                        System.out.println("Skill " + packet.action);
-                        ItemStack skillStack = tiamatInventory.readySkills.get(packet.action);
-                        if (!skillStack.isEmpty())
-                        {
-                            //TODO
-                        }
-                    }
-                }
-
-                CustomMouseHandler.playerControlModifiers.put(player.getPersistentID(), packet.controlModifier);
             });
             return null;
         }

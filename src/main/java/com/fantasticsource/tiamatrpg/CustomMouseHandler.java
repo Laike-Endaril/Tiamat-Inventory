@@ -1,301 +1,83 @@
 package com.fantasticsource.tiamatrpg;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.EnumActionResult;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import com.fantasticsource.mctools.controlintercept.ControlEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
-import java.util.LinkedHashMap;
-import java.util.UUID;
+import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
 public class CustomMouseHandler
 {
-    public static LinkedHashMap<UUID, Integer> playerControlModifiers = new LinkedHashMap<>();
+    protected static boolean skillset1Locked = false, skillset2Locked = false;
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackEntity(AttackEntityEvent event) throws IllegalAccessException
+    @SubscribeEvent
+    public static void controls(ControlEvent event)
     {
-        EntityPlayer player = event.getEntityPlayer();
-
-        //Early exit for creative mode
-        if (player.isCreative()) return;
-
-
-        if (!(player instanceof EntityPlayerMP))
+        if (event.identifier.equals(""))
         {
-            //Client
-            if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
-            else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
+            //Client-side
 
-            Keys.controlModifier = 0;
-            Keys.skillset1Pressed = false;
-            Keys.skillset2Pressed = false;
-            event.setCanceled(true);
+            //Early exit for creative mode
+            if (Minecraft.getMinecraft().player.isCreative()) return;
 
-            KeyBinding.setKeyBindState(-100, false);
-
-            return;
-        }
-
-
-        //Server
-        if (Attacks.tiamatAttackActive) return; //Allow subattacks to pass through normally
-
-        event.setCanceled(true);
-        customClickAction((EntityPlayerMP) player, false);
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackBlock(PlayerInteractEvent.LeftClickBlock event) throws IllegalAccessException
-    {
-        EntityPlayer player = event.getEntityPlayer();
-
-        //Early exit for creative mode
-        if (player.isCreative()) return;
-
-
-        if (!(player instanceof EntityPlayerMP))
-        {
-            //Client
-            if (Keys.controlModifier != 0 || player.inventory.currentItem == 0)
+            if (event.state)
             {
-                if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
-                else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
-
-                Keys.controlModifier = 0;
-                Keys.skillset1Pressed = false;
-                Keys.skillset2Pressed = false;
-                event.setCanceled(true);
-
-                KeyBinding.setKeyBindState(-100, false);
-            }
-
-            return;
-        }
-
-
-        //Server
-        if (customClickAction((EntityPlayerMP) player, false)) event.setCanceled(true);
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void attackAir(PlayerInteractEvent.LeftClickEmpty event)
-    {
-        //This event normally only happens client-side; need to send to server
-        EntityPlayer player = event.getEntityPlayer();
-
-        //Early exit for creative mode
-        if (player.isCreative()) return;
-
-
-        if (Keys.controlModifier != 0 || player.inventory.currentItem == 0)
-        {
-            if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
-            else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
-
-            Keys.controlModifier = 0;
-            Keys.skillset1Pressed = false;
-            Keys.skillset2Pressed = false;
-
-            KeyBinding.setKeyBindState(-100, false);
-
-            Network.WRAPPER.sendToServer(new Network.ClickEmptyPacket(false));
-        }
-    }
-
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void rightClickEntitySpecific(PlayerInteractEvent.EntityInteractSpecific event) throws IllegalAccessException
-    {
-        EntityPlayer player = event.getEntityPlayer();
-
-        //Early exit for creative mode
-        if (player.isCreative()) return;
-
-
-        if (!(player instanceof EntityPlayerMP))
-        {
-            //Client
-            if (Keys.controlModifier != 0)
-            {
-                if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
-                else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
-
-                Keys.controlModifier = 0;
-                Keys.skillset1Pressed = false;
-                Keys.skillset2Pressed = false;
-
-                event.setCanceled(true);
-                event.setCancellationResult(EnumActionResult.SUCCESS);
-
-                KeyBinding.setKeyBindState(-99, false);
-            }
-
-            return;
-        }
-
-
-        //Server
-        if (customClickAction((EntityPlayerMP) player, true))
-        {
-            event.setCanceled(true);
-            event.setCancellationResult(EnumActionResult.SUCCESS);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) throws IllegalAccessException
-    {
-        EntityPlayer player = event.getEntityPlayer();
-
-        //Early exit for creative mode
-        if (player.isCreative()) return;
-
-
-        if (!(player instanceof EntityPlayerMP))
-        {
-            //Client
-            if (Keys.controlModifier != 0)
-            {
-                if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
-                else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
-
-                Keys.controlModifier = 0;
-                Keys.skillset1Pressed = false;
-                Keys.skillset2Pressed = false;
-
-                event.setCanceled(true);
-                event.setCancellationResult(EnumActionResult.SUCCESS);
-
-                KeyBinding.setKeyBindState(-99, false);
-            }
-
-            return;
-        }
-
-
-        //Server
-        if (customClickAction((EntityPlayerMP) player, true))
-        {
-            event.setCanceled(true);
-            event.setCancellationResult(EnumActionResult.SUCCESS);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void rightClickItem(PlayerInteractEvent.RightClickItem event) throws IllegalAccessException
-    {
-        EntityPlayer player = event.getEntityPlayer();
-
-        //Early exit for creative mode
-        if (player.isCreative()) return;
-
-
-        if (!(player instanceof EntityPlayerMP))
-        {
-            //Client
-            if (Keys.controlModifier != 0)
-            {
-                if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
-                else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
-
-                Keys.controlModifier = 0;
-                Keys.skillset1Pressed = false;
-                Keys.skillset2Pressed = false;
-
-                event.setCanceled(true);
-                event.setCancellationResult(EnumActionResult.SUCCESS);
-
-                KeyBinding.setKeyBindState(-99, false);
-            }
-
-            return;
-        }
-
-
-        //Server
-        if (customClickAction((EntityPlayerMP) player, true))
-        {
-            event.setCanceled(true);
-            event.setCancellationResult(EnumActionResult.SUCCESS);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    public static void rightClickEmpty(PlayerInteractEvent.RightClickEmpty event)
-    {
-        //This event normally only happens client-side; need to send to server
-
-        //Early exit for creative mode
-        if (event.getEntityPlayer().isCreative()) return;
-
-
-        if (Keys.controlModifier != 0)
-        {
-            if (Keys.controlModifier == 1) Keys.skillset1Locked = true;
-            else if (Keys.controlModifier == 2) Keys.skillset2Locked = true;
-
-            Keys.controlModifier = 0;
-            Keys.skillset1Pressed = false;
-            Keys.skillset2Pressed = false;
-
-            KeyBinding.setKeyBindState(-99, false);
-
-            Network.WRAPPER.sendToServer(new Network.ClickEmptyPacket(false));
-        }
-    }
-
-
-    public static void unload(PlayerEvent.PlayerLoggedOutEvent event)
-    {
-        playerControlModifiers.remove(event.player.getPersistentID());
-    }
-
-    public static void unloadAll(FMLServerStoppedEvent event)
-    {
-        playerControlModifiers.clear();
-    }
-
-    public static int getControlModifier(EntityPlayerMP player)
-    {
-        Integer integer = playerControlModifiers.get(player.getPersistentID());
-        return integer != null ? integer : 0;
-    }
-
-
-    public static boolean customClickAction(EntityPlayerMP player, boolean isRightClick) throws IllegalAccessException
-    {
-        switch (getControlModifier(player))
-        {
-            case 1:
-                //TODO
-                if (isRightClick) System.out.println("Skill 2");
-                else System.out.println("Skill 1");
-                playerControlModifiers.remove(player.getPersistentID());
-                return true;
-
-            case 2:
-                //TODO
-                if (isRightClick) System.out.println("Skill 5");
-                else System.out.println("Skill 4");
-                playerControlModifiers.remove(player.getPersistentID());
-                return true;
-
-            case 0:
-            default:
-                if (!isRightClick && player.inventory.currentItem == 0)
+                if (event.name.equals("key.attack"))
                 {
-                    Attacks.tiamatAttack(player, EntityLivingBase.class);
-                    return true;
+                    //Mainhand / left click
+                    if (Keys.SKILLSET_1.isKeyDown() && !skillset1Locked)
+                    {
+                        System.out.println("Skill 1");
+                        skillset1Locked = true;
+                        event.cancelOriginal();
+                    }
+                    else if (Keys.SKILLSET_2.isKeyDown() && !skillset2Locked)
+                    {
+                        System.out.println("Skill 4");
+                        skillset2Locked = true;
+                        event.cancelOriginal();
+                    }
+                    else if (Minecraft.getMinecraft().player.inventory.currentItem == 0)
+                    {
+                        System.out.println("Mainhand");
+                        event.cancelOriginal();
+                    }
                 }
-                return false;
+                else if (event.name.equals("key.use"))
+                {
+                    //Offhand / right click
+                    if (Keys.SKILLSET_1.isKeyDown() && !skillset1Locked)
+                    {
+                        System.out.println("Skill 2");
+                        skillset1Locked = true;
+                        event.cancelOriginal();
+                    }
+                    else if (Keys.SKILLSET_2.isKeyDown() && !skillset2Locked)
+                    {
+                        System.out.println("Skill 5");
+                        skillset2Locked = true;
+                        event.cancelOriginal();
+                    }
+                    else if (Minecraft.getMinecraft().player.inventory.currentItem == 0)
+                    {
+                        System.out.println("Offhand");
+                        event.cancelOriginal();
+                    }
+                }
+            }
+            else
+            {
+                if (event.name.equals(MODID + ".key.skillset1"))
+                {
+                    if (!skillset1Locked) System.out.println("Skill 0");
+                    skillset1Locked = false;
+                }
+                else if (event.name.equals(MODID + ".key.skillset2"))
+                {
+                    if (!skillset2Locked) System.out.println("Skill 3");
+                    skillset2Locked = false;
+                }
+            }
         }
     }
 }

@@ -106,25 +106,11 @@ public class TiamatRPG
     public static void playerLogout(PlayerEvent.PlayerLoggedOutEvent event)
     {
         TiamatPlayerInventory.saveUnload(event);
-        CustomMouseHandler.unload(event);
     }
 
     @Mod.EventHandler
     public static void serverStop(FMLServerStoppedEvent event)
     {
         TiamatPlayerInventory.saveUnloadAll(event);
-        CustomMouseHandler.unloadAll(event);
     }
-//
-//    @SubscribeEvent
-//    public static void test(PlayerEvent.PlayerLoggedInEvent event)
-//    {
-//        System.out.println(1);
-//        ServerTickTimer.schedule(10, () ->
-//        {
-//            System.out.println(2);
-//            ItemStack stack = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers().get(0).getHeldItemMainhand();
-//            TiamatItems.setTwoHanded(stack, true);
-//        });
-//    }
 }
