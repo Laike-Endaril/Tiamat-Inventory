@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
-public class CustomMouseHandler
+public class ControlHandler
 {
     protected static boolean skillset1Locked = false, skillset2Locked = false;
 
