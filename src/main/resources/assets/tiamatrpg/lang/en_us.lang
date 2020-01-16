@@ -31,3 +31,8 @@ client=Client
 items=Items
 
 affixes=Affixes
+
+
+
+key.attack=Mainhand
+key.use=Offhand

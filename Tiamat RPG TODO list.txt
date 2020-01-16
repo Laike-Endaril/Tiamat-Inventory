@@ -1,18 +1,5 @@
-Change or add left click, right click keybinds "mainhand" and "offhand"
-
-
-
 Stat balance
 Attacks/skills/spells have unique, definable formulas
-
-
-
-Should the custom inventory slots...
-...be added to the vanilla inventory?
-...be in a custom inventory which replaces the vanilla inventory?
-...be in a custom inventory separate from the vanilla inventory (current setup)?
-Maybe see how baubles is doing it
-
 
 
 
@@ -23,12 +10,12 @@ Actions
 Weapon/item abilities (includes combos, block, and barrier) - LMB, RMB
 
 Dodge - Purely a quick movement ability with a stamina cost
+
 Block - 250* frontal, no damage to you from attack, and the attack is stopped.  Knockback based on TOTAL damage (damage * targets), stability, etc
 Barrier - 250* frontal, constant MP drain while held, blocks all magic cast on you, costing MP equal to the MP used to cast the spell
 
 
 Standing Dodge - 250* frontal, no damage to you from attack, but attack may hit other targets in the AOE.  2x speed for 1s, LoM evade effect and sound
-Parry - No damage to you from attack, and the attack is stopped.  Get slowed, minor sparks effect and sound (powerful ability; low chance)
 
 
 
