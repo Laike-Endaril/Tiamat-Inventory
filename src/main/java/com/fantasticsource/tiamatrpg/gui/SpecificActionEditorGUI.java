@@ -6,6 +6,7 @@ import com.fantasticsource.mctools.gui.element.other.GUIDarkenedBackground;
 import com.fantasticsource.mctools.gui.element.other.GUIVerticalScrollbar;
 import com.fantasticsource.mctools.gui.element.text.GUILabeledTextInput;
 import com.fantasticsource.mctools.gui.element.text.GUINavbar;
+import com.fantasticsource.mctools.gui.element.text.GUIText;
 import com.fantasticsource.mctools.gui.element.text.filter.FilterBlacklist;
 import com.fantasticsource.mctools.gui.element.text.filter.FilterInt;
 import com.fantasticsource.mctools.gui.element.view.GUIList;
@@ -21,7 +22,7 @@ public class SpecificActionEditorGUI extends GUIScreen
 
     protected static FilterBlacklist nameFilter = new FilterBlacklist("New Action");
     protected GUILabeledTextInput name;
-    protected GUIList subActions;
+    protected GUIList tasks;
     protected boolean reordering = false;
 
     public SpecificActionEditorGUI(String actionName)
@@ -31,7 +32,10 @@ public class SpecificActionEditorGUI extends GUIScreen
 
     protected void show(String actionName)
     {
-        Minecraft.getMinecraft().displayGuiScreen(this);
+        if (Minecraft.getMinecraft().currentScreen instanceof GUIScreen) GUIScreen.showStacked(this);
+        else Minecraft.getMinecraft().displayGuiScreen(this);
+
+
         initialName = actionName;
 
 
@@ -57,8 +61,8 @@ public class SpecificActionEditorGUI extends GUIScreen
         root.add(name);
 
 
-        //List of subactions
-        subActions = new GUIList(this, true, 0.98, 1 - (name.y + name.height))
+        //List of tasks
+        tasks = new GUIList(this, true, 0.98, 1 - (name.y + name.height))
         {
             @Override
             public GUIElement[] newLineDefaultElements()
@@ -67,9 +71,10 @@ public class SpecificActionEditorGUI extends GUIScreen
                 time.addEditActions(() ->
                 {
                     reorder();
-                    subActions.focus(time.parent);
+                    tasks.focus(time.parent);
                 });
-                return new GUIElement[]{time};
+
+                return new GUIElement[]{new GUIElement(screen, 1, 0), time, new GUIElement(screen, 1, 0), new GUIText(screen, "Task: "), new GUITask(screen)};
             }
 
             @Override
@@ -81,19 +86,19 @@ public class SpecificActionEditorGUI extends GUIScreen
                 reorder();
 
                 root.setActiveRecursive(false);
-                ((GUILabeledTextInput) line.getLineElement(0)).input.setActive(true);
+                ((GUILabeledTextInput) line.getLineElement(1)).input.setActive(true);
                 focus(line);
 
                 return this;
             }
         };
-        GUIVerticalScrollbar scrollbar = new GUIVerticalScrollbar(this, 0.02, 1 - (name.y + name.height), Color.GRAY, Color.BLANK, Color.WHITE, Color.BLANK, subActions);
-        root.addAll(subActions, scrollbar);
+        GUIVerticalScrollbar scrollbar = new GUIVerticalScrollbar(this, 0.02, 1 - (name.y + name.height), Color.GRAY, Color.BLANK, Color.WHITE, Color.BLANK, tasks);
+        root.addAll(tasks, scrollbar);
 
         name.addRecalcActions(() ->
         {
             double h = 1 - (name.y + name.height);
-            subActions.height = h;
+            tasks.height = h;
             scrollbar.height = h;
         });
     }
@@ -124,12 +129,12 @@ public class SpecificActionEditorGUI extends GUIScreen
         reordering = true;
 
 
-        GUIList.Line[] lines = subActions.getLines();
+        GUIList.Line[] lines = tasks.getLines();
 
-        ExplicitPriorityQueue<GUIList.Line> lineQueue = new ExplicitPriorityQueue<>(subActions.lineCount());
+        ExplicitPriorityQueue<GUIList.Line> lineQueue = new ExplicitPriorityQueue<>(tasks.lineCount());
         for (GUIList.Line line : lines)
         {
-            GUILabeledTextInput time = (GUILabeledTextInput) line.getLineElement(0);
+            GUILabeledTextInput time = (GUILabeledTextInput) line.getLineElement(1);
             if (!time.valid())
             {
                 reordering = false;
@@ -139,10 +144,10 @@ public class SpecificActionEditorGUI extends GUIScreen
             lineQueue.add(line, FilterInt.INSTANCE.parse(time.getText()));
         }
 
-        for (GUIList.Line line : lines) subActions.remove(line);
+        for (GUIList.Line line : lines) tasks.remove(line);
 
-        int offset = subActions.size();
-        while (lineQueue.size() > 0) subActions.add(subActions.size() - offset, lineQueue.poll());
+        int offset = tasks.size();
+        while (lineQueue.size() > 0) tasks.add(tasks.size() - offset, lineQueue.poll());
 
 
         root.recalc(0);
