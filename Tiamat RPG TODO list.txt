@@ -1,3 +1,14 @@
+Create action editor - timeline and events
+Some or all events are literal forge events
+Events include...
+...activating item attribute mods (deactivate them automatically at end of action)
+...goto (action, time)
+...queue (action, time)
+...spawn entity
+...keyframes (for animation)
+
+
+
 Stat balance
 Attacks/skills/spells have unique, definable formulas
 
