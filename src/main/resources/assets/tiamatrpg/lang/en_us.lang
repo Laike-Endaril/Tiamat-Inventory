@@ -1,11 +1,3 @@
-itemGroup.tiamatrpg=Tiamat RPG
-
-tile.tiamatrpg:actioneditor.name=Action Editor
-
-item.tiamatrpg:tiamaticon.name=Tiamat Icon
-
-
-
 tiamatrpg.keyCategory=Tiamat RPG
 tiamatrpg.key.inventory=Inventory
 tiamatrpg.key.swapWeaponsets=Swap Weaponsets
