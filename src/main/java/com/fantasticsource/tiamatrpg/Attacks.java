@@ -1,9 +1,7 @@
 package com.fantasticsource.tiamatrpg;
 
-import com.fantasticsource.mctools.ImprovedRayTracing;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tools.ReflectionTool;
-import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.ExplicitPriorityQueue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,19 +12,16 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingKnockBackEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.lwjgl.util.vector.Quaternion;
+import scala.actors.threadpool.Arrays;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static com.fantasticsource.mctools.MCTools.TRIG_TABLE;
 import static com.fantasticsource.tiamatrpg.Attributes.*;
 import static net.minecraft.entity.SharedMonsterAttributes.KNOCKBACK_RESISTANCE;
 
 public class Attacks
 {
-    private static final double DISTRIBUTED_RAYTRACE_SPACING = 0.5;
-
     private static Field entityLivingBaseTicksSinceLastSwingField = ReflectionTool.getField(EntityLivingBase.class, "field_184617_aD", "ticksSinceLastSwing");
     public static boolean tiamatAttackActive = false;
 
@@ -48,94 +43,11 @@ public class Attacks
         Vec3d playerEyes = attacker.getPositionVector().addVector(0, attacker.eyeHeight, 0);
         ExplicitPriorityQueue<Entity> queue = new ExplicitPriorityQueue<>(entityList.size());
 
-        for (Entity target : entityList)
-        {
-            //Filter check
-            if (filter != null && !filter.isAssignableFrom(target.getClass())) continue;
+        //Filter check
+        entityList.removeIf(target -> filter != null && !filter.isAssignableFrom(target.getClass()));
 
-            //Spherical distance check
-            Vec3d targetCenter = target.getPositionVector().addVector(0, target.height / 2, 0);
-            double squareDist = playerEyes.squareDistanceTo(targetCenter);
-            if (squareDist > Math.pow(range + (attacker.width + target.width) / 2, 2)) continue;
-
-            //Succeed if player center is within target sphere
-            if (squareDist < Math.pow(target.width / 2, 2))
-            {
-                queue.add(target, squareDist);
-                continue;
-            }
-
-            //Succeed if direct raytrace along player vision line hits
-            if (ImprovedRayTracing.entityPenetration(attacker, range, target, true) >= 0)
-            {
-                queue.add(target, squareDist);
-                continue;
-            }
-
-            //Succeed if direct raytrace along axis between sphere centers is within attack angle and hits
-            double angleDif = MCTools.lookAngleDifDeg(attacker, target);
-            if (angleDif <= angle && ImprovedRayTracing.entityPenetration(target, playerEyes, target.getPositionVector(), true) >= 0)
-            {
-                queue.add(target, squareDist);
-                continue;
-            }
-
-
-            //Don't do the "shotgun check" if we're only attacking in a line and not a cone
-            if (angle == 0) continue;
-
-
-            //Final check: "shotgun" check (cone of distributed raytraces) (mostly useful for detection vs. large mobs)
-            //Find evenly distributed points on evenly distributed subcones
-            //Transforms are: player yaw, player pitch, roll (theta along circular intersection of cone and sphere), subConeAngle(angle of current cone)
-            double distance = Math.sqrt(squareDist);
-            double subConeStep = Tools.radtodeg(TRIG_TABLE.arctan(DISTRIBUTED_RAYTRACE_SPACING / distance));
-            int subConeCount = (int) (angle / subConeStep);
-            subConeStep = angle / subConeCount;
-            double subConeAngle = subConeStep;
-
-            Vec3d pitchYaw = Vec3d.fromPitchYaw(0, attacker.rotationYawHead + 90);
-            Quaternion qPitchAxis = new Quaternion((float) pitchYaw.x, (float) pitchYaw.y, (float) pitchYaw.z, 0);
-            pitchYaw = Vec3d.fromPitchYaw(attacker.rotationPitch, attacker.rotationYawHead);
-            Quaternion qPitchYaw = new Quaternion((float) pitchYaw.x, (float) pitchYaw.y, (float) pitchYaw.z, 0);
-
-            boolean stop = false;
-            for (int cone = 0; cone < subConeCount; cone++)
-            {
-                double radius = distance * TRIG_TABLE.sin(Tools.degtorad(subConeAngle));
-                double rollStep = Math.PI * radius * 2 / DISTRIBUTED_RAYTRACE_SPACING;
-                int thetaStepCount = Tools.max((int) rollStep + 1, 4);
-                rollStep = Math.PI * 2 / thetaStepCount;
-                double roll = rollStep;
-                Quaternion theta0 = MCTools.rotatedQuaternion(qPitchYaw, qPitchAxis, Tools.degtorad(subConeAngle));
-
-                for (int thetaStepI = 0; thetaStepI < thetaStepCount; thetaStepI++)
-                {
-                    //Final calc, using roll and subConeAngle
-
-
-                    Quaternion qRotated = MCTools.rotatedQuaternion(theta0, qPitchYaw, roll);
-                    qRotated.scale((float) distance);
-                    Vec3d pos = new Vec3d(qRotated.x, qRotated.y, qRotated.z).add(playerEyes);
-
-                    if (ImprovedRayTracing.entityPenetration(target, playerEyes, pos, true) > 0)
-                    {
-                        queue.add(target, squareDist);
-                        stop = true;
-                        break;
-                    }
-
-                    roll += rollStep;
-                }
-
-                if (stop) break;
-
-                subConeAngle += subConeStep;
-            }
-
-
-            //I feel a wall between us (or we're facing the wrong direction, etc)
-        }
+        //Cone check
+        entityList = Arrays.asList(MCTools.withinCone(playerEyes, attacker.rotationYawHead, attacker.rotationPitch, range, angle, true, entityList.toArray(new Entity[0])));
         if (entityList.size() == 0) return;
 
 
@@ -148,37 +60,15 @@ public class Attacks
 
             if (target instanceof EntityLivingBase)
             {
-                EntityLivingBase targetLivingBase = (EntityLivingBase) target;
-
                 //Block
-                if (Math.random() < MCTools.getAttribute(targetLivingBase, AUTO_BLOCK))
+                if (false)
                 {
                     //TODO make knockback use damage amount (need to do damage calcs first!)
-                    knockback(targetLivingBase, attacker, 100);
+                    knockback((EntityLivingBase) target, attacker, 100);
                     //TODO particle effect
 
                     //Stop the attack
                     break;
-                }
-
-                //Parry
-                if (Math.random() < MCTools.getAttribute(targetLivingBase, PARRY))
-                {
-                    //TODO 1/2 second root
-                    //TODO halve damage
-
-                    //Don't damage this player, but do count this player against hit count
-                    if (--hitsRemaining <= 0) break;
-                    continue;
-                }
-
-                //Dodge
-                if (Math.random() < MCTools.getAttribute(targetLivingBase, AUTO_DODGE))
-                {
-                    //TODO 1 second of 2x movement speed
-
-                    //Don't damage this player
-                    continue;
                 }
             }
 

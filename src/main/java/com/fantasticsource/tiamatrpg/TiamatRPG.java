@@ -23,12 +23,12 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.032b,)")
+@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.033a,)")
 public class TiamatRPG
 {
     public static final String MODID = "tiamatrpg";
     public static final String NAME = "Tiamat RPG";
-    public static final String VERSION = "1.12.2.000a";
+    public static final String VERSION = "1.12.2.000b";
 
 
     public TiamatRPG()
