@@ -39,6 +39,7 @@ public class TiamatRPG
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
             //Physical client
+            Attributes.updateDisplayList();
             Keys.init(event);
             MinecraftForge.EVENT_BUS.register(Keys.class);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
@@ -54,7 +55,7 @@ public class TiamatRPG
     @SubscribeEvent
     public static void syncConfig(ConfigChangedEvent.PostConfigChangedEvent event)
     {
-        Attributes.updateDisplayList(event);
+        Attributes.updateDisplayList();
     }
 
 
