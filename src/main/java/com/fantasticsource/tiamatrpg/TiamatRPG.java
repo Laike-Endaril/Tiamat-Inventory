@@ -3,20 +3,15 @@ package com.fantasticsource.tiamatrpg;
 import com.fantasticsource.tiamatrpg.config.server.items.AffixesConfig;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
-import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,12 +24,6 @@ public class TiamatRPG
     public static final String MODID = "tiamatrpg";
     public static final String NAME = "Tiamat RPG";
     public static final String VERSION = "1.12.2.000b";
-
-
-    public TiamatRPG()
-    {
-        Attributes.init();
-    }
 
 
     @Mod.EventHandler
@@ -53,7 +42,6 @@ public class TiamatRPG
             Keys.init(event);
             MinecraftForge.EVENT_BUS.register(Keys.class);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
-            Attributes.clientInit(event);
         }
     }
 
@@ -66,29 +54,7 @@ public class TiamatRPG
     @SubscribeEvent
     public static void syncConfig(ConfigChangedEvent.PostConfigChangedEvent event)
     {
-        Attributes.configChanged(event);
-    }
-
-    @SubscribeEvent
-    public static void entityConstructing(EntityEvent.EntityConstructing event)
-    {
-        Entity entity = event.getEntity();
-        if (entity instanceof EntityLivingBase)
-        {
-            //Add new attributes
-            Attributes.addAttributes((EntityLivingBase) entity);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void entityJoin(EntityJoinWorldEvent event)
-    {
-        Entity entity = event.getEntity();
-        if (entity instanceof EntityLivingBase)
-        {
-            //Edit existing attributes
-            Attributes.editAttributes((EntityLivingBase) entity);
-        }
+        Attributes.updateDisplayList(event);
     }
 
 

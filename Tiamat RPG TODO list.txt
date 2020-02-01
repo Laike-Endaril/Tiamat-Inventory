@@ -27,13 +27,6 @@ Dynamically defined sets
 
 
 
-Strength
-Dexterity
-Constitution
-Intelligence
-Wisdom
-Charisma
-
 MP
 Stamina (don't replace hunger)
 
