@@ -41,14 +41,6 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-
-    rename '(tiamatrpg_at.cfg)', 'META-INF/$1'
-}
-
-jar {
-    manifest {
-        attributes 'FMLAT': 'tiamatrpg_at.cfg'
-    }
 }
 
 task deobfJar(type: Jar) {
