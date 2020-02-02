@@ -16,16 +16,20 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -39,26 +43,48 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
 {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
-    private static final int TEXTURE_W = 512, TEXTURE_H = 512;
-    private static final int MODEL_WINDOW_X = 25, MODEL_WINDOW_Y = 22, MODEL_WINDOW_W = 70, MODEL_WINDOW_H = 88;
-    private static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
-    private static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
-    private static final int STAT_SCROLLKNOB_H = 5;
-    private static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
-    private static double statsScroll = 0;
-    private static int statLineHeight;
-    private static int statHeightDif;
-    private static int tab = 0;
-    private static boolean reopen = false;
-    private String[] stats, statTooltips;
-    private boolean buttonClicked, statsScrollGrabbed = false, modelGrabbed = false;
-    private int uOffset, vOffset, modelGrabX, modelGrabY;
-    private double modelYaw = 0, modelPitch = 0, modelScale = 1;
+    protected static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
+    protected static final int TEXTURE_W = 512, TEXTURE_H = 512;
+    protected static final int MODEL_WINDOW_X = 25, MODEL_WINDOW_Y = 22, MODEL_WINDOW_W = 70, MODEL_WINDOW_H = 88;
+    protected static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
+    protected static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
+    protected static final int STAT_SCROLLKNOB_H = 5;
+    protected static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
+    protected static double statsScroll = 0;
+    protected static int statLineHeight;
+    protected static int statHeightDif;
+    protected static int tab = 0;
+    protected static boolean reopen = false;
+    protected String[] stats, statTooltips;
+    protected boolean buttonClicked, statsScrollGrabbed = false, modelGrabbed = false;
+    protected int uOffset, vOffset, modelGrabX, modelGrabY;
+    protected double modelYaw = 0, modelPitch = 0, modelScale = 1;
+    protected Slot hoveredSlot;
+    protected ItemStack draggedStack = ItemStack.EMPTY;
+    protected boolean isRightMouseClick;
+    protected int dragSplittingRemnant;
+    protected ItemStack returningStack = ItemStack.EMPTY;
+    protected long returningStackTime;
+    protected Slot returningStackDestSlot;
+    protected int touchUpX;
+    protected int touchUpY;
+    protected boolean doubleClick;
+    protected Slot lastClickSlot;
+    protected long lastClickTime;
+    protected int lastClickButton;
+    protected boolean ignoreMouseUp;
+    protected Slot clickedSlot;
+    protected ItemStack shiftClickedSlot = ItemStack.EMPTY;
+    protected int dragSplittingButton;
+    protected int dragSplittingLimit;
+    protected Slot currentDragTargetSlot;
+    protected long dragItemDropDelay;
 
     public TiamatInventoryGUI()
     {
         super(new TiamatInventoryContainer(Minecraft.getMinecraft().player));
+        ignoreMouseUp = true;
+
         allowUserInput = true;
 
         mc = Minecraft.getMinecraft();
@@ -116,14 +142,115 @@ public class TiamatInventoryGUI extends GuiContainer
     {
         inventorySlots = new TiamatInventoryContainer(Minecraft.getMinecraft().player);
         setTab(tab);
-        super.initGui();
+
+        mc.player.openContainer = inventorySlots;
+        guiLeft = (width - xSize) / 2;
+        guiTop = (height - ySize) / 2;
     }
 
+    @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         drawDefaultBackground();
 
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
+        GlStateManager.disableRescaleNormal();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+
+        for (int i = 0; i < buttonList.size(); ++i)
+        {
+            buttonList.get(i).drawButton(mc, mouseX, mouseY, partialTicks);
+        }
+
+        for (int j = 0; j < labelList.size(); ++j)
+        {
+            labelList.get(j).drawLabel(mc, mouseX, mouseY);
+        }
+
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float) guiLeft, (float) guiTop, 0);
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.enableRescaleNormal();
+        hoveredSlot = null;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+        GlStateManager.color(1, 1, 1, 1);
+
+        for (int i1 = 0; i1 < inventorySlots.inventorySlots.size(); ++i1)
+        {
+            Slot slot = inventorySlots.inventorySlots.get(i1);
+
+            if (slot.isEnabled())
+            {
+                drawSlot(slot);
+            }
+
+            if (isMouseOverSlot(slot, mouseX, mouseY) && slot.isEnabled())
+            {
+                hoveredSlot = slot;
+                GlStateManager.disableLighting();
+                GlStateManager.disableDepth();
+                GlStateManager.colorMask(true, true, true, false);
+                drawGradientRect(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, -2130706433, -2130706433);
+                GlStateManager.colorMask(true, true, true, true);
+                GlStateManager.enableLighting();
+                GlStateManager.enableDepth();
+            }
+        }
+
+        RenderHelper.disableStandardItemLighting();
+        drawGuiContainerForegroundLayer(mouseX, mouseY);
+        RenderHelper.enableGUIStandardItemLighting();
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
+        InventoryPlayer inventoryplayer = mc.player.inventory;
+        ItemStack itemstack = draggedStack.isEmpty() ? inventoryplayer.getItemStack() : draggedStack;
+
+        if (!itemstack.isEmpty())
+        {
+            String s = null;
+
+            if (!draggedStack.isEmpty() && isRightMouseClick)
+            {
+                itemstack = itemstack.copy();
+                itemstack.setCount(MathHelper.ceil((float) itemstack.getCount() / 2));
+            }
+            else if (dragSplitting && dragSplittingSlots.size() > 1)
+            {
+                itemstack = itemstack.copy();
+                itemstack.setCount(dragSplittingRemnant);
+
+                if (itemstack.isEmpty())
+                {
+                    s = "" + TextFormatting.YELLOW + "0";
+                }
+            }
+
+            drawItemStack(itemstack, mouseX - guiLeft - 8, mouseY - guiTop - (draggedStack.isEmpty() ? 8 : 16), s);
+        }
+
+        if (!returningStack.isEmpty())
+        {
+            float f = (float) (Minecraft.getSystemTime() - returningStackTime) / 100;
+
+            if (f >= 1)
+            {
+                f = 1;
+                returningStack = ItemStack.EMPTY;
+            }
+
+            int l2 = returningStackDestSlot.xPos - touchUpX;
+            int i3 = returningStackDestSlot.yPos - touchUpY;
+            int l1 = touchUpX + (int) ((float) l2 * f);
+            int i2 = touchUpY + (int) ((float) i3 * f);
+            drawItemStack(returningStack, l1, i2, null);
+        }
+
+        GlStateManager.popMatrix();
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        RenderHelper.enableStandardItemLighting();
 
         renderHoveredToolTip(mouseX, mouseY);
     }
@@ -307,7 +434,128 @@ public class TiamatInventoryGUI extends GuiContainer
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        if (mouseButton == 0)
+        {
+            for (int i = 0; i < buttonList.size(); ++i)
+            {
+                GuiButton guibutton = buttonList.get(i);
+
+                if (guibutton.mousePressed(mc, mouseX, mouseY))
+                {
+                    net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre event = new net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Pre(this, guibutton, buttonList);
+                    if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event))
+                        break;
+                    guibutton = event.getButton();
+                    selectedButton = guibutton;
+                    guibutton.playPressSound(mc.getSoundHandler());
+                    actionPerformed(guibutton);
+                    if (equals(mc.currentScreen))
+                        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent.Post(this, event.getButton(), buttonList));
+                }
+            }
+        }
+
+
+        boolean flag = mc.gameSettings.keyBindPickBlock.isActiveAndMatches(mouseButton - 100);
+        Slot slot = getSlotAtPosition(mouseX, mouseY);
+        long i = Minecraft.getSystemTime();
+        doubleClick = lastClickSlot == slot && i - lastClickTime < 250L && lastClickButton == mouseButton;
+        ignoreMouseUp = false;
+
+        if (mouseButton == 0 || mouseButton == 1 || flag)
+        {
+            int j = guiLeft;
+            int k = guiTop;
+            boolean flag1 = hasClickedOutside(mouseX, mouseY, j, k);
+            if (slot != null) flag1 = false; // Forge, prevent dropping of items through slots outside of GUI boundaries
+            int l = -1;
+
+            if (slot != null)
+            {
+                l = slot.slotNumber;
+            }
+
+            if (flag1)
+            {
+                l = -999;
+            }
+
+            if (mc.gameSettings.touchscreen && flag1 && mc.player.inventory.getItemStack().isEmpty())
+            {
+                mc.displayGuiScreen(null);
+                return;
+            }
+
+            if (l != -1)
+            {
+                if (mc.gameSettings.touchscreen)
+                {
+                    if (slot != null && slot.getHasStack())
+                    {
+                        clickedSlot = slot;
+                        draggedStack = ItemStack.EMPTY;
+                        isRightMouseClick = mouseButton == 1;
+                    }
+                    else
+                    {
+                        clickedSlot = null;
+                    }
+                }
+                else if (!dragSplitting)
+                {
+                    if (mc.player.inventory.getItemStack().isEmpty())
+                    {
+                        if (mc.gameSettings.keyBindPickBlock.isActiveAndMatches(mouseButton - 100))
+                        {
+                            handleMouseClick(slot, l, mouseButton, ClickType.CLONE);
+                        }
+                        else
+                        {
+                            boolean flag2 = l != -999 && (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
+                            ClickType clicktype = ClickType.PICKUP;
+
+                            if (flag2)
+                            {
+                                shiftClickedSlot = slot != null && slot.getHasStack() ? slot.getStack().copy() : ItemStack.EMPTY;
+                                clicktype = ClickType.QUICK_MOVE;
+                            }
+                            else if (l == -999)
+                            {
+                                clicktype = ClickType.THROW;
+                            }
+
+                            handleMouseClick(slot, l, mouseButton, clicktype);
+                        }
+
+                        ignoreMouseUp = true;
+                    }
+                    else
+                    {
+                        dragSplitting = true;
+                        dragSplittingButton = mouseButton;
+                        dragSplittingSlots.clear();
+
+                        if (mouseButton == 0)
+                        {
+                            dragSplittingLimit = 0;
+                        }
+                        else if (mouseButton == 1)
+                        {
+                            dragSplittingLimit = 1;
+                        }
+                        else if (mc.gameSettings.keyBindPickBlock.isActiveAndMatches(mouseButton - 100))
+                        {
+                            dragSplittingLimit = 2;
+                        }
+                    }
+                }
+            }
+        }
+
+        lastClickSlot = slot;
+        lastClickTime = i;
+        lastClickButton = mouseButton;
+
 
         if (mouseButton == 0 && Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_SCROLLBAR_X, STAT_SCROLLBAR_Y, STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, STAT_SCROLLBAR_Y + STAT_SCROLLBAR_H))
         {
@@ -325,7 +573,48 @@ public class TiamatInventoryGUI extends GuiContainer
     @Override
     protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick)
     {
-        super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+        Slot slot = getSlotAtPosition(mouseX, mouseY);
+        ItemStack itemstack = mc.player.inventory.getItemStack();
+
+        if (clickedSlot != null && mc.gameSettings.touchscreen)
+        {
+            if (clickedMouseButton == 0 || clickedMouseButton == 1)
+            {
+                if (draggedStack.isEmpty())
+                {
+                    if (slot != clickedSlot && !clickedSlot.getStack().isEmpty())
+                    {
+                        draggedStack = clickedSlot.getStack().copy();
+                    }
+                }
+                else if (draggedStack.getCount() > 1 && slot != null && Container.canAddItemToSlot(slot, draggedStack, false))
+                {
+                    long i = Minecraft.getSystemTime();
+
+                    if (currentDragTargetSlot == slot)
+                    {
+                        if (i - dragItemDropDelay > 500L)
+                        {
+                            handleMouseClick(clickedSlot, clickedSlot.slotNumber, 0, ClickType.PICKUP);
+                            handleMouseClick(slot, slot.slotNumber, 1, ClickType.PICKUP);
+                            handleMouseClick(clickedSlot, clickedSlot.slotNumber, 0, ClickType.PICKUP);
+                            dragItemDropDelay = i + 750L;
+                            draggedStack.shrink(1);
+                        }
+                    }
+                    else
+                    {
+                        currentDragTargetSlot = slot;
+                        dragItemDropDelay = i;
+                    }
+                }
+            }
+        }
+        else if (dragSplitting && slot != null && !itemstack.isEmpty() && (itemstack.getCount() > dragSplittingSlots.size() || dragSplittingLimit == 2) && Container.canAddItemToSlot(slot, itemstack, true) && slot.isItemValid(itemstack) && inventorySlots.canDragIntoSlot(slot))
+        {
+            dragSplittingSlots.add(slot);
+            updateDragSplitting();
+        }
 
         if (statsScrollGrabbed)
         {
@@ -341,10 +630,155 @@ public class TiamatInventoryGUI extends GuiContainer
         }
     }
 
+    @Override
     protected void mouseReleased(int mouseX, int mouseY, int state)
     {
         if (buttonClicked) buttonClicked = false;
-        else super.mouseReleased(mouseX, mouseY, state);
+        else
+        {
+            if (selectedButton != null && state == 0)
+            {
+                selectedButton.mouseReleased(mouseX, mouseY);
+                selectedButton = null;
+            }
+
+            Slot slot = getSlotAtPosition(mouseX, mouseY);
+            int i = guiLeft;
+            int j = guiTop;
+            boolean flag = hasClickedOutside(mouseX, mouseY, i, j);
+            if (slot != null) flag = false; // Forge, prevent dropping of items through slots outside of GUI boundaries
+            int k = -1;
+
+            if (slot != null)
+            {
+                k = slot.slotNumber;
+            }
+
+            if (flag)
+            {
+                k = -999;
+            }
+
+            if (doubleClick && slot != null && state == 0 && inventorySlots.canMergeSlot(ItemStack.EMPTY, slot))
+            {
+                if (isShiftKeyDown())
+                {
+                    if (!shiftClickedSlot.isEmpty())
+                    {
+                        for (Slot slot2 : inventorySlots.inventorySlots)
+                        {
+                            if (slot2 != null && slot2.canTakeStack(mc.player) && slot2.getHasStack() && slot2.isSameInventory(slot) && Container.canAddItemToSlot(slot2, shiftClickedSlot, true))
+                            {
+                                handleMouseClick(slot2, slot2.slotNumber, state, ClickType.QUICK_MOVE);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    handleMouseClick(slot, k, state, ClickType.PICKUP_ALL);
+                }
+
+                doubleClick = false;
+                lastClickTime = 0L;
+            }
+            else
+            {
+                if (dragSplitting && dragSplittingButton != state)
+                {
+                    dragSplitting = false;
+                    dragSplittingSlots.clear();
+                    ignoreMouseUp = true;
+                    return;
+                }
+
+                if (ignoreMouseUp)
+                {
+                    ignoreMouseUp = false;
+                    return;
+                }
+
+                if (clickedSlot != null && mc.gameSettings.touchscreen)
+                {
+                    if (state == 0 || state == 1)
+                    {
+                        if (draggedStack.isEmpty() && slot != clickedSlot)
+                        {
+                            draggedStack = clickedSlot.getStack();
+                        }
+
+                        boolean flag2 = Container.canAddItemToSlot(slot, draggedStack, false);
+
+                        if (k != -1 && !draggedStack.isEmpty() && flag2)
+                        {
+                            handleMouseClick(clickedSlot, clickedSlot.slotNumber, state, ClickType.PICKUP);
+                            handleMouseClick(slot, k, 0, ClickType.PICKUP);
+
+                            if (mc.player.inventory.getItemStack().isEmpty())
+                            {
+                                returningStack = ItemStack.EMPTY;
+                            }
+                            else
+                            {
+                                handleMouseClick(clickedSlot, clickedSlot.slotNumber, state, ClickType.PICKUP);
+                                touchUpX = mouseX - i;
+                                touchUpY = mouseY - j;
+                                returningStackDestSlot = clickedSlot;
+                                returningStack = draggedStack;
+                                returningStackTime = Minecraft.getSystemTime();
+                            }
+                        }
+                        else if (!draggedStack.isEmpty())
+                        {
+                            touchUpX = mouseX - i;
+                            touchUpY = mouseY - j;
+                            returningStackDestSlot = clickedSlot;
+                            returningStack = draggedStack;
+                            returningStackTime = Minecraft.getSystemTime();
+                        }
+
+                        draggedStack = ItemStack.EMPTY;
+                        clickedSlot = null;
+                    }
+                }
+                else if (dragSplitting && !dragSplittingSlots.isEmpty())
+                {
+                    handleMouseClick((Slot) null, -999, Container.getQuickcraftMask(0, dragSplittingLimit), ClickType.QUICK_CRAFT);
+
+                    for (Slot slot1 : dragSplittingSlots)
+                    {
+                        handleMouseClick(slot1, slot1.slotNumber, Container.getQuickcraftMask(1, dragSplittingLimit), ClickType.QUICK_CRAFT);
+                    }
+
+                    handleMouseClick((Slot) null, -999, Container.getQuickcraftMask(2, dragSplittingLimit), ClickType.QUICK_CRAFT);
+                }
+                else if (!mc.player.inventory.getItemStack().isEmpty())
+                {
+                    if (mc.gameSettings.keyBindPickBlock.isActiveAndMatches(state - 100))
+                    {
+                        handleMouseClick(slot, k, state, ClickType.CLONE);
+                    }
+                    else
+                    {
+                        boolean flag1 = k != -999 && (Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54));
+
+                        if (flag1)
+                        {
+                            shiftClickedSlot = slot != null && slot.getHasStack() ? slot.getStack().copy() : ItemStack.EMPTY;
+                        }
+
+                        handleMouseClick(slot, k, state, flag1 ? ClickType.QUICK_MOVE : ClickType.PICKUP);
+                    }
+                }
+            }
+
+            if (mc.player.inventory.getItemStack().isEmpty())
+            {
+                lastClickTime = 0L;
+            }
+
+            dragSplitting = false;
+        }
 
         statsScrollGrabbed = false;
         modelGrabbed = false;
@@ -375,8 +809,7 @@ public class TiamatInventoryGUI extends GuiContainer
         super.drawGradientRect(left, top, right, bottom, startColor, endColor);
     }
 
-    @Override
-    public void drawSlot(Slot slot)
+    protected void drawSlot(Slot slot)
     {
         if (slot instanceof TexturedSlot && !((TexturedSlot) slot).enabled) return;
 
@@ -475,7 +908,7 @@ public class TiamatInventoryGUI extends GuiContainer
         zLevel = 0;
     }
 
-    public void updateDragSplitting()
+    protected void updateDragSplitting()
     {
         ItemStack itemstack = mc.player.inventory.getItemStack();
 
@@ -507,6 +940,108 @@ public class TiamatInventoryGUI extends GuiContainer
             }
         }
     }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode)
+    {
+        if (keyCode == 1 || mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode))
+        {
+            mc.player.closeScreen();
+        }
+
+        checkHotbarKeys(keyCode);
+
+        if (hoveredSlot != null && hoveredSlot.getHasStack())
+        {
+            if (mc.gameSettings.keyBindPickBlock.isActiveAndMatches(keyCode))
+            {
+                handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, 0, ClickType.CLONE);
+            }
+            else if (mc.gameSettings.keyBindDrop.isActiveAndMatches(keyCode))
+            {
+                handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, ClickType.THROW);
+            }
+        }
+    }
+
+    @Override
+    protected boolean checkHotbarKeys(int keyCode)
+    {
+        if (mc.player.inventory.getItemStack().isEmpty() && hoveredSlot != null)
+        {
+            for (int i = 0; i < 9; ++i)
+            {
+                if (mc.gameSettings.keyBindsHotbar[i].isActiveAndMatches(keyCode))
+                {
+                    handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, i, ClickType.SWAP);
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected boolean isMouseOverSlot(Slot slotIn, int mouseX, int mouseY)
+    {
+        return isPointInRegion(slotIn.xPos, slotIn.yPos, 16, 16, mouseX, mouseY);
+    }
+
+    protected void drawItemStack(ItemStack stack, int x, int y, String altText)
+    {
+        GlStateManager.translate(0, 0, 32);
+        zLevel = 200;
+        itemRender.zLevel = 200;
+        net.minecraft.client.gui.FontRenderer font = stack.getItem().getFontRenderer(stack);
+        if (font == null) font = fontRenderer;
+        itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+        itemRender.renderItemOverlayIntoGUI(font, stack, x, y - (draggedStack.isEmpty() ? 0 : 8), altText);
+        zLevel = 0;
+        itemRender.zLevel = 0;
+    }
+
+    protected Slot getSlotAtPosition(int x, int y)
+    {
+        for (int i = 0; i < inventorySlots.inventorySlots.size(); ++i)
+        {
+            Slot slot = inventorySlots.inventorySlots.get(i);
+
+            if (isMouseOverSlot(slot, x, y) && slot.isEnabled())
+            {
+                return slot;
+            }
+        }
+
+        return null;
+    }
+
+
+    @javax.annotation.Nullable
+    public Slot getSlotUnderMouse()
+    {
+        return hoveredSlot;
+    }
+
+    public int getGuiLeft()
+    {
+        return guiLeft;
+    }
+
+    public int getGuiTop()
+    {
+        return guiTop;
+    }
+
+    public int getXSize()
+    {
+        return xSize;
+    }
+
+    public int getYSize()
+    {
+        return ySize;
+    }
+
 
     private void scissor(int x, int y, int w, int h)
     {
