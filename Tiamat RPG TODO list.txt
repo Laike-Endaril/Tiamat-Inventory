@@ -1,9 +1,10 @@
+For active dodge, a keybind, but also an option for double-tap dodging
+
+
+
 Interact menu for interacting with other players
 
 
-
-Special movement
-Active dodge - V
 
 Actions
 Weapon/item abilities (includes combos, block, and barrier) - LMB, RMB
