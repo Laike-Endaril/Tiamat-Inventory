@@ -1,8 +1,8 @@
 package com.fantasticsource.tiamatrpg.inventory;
 
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.tiamatrpg.api.ITiamatPlayerInventory;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
@@ -25,14 +25,11 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
-public class TiamatPlayerInventory implements IInventory
+public class TiamatPlayerInventory implements ITiamatPlayerInventory
 {
     public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatServerInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
@@ -43,7 +40,7 @@ public class TiamatPlayerInventory implements IInventory
     public final NonNullList<ItemStack> pet = NonNullList.withSize(1, ItemStack.EMPTY);
     public final NonNullList<ItemStack> classes = NonNullList.withSize(2, ItemStack.EMPTY);
     public final NonNullList<ItemStack> skills = NonNullList.withSize(18, ItemStack.EMPTY);
-    public final NonNullList<ItemStack> gatherProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> gatheringProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
     public final NonNullList<ItemStack> craftingProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
     public final NonNullList<ItemStack> craftingRecipes = NonNullList.withSize(15, ItemStack.EMPTY);
     public final NonNullList<ItemStack> readySkills = NonNullList.withSize(6, ItemStack.EMPTY);
@@ -55,7 +52,7 @@ public class TiamatPlayerInventory implements IInventory
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
-        allInventories = Arrays.asList(offhand, mainhand, armor, pet, classes, skills, gatherProfessions, craftingProfessions, craftingRecipes, readySkills);
+        allInventories = Arrays.asList(offhand, mainhand, armor, pet, classes, skills, gatheringProfessions, craftingProfessions, craftingRecipes, readySkills);
         itemStack = ItemStack.EMPTY;
         player = playerIn;
     }
@@ -595,5 +592,65 @@ public class TiamatPlayerInventory implements IInventory
             System.err.println("Failed to save player data for " + player.getName());
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public ItemStack getInactiveWeaponsetMainhand()
+    {
+        return mainhand.get(0);
+    }
+
+    @Override
+    public ItemStack getInactiveWeaponsetOffhand()
+    {
+        return offhand.get(0);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getTiamatArmor()
+    {
+        return new ArrayList<>(armor);
+    }
+
+    @Override
+    public ItemStack getPet()
+    {
+        return pet.get(0);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getPlayerClasses()
+    {
+        return new ArrayList<>(classes);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getSkills()
+    {
+        return new ArrayList<>(skills);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getGatheringProfessions()
+    {
+        return new ArrayList<>(gatheringProfessions);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getCraftingProfessions()
+    {
+        return new ArrayList<>(craftingProfessions);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getCraftingRecipes()
+    {
+        return new ArrayList<>(craftingRecipes);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getReadySkills()
+    {
+        return new ArrayList<>(readySkills);
     }
 }
