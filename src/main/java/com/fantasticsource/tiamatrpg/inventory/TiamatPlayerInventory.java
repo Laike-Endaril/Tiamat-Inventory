@@ -653,4 +653,12 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     {
         return new ArrayList<>(readySkills);
     }
+
+    @Override
+    public ArrayList<ItemStack> getAllItems()
+    {
+        ArrayList<ItemStack> result = new ArrayList<>();
+        for (NonNullList<ItemStack> inventory : allInventories) result.addAll(inventory);
+        return result;
+    }
 }
