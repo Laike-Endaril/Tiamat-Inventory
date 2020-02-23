@@ -1,3 +1,8 @@
+Remove the tiamat inventory keybind
+Make the normal inventory keybind open the tiamat inventory instead
+Add a creative inventory keybind (in the vanilla controls section that contains the normal inventory keybind)
+
+
 For active dodge, a keybind, but also an option for double-tap dodging
 
 
