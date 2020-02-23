@@ -661,4 +661,15 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         for (NonNullList<ItemStack> inventory : allInventories) result.addAll(inventory);
         return result;
     }
+
+    @Override
+    public ArrayList<ItemStack> getAllEquippedItems()
+    {
+        ArrayList<ItemStack> result = new ArrayList<>();
+        for (NonNullList<ItemStack> inventory : allInventories)
+        {
+            if (inventory != mainhand && inventory != offhand) result.addAll(inventory);
+        }
+        return result;
+    }
 }

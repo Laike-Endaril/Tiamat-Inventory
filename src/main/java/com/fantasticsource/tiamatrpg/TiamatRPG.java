@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatrpg;
 
+import com.fantasticsource.tiamatrpg.api.TiamatRPGAPI;
 import com.fantasticsource.tiamatrpg.config.server.items.AffixesConfig;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
@@ -69,6 +70,7 @@ public class TiamatRPG
     public static void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
         TiamatPlayerInventory.load(event);
+        System.out.println(TiamatRPGAPI.getTiamatPlayerInventory(event.player).getSizeInventory());
     }
 
     @SubscribeEvent
