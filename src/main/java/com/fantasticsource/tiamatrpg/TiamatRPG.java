@@ -1,11 +1,15 @@
 package com.fantasticsource.tiamatrpg;
 
+import com.fantasticsource.mctools.aw.RenderModes;
 import com.fantasticsource.tiamatrpg.config.server.items.AffixesConfig;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -18,7 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.IOException;
 
-@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.033a,);required-after:tiamatitems@[1.12.2.000b,);required-after:tiamatactions@[1.12.2.000,)")
+@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.034l,);required-after:tiamatitems@[1.12.2.000b,);required-after:tiamatactions@[1.12.2.000,)")
 public class TiamatRPG
 {
     public static final String MODID = "tiamatrpg";
@@ -69,6 +73,18 @@ public class TiamatRPG
     public static void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
         TiamatPlayerInventory.load(event);
+    }
+
+    @SubscribeEvent
+    public static void entityJoinWorld(EntityJoinWorldEvent event)
+    {
+        Entity entity = event.getEntity();
+        if (!entity.world.isRemote && entity instanceof EntityLivingBase)
+        {
+            if (RenderModes.getRenderMode(entity, "CapeInv") == null) RenderModes.setRenderMode(entity, "CapeInv", "On");
+            if (RenderModes.getRenderMode(entity, "ShoulderL") == null) RenderModes.setRenderMode(entity, "ShoulderL", "On");
+            if (RenderModes.getRenderMode(entity, "ShoulderR") == null) RenderModes.setRenderMode(entity, "ShoulderR", "On");
+        }
     }
 
     @SubscribeEvent
