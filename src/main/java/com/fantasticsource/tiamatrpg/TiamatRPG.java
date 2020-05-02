@@ -27,7 +27,7 @@ public class TiamatRPG
 {
     public static final String MODID = "tiamatrpg";
     public static final String NAME = "Tiamat RPG";
-    public static final String VERSION = "1.12.2.000d";
+    public static final String VERSION = "1.12.2.000e";
 
 
     @Mod.EventHandler
