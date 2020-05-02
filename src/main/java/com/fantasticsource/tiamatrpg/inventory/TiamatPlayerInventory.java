@@ -34,8 +34,8 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatServerInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
 
-    public final NonNullList<ItemStack> offhand = NonNullList.withSize(1, ItemStack.EMPTY);
-    public final NonNullList<ItemStack> mainhand = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> inactiveOffhand = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> inactiveMainhand = NonNullList.withSize(1, ItemStack.EMPTY);
     public final NonNullList<ItemStack> armor = NonNullList.withSize(2, ItemStack.EMPTY);
     public final NonNullList<ItemStack> pet = NonNullList.withSize(1, ItemStack.EMPTY);
     public final NonNullList<ItemStack> classes = NonNullList.withSize(2, ItemStack.EMPTY);
@@ -49,10 +49,11 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public EntityPlayer player;
     private ItemStack itemStack;
     private int timesChanged;
+    private boolean unsheathed = false;
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
-        allInventories = Arrays.asList(offhand, mainhand, armor, pet, classes, skills, gatheringProfessions, craftingProfessions, craftingRecipes, readySkills);
+        allInventories = Arrays.asList(inactiveOffhand, inactiveMainhand, armor, pet, classes, skills, gatheringProfessions, craftingProfessions, craftingRecipes, readySkills);
         itemStack = ItemStack.EMPTY;
         player = playerIn;
     }
@@ -597,13 +598,13 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     @Override
     public ItemStack getInactiveWeaponsetMainhand()
     {
-        return mainhand.get(0);
+        return inactiveMainhand.get(0);
     }
 
     @Override
     public ItemStack getInactiveWeaponsetOffhand()
     {
-        return offhand.get(0);
+        return inactiveOffhand.get(0);
     }
 
     @Override
@@ -668,8 +669,19 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         ArrayList<ItemStack> result = new ArrayList<>();
         for (NonNullList<ItemStack> inventory : allInventories)
         {
-            if (inventory != mainhand && inventory != offhand) result.addAll(inventory);
+            if (inventory != inactiveMainhand && inventory != inactiveOffhand) result.addAll(inventory);
         }
         return result;
+    }
+
+    @Override
+    public boolean unsheathed()
+    {
+        return unsheathed;
+    }
+
+    public void setUnsheathed(boolean unsheathed)
+    {
+        this.unsheathed = unsheathed;
     }
 }

@@ -103,10 +103,10 @@ public class Network
                 if (inventory == null || tiamatInventory == null) return;
 
 
-                ItemStack mainhand = tiamatInventory.mainhand.get(0);
-                ItemStack offhand = tiamatInventory.offhand.get(0);
-                tiamatInventory.mainhand.set(0, inventory.mainInventory.get(0));
-                tiamatInventory.offhand.set(0, inventory.offHandInventory.get(0));
+                ItemStack mainhand = tiamatInventory.inactiveMainhand.get(0);
+                ItemStack offhand = tiamatInventory.inactiveOffhand.get(0);
+                tiamatInventory.inactiveMainhand.set(0, inventory.mainInventory.get(0));
+                tiamatInventory.inactiveOffhand.set(0, inventory.offHandInventory.get(0));
                 inventory.mainInventory.set(0, mainhand);
                 inventory.offHandInventory.set(0, offhand);
             });
