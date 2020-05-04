@@ -245,7 +245,6 @@ public class TiamatInventoryContainer extends Container
         if (stack.isEmpty()) slot.putStack(ItemStack.EMPTY);
         else slot.putStack(stack);
 
-        slot.onSlotChanged();
         return ItemStack.EMPTY;
     }
 
@@ -263,64 +262,44 @@ public class TiamatInventoryContainer extends Container
             {
                 for (int i = startIndex; i <= endIndex; i++)
                 {
-                    Slot slot = this.inventorySlots.get(i);
-                    if (!slot.isItemValid(stackFrom)) continue;
-
-                    ItemStack stackTo = slot.getStack();
-                    if (!canCombine(stackFrom, stackTo)) continue;
-
-                    int limit = Tools.min(stackTo.getMaxStackSize(), slot.getSlotStackLimit());
-                    if (!stackTo.isEmpty() && stackTo.getCount() >= limit) continue;
-
-
-                    int sum = stackTo.isEmpty() ? stackFrom.getCount() : stackFrom.getCount() + stackTo.getCount();
-
-                    if (stackTo.isEmpty()) slot.putStack(stackFrom.copy());
-
-                    if (sum <= limit)
-                    {
-                        stackTo.setCount(sum);
-                        stackFrom.setCount(0);
-                        return;
-                    }
-
-                    stackTo.setCount(limit);
-                    stackFrom.setCount(sum - limit);
-
-                    slot.onSlotChanged();
+                    tryMergeItemStack(stackFrom, i);
                 }
             }
             else
             {
                 for (int i = startIndex; i >= endIndex; i--)
                 {
-                    Slot slot = this.inventorySlots.get(i);
-                    if (!slot.isItemValid(stackFrom)) continue;
-
-                    ItemStack stackTo = slot.getStack();
-                    if (!canCombine(stackFrom, stackTo)) continue;
-
-                    int limit = Tools.min(stackTo.getMaxStackSize(), slot.getSlotStackLimit());
-                    if (!stackTo.isEmpty() && stackTo.getCount() >= limit) continue;
-
-
-                    int sum = stackTo.isEmpty() ? stackFrom.getCount() : stackFrom.getCount() + stackTo.getCount();
-
-                    if (stackTo.isEmpty()) slot.putStack(stackFrom.copy());
-
-                    if (sum <= limit)
-                    {
-                        stackTo.setCount(sum);
-                        stackFrom.setCount(0);
-                        return;
-                    }
-
-                    stackTo.setCount(limit);
-                    stackFrom.setCount(sum - limit);
-
-                    slot.onSlotChanged();
+                    tryMergeItemStack(stackFrom, i);
                 }
             }
         }
+    }
+
+    protected void tryMergeItemStack(ItemStack stackFrom, int slotIDTo)
+    {
+        Slot slotTo = this.inventorySlots.get(slotIDTo);
+        if (!slotTo.isItemValid(stackFrom)) return;
+
+        ItemStack stackTo = slotTo.getStack();
+        if (!canCombine(stackFrom, stackTo)) return;
+
+        int limit = Tools.min(slotTo.getSlotStackLimit(), !stackTo.isEmpty() ? stackTo.getMaxStackSize() : stackFrom.getMaxStackSize());
+
+        int moveAmount = Tools.min(stackFrom.getCount(), limit - stackTo.getCount());
+
+        if (stackTo.isEmpty())
+        {
+            stackTo = stackFrom.copy();
+            stackTo.setCount(moveAmount);
+            slotTo.putStack(stackTo);
+        }
+        else
+        {
+            stackTo.grow(moveAmount);
+        }
+
+        stackFrom.shrink(moveAmount);
+
+        slotTo.onSlotChanged();
     }
 }
