@@ -12,6 +12,7 @@ import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -79,7 +80,7 @@ public class TiamatRPG
     public static void entityJoinWorld(EntityJoinWorldEvent event)
     {
         Entity entity = event.getEntity();
-        if (!entity.world.isRemote && entity instanceof EntityLivingBase)
+        if (!entity.world.isRemote && entity instanceof EntityLivingBase && Loader.isModLoaded("armourers_workshop"))
         {
             if (RenderModes.getRenderMode(entity, "CapeInv") == null) RenderModes.setRenderMode(entity, "CapeInv", "On");
             if (RenderModes.getRenderMode(entity, "ShoulderL") == null) RenderModes.setRenderMode(entity, "ShoulderL", "On");
