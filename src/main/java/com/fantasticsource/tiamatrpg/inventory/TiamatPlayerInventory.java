@@ -34,16 +34,30 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatServerInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
 
-    public final NonNullList<ItemStack> inactiveOffhand = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> activeMainhand = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> activeOffhand = NonNullList.withSize(1, ItemStack.EMPTY);
     public final NonNullList<ItemStack> inactiveMainhand = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> inactiveOffhand = NonNullList.withSize(1, ItemStack.EMPTY);
+
     public final NonNullList<ItemStack> armor = NonNullList.withSize(2, ItemStack.EMPTY);
+
+    public final NonNullList<ItemStack> quickSlots = NonNullList.withSize(1, ItemStack.EMPTY);
+
     public final NonNullList<ItemStack> pet = NonNullList.withSize(1, ItemStack.EMPTY);
+
+    public final NonNullList<ItemStack> deck = NonNullList.withSize(1, ItemStack.EMPTY);
+
     public final NonNullList<ItemStack> classes = NonNullList.withSize(2, ItemStack.EMPTY);
-    public final NonNullList<ItemStack> skills = NonNullList.withSize(18, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> offensiveSkills = NonNullList.withSize(2, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> utilitySkills = NonNullList.withSize(2, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> ultimateSkill = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> passiveSkills = NonNullList.withSize(2, ItemStack.EMPTY);
+
     public final NonNullList<ItemStack> gatheringProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
     public final NonNullList<ItemStack> craftingProfessions = NonNullList.withSize(2, ItemStack.EMPTY);
     public final NonNullList<ItemStack> craftingRecipes = NonNullList.withSize(15, ItemStack.EMPTY);
-    public final NonNullList<ItemStack> readySkills = NonNullList.withSize(6, ItemStack.EMPTY);
+
+
     private final List<NonNullList<ItemStack>> allInventories;
     public int currentItem;
     public EntityPlayer player;
@@ -53,7 +67,15 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
-        allInventories = Arrays.asList(inactiveOffhand, inactiveMainhand, armor, pet, classes, skills, gatheringProfessions, craftingProfessions, craftingRecipes, readySkills);
+        allInventories = Arrays.asList(activeMainhand, activeOffhand, inactiveMainhand, inactiveOffhand,
+                armor,
+                quickSlots,
+                pet,
+                deck,
+                classes, offensiveSkills, utilitySkills, ultimateSkill, passiveSkills,
+                gatheringProfessions, craftingProfessions, craftingRecipes);
+
+
         itemStack = ItemStack.EMPTY;
         player = playerIn;
     }
@@ -596,13 +618,25 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
-    public ItemStack getInactiveWeaponsetMainhand()
+    public ItemStack getActiveMainhand()
+    {
+        return activeMainhand.get(0);
+    }
+
+    @Override
+    public ItemStack getActiveOffhand()
+    {
+        return activeOffhand.get(0);
+    }
+
+    @Override
+    public ItemStack getInactiveMainhand()
     {
         return inactiveMainhand.get(0);
     }
 
     @Override
-    public ItemStack getInactiveWeaponsetOffhand()
+    public ItemStack getInactiveOffhand()
     {
         return inactiveOffhand.get(0);
     }
@@ -614,9 +648,21 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public ArrayList<ItemStack> getQuickSlots()
+    {
+        return new ArrayList<>(quickSlots);
+    }
+
+    @Override
     public ItemStack getPet()
     {
         return pet.get(0);
+    }
+
+    @Override
+    public ItemStack getDeck()
+    {
+        return deck.get(0);
     }
 
     @Override
@@ -626,9 +672,27 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
-    public ArrayList<ItemStack> getSkills()
+    public ArrayList<ItemStack> getOffensiveSkills()
     {
-        return new ArrayList<>(skills);
+        return new ArrayList<>(offensiveSkills);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getUtilitySkills()
+    {
+        return new ArrayList<>(utilitySkills);
+    }
+
+    @Override
+    public ItemStack getUltimateSkill()
+    {
+        return ultimateSkill.get(0);
+    }
+
+    @Override
+    public ArrayList<ItemStack> getPassiveSkills()
+    {
+        return new ArrayList<>(passiveSkills);
     }
 
     @Override
@@ -650,12 +714,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
-    public ArrayList<ItemStack> getReadySkills()
-    {
-        return new ArrayList<>(readySkills);
-    }
-
-    @Override
     public ArrayList<ItemStack> getAllItems()
     {
         ArrayList<ItemStack> result = new ArrayList<>();
@@ -669,7 +727,13 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         ArrayList<ItemStack> result = new ArrayList<>();
         for (NonNullList<ItemStack> inventory : allInventories)
         {
-            if (inventory != inactiveMainhand && inventory != inactiveOffhand) result.addAll(inventory);
+            if (inventory == inactiveMainhand || inventory == inactiveOffhand) continue;
+            if (!unsheathed)
+            {
+                if (inventory == activeMainhand || inventory == activeOffhand) continue;
+            }
+
+            result.addAll(inventory);
         }
         return result;
     }

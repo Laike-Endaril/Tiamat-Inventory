@@ -1,7 +1,8 @@
 package com.fantasticsource.tiamatrpg;
 
 import com.fantasticsource.mctools.aw.RenderModes;
-import com.fantasticsource.tiamatrpg.config.server.items.AffixesConfig;
+import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.ClientInventoryHacks;
+import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.InventoryHacks;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
 import net.minecraft.entity.Entity;
@@ -21,8 +22,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-import java.io.IOException;
-
 @Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.034l,);required-after:tiamatitems@[1.12.2.000b,);required-after:tiamatactions@[1.12.2.000,)")
 public class TiamatRPG
 {
@@ -32,14 +31,13 @@ public class TiamatRPG
 
 
     @Mod.EventHandler
-    public static void preInit(FMLPreInitializationEvent event) throws IllegalAccessException, IOException
+    public static void preInit(FMLPreInitializationEvent event)
     {
         Network.init();
         MinecraftForge.EVENT_BUS.register(TiamatRPG.class);
-        MinecraftForge.EVENT_BUS.register(AffixesConfig.class);
-        AffixesConfig.init();
         MinecraftForge.EVENT_BUS.register(ControlHandler.class);
         MinecraftForge.EVENT_BUS.register(Attacks.class);
+        MinecraftForge.EVENT_BUS.register(InventoryHacks.class);
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
@@ -48,6 +46,7 @@ public class TiamatRPG
             Keys.init(event);
             MinecraftForge.EVENT_BUS.register(Keys.class);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
+            MinecraftForge.EVENT_BUS.register(ClientInventoryHacks.class);
         }
     }
 

@@ -1,13 +1,14 @@
 package com.fantasticsource.tiamatrpg.config.server;
 
-import com.fantasticsource.tiamatrpg.config.server.items.ItemsConfig;
 import net.minecraftforge.common.config.Config;
 
 import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 
 public class ServerConfig
 {
-    @Config.Name("Items")
-    @Config.LangKey(MODID + ".config.serverItems")
-    public ItemsConfig items = new ItemsConfig();
+    @Config.Name("Default Inventory Size")
+    @Config.Comment("The default inventory size, without a backpack")
+    @Config.LangKey(MODID + ".config.defaultInvSize")
+    @Config.RangeInt(min = 0, max = 36)
+    public int defaultInventorySize = 3;
 }

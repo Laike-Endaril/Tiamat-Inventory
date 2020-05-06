@@ -43,13 +43,14 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends GuiContainer
 {
-    protected static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
-    protected static final int TEXTURE_W = 512, TEXTURE_H = 512;
-    protected static final int MODEL_WINDOW_X = 25, MODEL_WINDOW_Y = 22, MODEL_WINDOW_W = 70, MODEL_WINDOW_H = 88;
-    protected static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
-    protected static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
-    protected static final int STAT_SCROLLKNOB_H = 5;
-    protected static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
+    public static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
+    public static final int TEXTURE_W = 1024, TEXTURE_H = 1024;
+    public static final int MODEL_WINDOW_X = 25, MODEL_WINDOW_Y = 22, MODEL_WINDOW_W = 70, MODEL_WINDOW_H = 88;
+    public static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
+    public static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
+    public static final int STAT_SCROLLKNOB_H = 5;
+    public static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
+
     protected static double statsScroll = 0;
     protected static int statLineHeight;
     protected static int statHeightDif;
@@ -74,7 +75,7 @@ public class TiamatInventoryGUI extends GuiContainer
     protected int lastClickButton;
     protected boolean ignoreMouseUp;
     protected Slot clickedSlot;
-    protected ItemStack shiftClickedSlot = ItemStack.EMPTY;
+    protected ItemStack shiftClickedStack = ItemStack.EMPTY;
     protected int dragSplittingButton;
     protected int dragSplittingLimit;
     protected Slot currentDragTargetSlot;
@@ -338,43 +339,53 @@ public class TiamatInventoryGUI extends GuiContainer
         switch (tab)
         {
             case 0:
-                //Stats
-                xSize = 250;
-                ySize = 232;
+                //Inventory
+                xSize = 256;
+                ySize = 256;
                 uOffset = 0;
                 vOffset = 0;
-                for (TexturedSlot slot : container.classTabSlots) slot.disable();
-                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
+//                for (TexturedSlot slot : container.classTabSlots) slot.disable();
+//                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
                 break;
 
             case 1:
-                //Classes and skills
-                xSize = 250;
-                ySize = 232;
-                uOffset = 0;
-                vOffset = 256;
-                for (TexturedSlot slot : container.classTabSlots) slot.enable();
-                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
+                //Stats
+                xSize = 256;
+                ySize = 256;
+                uOffset = 256;
+                vOffset = 0;
+//                for (TexturedSlot slot : container.classTabSlots) slot.enable();
+//                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
                 break;
 
             case 2:
-                //Crafting
-                xSize = 250;
-                ySize = 232;
-                uOffset = 256;
+                //Party
+                xSize = 256;
+                ySize = 256;
+                uOffset = 512;
                 vOffset = 0;
-                for (TexturedSlot slot : container.classTabSlots) slot.disable();
-                for (TexturedSlot slot : container.professionTabSlots) slot.enable();
+//                for (TexturedSlot slot : container.classTabSlots) slot.disable();
+//                for (TexturedSlot slot : container.professionTabSlots) slot.enable();
                 break;
 
             case 3:
-                //Party
-                xSize = 250;
-                ySize = 232;
-                uOffset = 256;
+                //Friends
+                xSize = 256;
+                ySize = 256;
+                uOffset = 768;
+                vOffset = 0;
+//                for (TexturedSlot slot : container.classTabSlots) slot.disable();
+//                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
+                break;
+
+            case 4:
+                //Guild
+                xSize = 256;
+                ySize = 256;
+                uOffset = 0;
                 vOffset = 256;
-                for (TexturedSlot slot : container.classTabSlots) slot.disable();
-                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
+//                for (TexturedSlot slot : container.classTabSlots) slot.disable();
+//                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
                 break;
         }
 
@@ -516,7 +527,7 @@ public class TiamatInventoryGUI extends GuiContainer
 
                             if (flag2)
                             {
-                                shiftClickedSlot = slot != null && slot.getHasStack() ? slot.getStack().copy() : ItemStack.EMPTY;
+                                shiftClickedStack = slot != null && slot.getHasStack() ? slot.getStack().copy() : ItemStack.EMPTY;
                                 clicktype = ClickType.QUICK_MOVE;
                             }
                             else if (l == -999)
@@ -663,11 +674,11 @@ public class TiamatInventoryGUI extends GuiContainer
             {
                 if (isShiftKeyDown())
                 {
-                    if (!shiftClickedSlot.isEmpty())
+                    if (!shiftClickedStack.isEmpty())
                     {
                         for (Slot slot2 : inventorySlots.inventorySlots)
                         {
-                            if (slot2 != null && slot2.canTakeStack(mc.player) && slot2.getHasStack() && slot2.isSameInventory(slot) && Container.canAddItemToSlot(slot2, shiftClickedSlot, true))
+                            if (slot2 != null && slot2.canTakeStack(mc.player) && slot2.getHasStack() && slot2.isSameInventory(slot) && Container.canAddItemToSlot(slot2, shiftClickedStack, true))
                             {
                                 handleMouseClick(slot2, slot2.slotNumber, state, ClickType.QUICK_MOVE);
                             }
@@ -764,7 +775,7 @@ public class TiamatInventoryGUI extends GuiContainer
 
                         if (flag1)
                         {
-                            shiftClickedSlot = slot != null && slot.getHasStack() ? slot.getStack().copy() : ItemStack.EMPTY;
+                            shiftClickedStack = slot != null && slot.getHasStack() ? slot.getStack().copy() : ItemStack.EMPTY;
                         }
 
                         handleMouseClick(slot, k, state, flag1 ? ClickType.QUICK_MOVE : ClickType.PICKUP);

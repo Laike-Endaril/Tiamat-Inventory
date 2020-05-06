@@ -7,25 +7,37 @@ import java.util.ArrayList;
 
 public interface ITiamatPlayerInventory extends IInventory
 {
-    ItemStack getInactiveWeaponsetMainhand();
+    ItemStack getActiveMainhand();
 
-    ItemStack getInactiveWeaponsetOffhand();
+    ItemStack getActiveOffhand();
+
+    ItemStack getInactiveMainhand();
+
+    ItemStack getInactiveOffhand();
 
     ArrayList<ItemStack> getTiamatArmor();
 
+    ArrayList<ItemStack> getQuickSlots();
+
     ItemStack getPet();
+
+    ItemStack getDeck();
 
     ArrayList<ItemStack> getPlayerClasses();
 
-    ArrayList<ItemStack> getSkills();
+    ArrayList<ItemStack> getOffensiveSkills();
+
+    ArrayList<ItemStack> getUtilitySkills();
+
+    ItemStack getUltimateSkill();
+
+    ArrayList<ItemStack> getPassiveSkills();
 
     ArrayList<ItemStack> getGatheringProfessions();
 
     ArrayList<ItemStack> getCraftingProfessions();
 
     ArrayList<ItemStack> getCraftingRecipes();
-
-    ArrayList<ItemStack> getReadySkills();
 
     ArrayList<ItemStack> getAllItems();
 
