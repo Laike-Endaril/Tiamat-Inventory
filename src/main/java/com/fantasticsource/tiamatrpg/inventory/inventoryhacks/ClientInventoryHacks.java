@@ -46,7 +46,7 @@ public class ClientInventoryHacks extends GuiButton
             if (slot == null || !slot.isHere(mc.player.inventory, slot.getSlotIndex())) continue;
 
             int slotIndex = slot.getSlotIndex();
-            if (slotIndex < 9 || slotIndex == 40)
+            if (slotIndex < 9 || slotIndex == 40 || (slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex)))
             {
                 drawAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, slotIndex < 9);
             }

@@ -6,6 +6,7 @@ import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatrpg.Network;
 import com.fantasticsource.tiamatrpg.config.TiamatConfig;
 import com.fantasticsource.tiamatrpg.nbt.SlotDataTags;
+import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -13,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
@@ -24,10 +26,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 public class InventoryHacks
 {
+    protected static final Field CONTAINER_LISTENERS_FIELD = ReflectionTool.getField(Container.class, "listeners");
+
     public static final int[] ORDERED_SLOT_INDICES = new int[]
             {
                     9, 18, 27,
@@ -118,8 +124,9 @@ public class InventoryHacks
         int[] availableSlots = new int[Tools.min(Tools.max(slotCount, 0), 27)];
         System.arraycopy(ORDERED_SLOT_INDICES, 0, availableSlots, 0, availableSlots.length);
 
+        boolean changed = false;
         //Completely blocked hotbar slots (all except first)
-        for (int i = 1; i < 8; i++)
+        for (int i = 1; i < 9; i++)
         {
             ItemStack stack = playerInventory.getStackInSlot(i);
             if (!stack.isEmpty())
@@ -131,6 +138,7 @@ public class InventoryHacks
                     stack.setCount(0);
                     player.entityDropItem(copy, 0);
                 }
+                changed = true;
             }
         }
         //Completely blocked "cargo" slots
@@ -148,6 +156,15 @@ public class InventoryHacks
                     stack.setCount(0);
                     player.entityDropItem(copy, 0);
                 }
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            for (IContainerListener listener : (List<IContainerListener>) ReflectionTool.get(CONTAINER_LISTENERS_FIELD, player.openContainer))
+            {
+                listener.sendAllContents(player.openContainer, player.openContainer.inventoryItemStacks);
             }
         }
     }
