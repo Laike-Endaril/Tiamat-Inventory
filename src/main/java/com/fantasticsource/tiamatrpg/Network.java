@@ -3,13 +3,17 @@ package com.fantasticsource.tiamatrpg;
 import com.fantasticsource.tiamatrpg.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
+import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.InventoryHacks;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketOpenWindow;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.StatList;
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -34,6 +38,101 @@ public class Network
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(SwapWeaponsetPacketHandler.class, SwapWeaponsetPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(ActionPacketHandler.class, ActionPacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(InventorySizePacketHandler.class, InventorySizePacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(PickupSoundPacketHandler.class, PickupSoundPacket.class, discriminator++, Side.CLIENT);
+    }
+
+
+    public static class PickupSoundPacket implements IMessage
+    {
+        double x, y, z;
+
+        public PickupSoundPacket()
+        {
+            //Required
+        }
+
+        public PickupSoundPacket(double x, double y, double z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeDouble(x);
+            buf.writeDouble(y);
+            buf.writeDouble(z);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            x = buf.readDouble();
+            y = buf.readDouble();
+            z = buf.readDouble();
+        }
+    }
+
+    public static class PickupSoundPacketHandler implements IMessageHandler<PickupSoundPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(PickupSoundPacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().world.playSound(packet.x, packet.y, packet.z, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.PLAYERS, 0.2F, (float) ((Math.random() - Math.random()) * 1.4 + 2), false));
+            }
+
+            return null;
+        }
+    }
+
+
+    public static class InventorySizePacket implements IMessage
+    {
+        public int currentInventorySize;
+
+        public InventorySizePacket()
+        {
+            //Required
+        }
+
+        public InventorySizePacket(int currentInventorySize)
+        {
+            this.currentInventorySize = currentInventorySize;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeInt(currentInventorySize);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            currentInventorySize = buf.readInt();
+        }
+    }
+
+    public static class InventorySizePacketHandler implements IMessageHandler<InventorySizePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(InventorySizePacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft.getMinecraft().addScheduledTask(() ->
+                {
+                    InventoryHacks.clientInventorySize = packet.currentInventorySize;
+                });
+            }
+
+            return null;
+        }
     }
 
 

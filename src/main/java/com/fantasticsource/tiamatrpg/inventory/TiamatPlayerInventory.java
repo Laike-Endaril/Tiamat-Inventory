@@ -43,6 +43,8 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public final NonNullList<ItemStack> quickSlots = NonNullList.withSize(1, ItemStack.EMPTY);
 
+    public final NonNullList<ItemStack> backpack = NonNullList.withSize(1, ItemStack.EMPTY);
+
     public final NonNullList<ItemStack> pet = NonNullList.withSize(1, ItemStack.EMPTY);
 
     public final NonNullList<ItemStack> deck = NonNullList.withSize(1, ItemStack.EMPTY);
@@ -70,6 +72,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         allInventories = Arrays.asList(activeMainhand, activeOffhand, inactiveMainhand, inactiveOffhand,
                 armor,
                 quickSlots,
+                backpack,
                 pet,
                 deck,
                 classes, offensiveSkills, utilitySkills, ultimateSkill, passiveSkills,
@@ -651,6 +654,12 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public ArrayList<ItemStack> getQuickSlots()
     {
         return new ArrayList<>(quickSlots);
+    }
+
+    @Override
+    public ItemStack getBackpack()
+    {
+        return backpack.get(0);
     }
 
     @Override

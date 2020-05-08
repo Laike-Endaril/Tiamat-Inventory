@@ -1,12 +1,13 @@
 package com.fantasticsource.tiamatrpg;
 
 import com.fantasticsource.mctools.aw.RenderModes;
-import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.ClientInventoryHacks;
-import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.InventoryHacks;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
+import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.ClientInventoryHacks;
+import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.InventoryHacks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -42,7 +43,7 @@ public class TiamatRPG
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
             //Physical client
-            Attributes.updateDisplayList();
+            AttributeDisplayData.updateDisplayList();
             Keys.init(event);
             MinecraftForge.EVENT_BUS.register(Keys.class);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
@@ -59,7 +60,7 @@ public class TiamatRPG
     @SubscribeEvent
     public static void syncConfig(ConfigChangedEvent.PostConfigChangedEvent event)
     {
-        Attributes.updateDisplayList();
+        AttributeDisplayData.updateDisplayList();
     }
 
 
@@ -72,7 +73,9 @@ public class TiamatRPG
     @SubscribeEvent
     public static void playerLogin(PlayerEvent.PlayerLoggedInEvent event)
     {
+        EntityPlayerMP player = (EntityPlayerMP) event.player;
         TiamatPlayerInventory.load(event);
+        Network.WRAPPER.sendTo(new Network.InventorySizePacket(InventoryHacks.getCurrentInventorySize(player)), player);
     }
 
     @SubscribeEvent

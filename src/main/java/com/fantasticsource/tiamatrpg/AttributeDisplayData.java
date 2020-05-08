@@ -2,7 +2,7 @@ package com.fantasticsource.tiamatrpg;
 
 import com.fantasticsource.tiamatrpg.config.TiamatConfig;
 
-public class Attributes
+public class AttributeDisplayData
 {
     public static String[] displayAttributes = new String[0], displayAttributeDescriptions = new String[0];
 

@@ -1,23 +1,66 @@
 package com.fantasticsource.tiamatrpg.inventory.inventoryhacks;
 
+import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.mctools.items.ItemMatcher;
+import com.fantasticsource.tiamatrpg.Network;
+import com.fantasticsource.tiamatrpg.config.TiamatConfig;
+import com.fantasticsource.tiamatrpg.nbt.SlotDataTags;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
+import net.minecraft.world.WorldServer;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 
 public class InventoryHacks
 {
+    public static final int[] ORDERED_SLOT_INDICES = new int[]
+            {
+                    9, 18, 27,
+                    10, 19, 28,
+                    11, 20, 29,
+                    12, 21, 30,
+                    13, 22, 31,
+                    14, 23, 32,
+                    15, 24, 33,
+                    16, 25, 34,
+                    17, 26, 35
+            };
+
+    public static int clientInventorySize = TiamatConfig.serverSettings.defaultInventorySize;
+
+    @SideOnly(Side.CLIENT)
+    public static ArrayList<Integer> getAvailableClientInventorySlots()
+    {
+        ArrayList<Integer> result = new ArrayList<>(clientInventorySize);
+        for (int i = 0; i < clientInventorySize; i++) result.add(ORDERED_SLOT_INDICES[i]);
+        return result;
+    }
+
+    public static int getCurrentInventorySize(EntityPlayerMP player)
+    {
+        int slotCount = TiamatConfig.serverSettings.defaultInventorySize;
+        for (ItemStack stack : GlobalInventory.getAllNonSkinItems(player))
+        {
+            slotCount += SlotDataTags.getInvSlotCount(stack);
+        }
+        return slotCount;
+    }
+
     @SubscribeEvent
     public static void playerContainer(PlayerContainerEvent.Open event)
     {
@@ -37,34 +80,84 @@ public class InventoryHacks
     }
 
     @SubscribeEvent
-    public static void inventoryChanged(InventoryChangedEvent event)
+    public static void itemPickup1(EntityItemPickupEvent event)
     {
-        Entity entity = event.getEntity();
-        if (!(entity instanceof EntityPlayer)) return;
+        ItemStack stack = event.getItem().getItem();
+        int oldCount = stack.getCount();
+        EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
 
-        InventoryPlayer playerInventory = ((EntityPlayer) entity).inventory;
-        for (int i : new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 40})
+        int[] availableSlots = new int[getCurrentInventorySize(player)];
+        System.arraycopy(ORDERED_SLOT_INDICES, 0, availableSlots, 0, availableSlots.length);
+        autoplaceItem(event.getEntityPlayer(), stack, availableSlots);
+        if (!stack.isEmpty()) event.setCanceled(true);
+
+        int pickedUpCount = oldCount - stack.getCount();
+        if (pickedUpCount > 0)
         {
-            ItemStack stack = playerInventory.getStackInSlot(i);
-            if (!stack.isEmpty()) autoplaceItem((EntityPlayer) entity, stack);
+            player.addStat(StatList.getObjectsPickedUpStats(stack.getItem()), pickedUpCount);
+
+            for (EntityPlayer trackingPlayer : ((WorldServer) player.world).getEntityTracker().getTrackingPlayers(event.getItem()))
+            {
+                Network.WRAPPER.sendTo(new Network.PickupSoundPacket(player.posX, player.posY, player.posZ), (EntityPlayerMP) trackingPlayer);
+            }
+
+            event.getItem().setItem(event.getItem().getItem());
         }
     }
 
-    @SubscribeEvent
-    public static void itemPickup(PlayerEvent.ItemPickupEvent event)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void inventoryChanged(InventoryChangedEvent event)
     {
-        ItemStack stack = event.getStack();
-        if (stack.isEmpty()) return;
+        Entity entity = event.getEntity();
+        if (!(entity instanceof EntityPlayerMP)) return;
 
-        autoplaceItem(event.player, stack);
+        EntityPlayerMP player = (EntityPlayerMP) entity;
+        InventoryPlayer playerInventory = player.inventory;
+
+        int slotCount = getCurrentInventorySize(player);
+        int[] availableSlots = new int[Tools.min(Tools.max(slotCount, 0), 27)];
+        System.arraycopy(ORDERED_SLOT_INDICES, 0, availableSlots, 0, availableSlots.length);
+
+        //Completely blocked hotbar slots (all except first)
+        for (int i = 1; i < 8; i++)
+        {
+            ItemStack stack = playerInventory.getStackInSlot(i);
+            if (!stack.isEmpty())
+            {
+                autoplaceItem(player, stack, availableSlots);
+                if (!stack.isEmpty())
+                {
+                    ItemStack copy = stack.copy();
+                    stack.setCount(0);
+                    player.entityDropItem(copy, 0);
+                }
+            }
+        }
+        //Completely blocked "cargo" slots
+        int[] blockedSlots = new int[Tools.min(Tools.max(27 - slotCount, 0), 27)];
+        System.arraycopy(ORDERED_SLOT_INDICES, slotCount, blockedSlots, 0, blockedSlots.length);
+        for (int i : blockedSlots)
+        {
+            ItemStack stack = playerInventory.getStackInSlot(i);
+            if (!stack.isEmpty())
+            {
+                autoplaceItem(player, stack, availableSlots);
+                if (!stack.isEmpty())
+                {
+                    ItemStack copy = stack.copy();
+                    stack.setCount(0);
+                    player.entityDropItem(copy, 0);
+                }
+            }
+        }
     }
 
-    protected static void autoplaceItem(EntityPlayer player, ItemStack stack)
+    protected static void autoplaceItem(EntityPlayer player, ItemStack stack, int[] availableSlots)
     {
         InventoryPlayer playerInventory = player.inventory;
 
         ArrayList<Integer> emptySlots = new ArrayList<>();
-        for (int i = 9; i < 36; i++)
+        for (int i : availableSlots)
         {
             ItemStack stack2 = playerInventory.getStackInSlot(i);
             if (stack2.isEmpty())
@@ -95,13 +188,6 @@ public class InventoryHacks
 
                 if (stack.isEmpty()) break;
             }
-        }
-
-        if (!stack.isEmpty())
-        {
-            ItemStack copy = stack.copy();
-            stack.setCount(0);
-            player.entityDropItem(copy, 0);
         }
     }
 }

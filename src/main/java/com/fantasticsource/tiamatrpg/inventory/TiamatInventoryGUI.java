@@ -1,6 +1,6 @@
 package com.fantasticsource.tiamatrpg.inventory;
 
-import com.fantasticsource.tiamatrpg.Attributes;
+import com.fantasticsource.tiamatrpg.AttributeDisplayData;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
 import moe.plushie.armourers_workshop.common.network.PacketHandler;
@@ -89,12 +89,12 @@ public class TiamatInventoryGUI extends GuiContainer
         allowUserInput = true;
 
         mc = Minecraft.getMinecraft();
-        stats = new String[Attributes.displayAttributes.length];
+        stats = new String[AttributeDisplayData.displayAttributes.length];
         statTooltips = new String[stats.length];
         for (int i = 0; i < stats.length; i++)
         {
-            stats[i] = I18n.translateToLocal("attribute.name." + Attributes.displayAttributes[i]);
-            statTooltips[i] = I18n.translateToLocal(Attributes.displayAttributeDescriptions[i]);
+            stats[i] = I18n.translateToLocal("attribute.name." + AttributeDisplayData.displayAttributes[i]);
+            statTooltips[i] = I18n.translateToLocal(AttributeDisplayData.displayAttributeDescriptions[i]);
         }
 
         fontRenderer = mc.fontRenderer;

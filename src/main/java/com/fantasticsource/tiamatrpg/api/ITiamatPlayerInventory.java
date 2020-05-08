@@ -19,6 +19,8 @@ public interface ITiamatPlayerInventory extends IInventory
 
     ArrayList<ItemStack> getQuickSlots();
 
+    ItemStack getBackpack();
+
     ItemStack getPet();
 
     ItemStack getDeck();
