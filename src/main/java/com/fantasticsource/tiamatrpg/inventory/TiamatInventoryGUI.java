@@ -45,7 +45,7 @@ public class TiamatInventoryGUI extends GuiContainer
 {
     public static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
     public static final int TEXTURE_W = 1024, TEXTURE_H = 1024;
-    public static final int MODEL_WINDOW_X = 25, MODEL_WINDOW_Y = 22, MODEL_WINDOW_W = 70, MODEL_WINDOW_H = 88;
+    public static final int MODEL_WINDOW_X = 24, MODEL_WINDOW_Y = 6, MODEL_WINDOW_W = 88, MODEL_WINDOW_H = 106;
     public static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
     public static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
     public static final int STAT_SCROLLKNOB_H = 5;
@@ -336,57 +336,24 @@ public class TiamatInventoryGUI extends GuiContainer
 
         TiamatInventoryContainer container = (TiamatInventoryContainer) inventorySlots;
 
-        switch (tab)
+        xSize = 280;
+        ySize = 136;
+        uOffset = 0;
+        vOffset = 136 * tab;
+
+        if (tab == 0)
         {
-            case 0:
-                //Inventory
-                xSize = 256;
-                ySize = 256;
-                uOffset = 0;
-                vOffset = 0;
-//                for (TexturedSlot slot : container.classTabSlots) slot.disable();
-//                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
-                break;
-
-            case 1:
-                //Stats
-                xSize = 256;
-                ySize = 256;
-                uOffset = 256;
-                vOffset = 0;
-//                for (TexturedSlot slot : container.classTabSlots) slot.enable();
-//                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
-                break;
-
-            case 2:
-                //Party
-                xSize = 256;
-                ySize = 256;
-                uOffset = 512;
-                vOffset = 0;
-//                for (TexturedSlot slot : container.classTabSlots) slot.disable();
-//                for (TexturedSlot slot : container.professionTabSlots) slot.enable();
-                break;
-
-            case 3:
-                //Friends
-                xSize = 256;
-                ySize = 256;
-                uOffset = 768;
-                vOffset = 0;
-//                for (TexturedSlot slot : container.classTabSlots) slot.disable();
-//                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
-                break;
-
-            case 4:
-                //Guild
-                xSize = 256;
-                ySize = 256;
-                uOffset = 0;
-                vOffset = 256;
-//                for (TexturedSlot slot : container.classTabSlots) slot.disable();
-//                for (TexturedSlot slot : container.professionTabSlots) slot.disable();
-                break;
+            for (Slot slot : container.inventorySlots)
+            {
+                if (slot instanceof BetterSlot) ((BetterSlot) slot).enable();
+            }
+        }
+        else
+        {
+            for (Slot slot : container.inventorySlots)
+            {
+                if (slot instanceof BetterSlot) ((BetterSlot) slot).disable();
+            }
         }
 
         guiTop = (height - ySize) >> 1;
@@ -798,7 +765,7 @@ public class TiamatInventoryGUI extends GuiContainer
     @Override
     protected void renderHoveredToolTip(int mouseX, int mouseY)
     {
-        if (mc.player.inventory.getItemStack().isEmpty() && hoveredSlot != null && hoveredSlot.getHasStack() && (!(hoveredSlot instanceof TexturedSlot) || ((TexturedSlot) hoveredSlot).enabled))
+        if (mc.player.inventory.getItemStack().isEmpty() && hoveredSlot != null && hoveredSlot.getHasStack() && (!(hoveredSlot instanceof BetterSlot) || ((BetterSlot) hoveredSlot).enabled))
         {
             renderToolTip(hoveredSlot.getStack(), mouseX, mouseY);
         }
@@ -814,7 +781,7 @@ public class TiamatInventoryGUI extends GuiContainer
     protected void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor)
     {
         //In this case, this is used for item slot highlighting only
-        if (hoveredSlot == null || (hoveredSlot instanceof TexturedSlot && !((TexturedSlot) hoveredSlot).enabled)) return;
+        if (hoveredSlot == null || (hoveredSlot instanceof BetterSlot && !((BetterSlot) hoveredSlot).enabled)) return;
 
         //TODO Rarity color highlighting
         super.drawGradientRect(left, top, right, bottom, startColor, endColor);
@@ -822,7 +789,7 @@ public class TiamatInventoryGUI extends GuiContainer
 
     protected void drawSlot(Slot slot)
     {
-        if (slot instanceof TexturedSlot && !((TexturedSlot) slot).enabled) return;
+        if (slot instanceof BetterSlot && !((BetterSlot) slot).enabled) return;
 
 
         int x = slot.xPos;
@@ -872,11 +839,10 @@ public class TiamatInventoryGUI extends GuiContainer
         {
             GlStateManager.disableLighting();
 
-            if (slot instanceof TexturedSlot)
+            if (slot instanceof BetterSlot && ((BetterSlot) slot).u >= 0 && ((BetterSlot) slot).v >= 0)
             {
-
-                TexturedSlot texturedSlot = (TexturedSlot) slot;
-                int u = texturedSlot.u, v = texturedSlot.v;
+                BetterSlot betterSlot = (BetterSlot) slot;
+                int u = betterSlot.u, v = betterSlot.v;
 
                 mc.getTextureManager().bindTexture(TEXTURE);
 

@@ -3,25 +3,25 @@ package com.fantasticsource.tiamatrpg.inventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 
-public class TexturedSlot extends Slot
+public class BetterSlot extends Slot
 {
     public final int u, v;
     public boolean enabled = true;
 
-    public TexturedSlot(IInventory inventoryIn, int index, int x, int y, int u, int v)
+    public BetterSlot(IInventory inventoryIn, int index, int x, int y, int u, int v)
     {
         super(inventoryIn, index, x, y);
         this.u = u;
         this.v = v;
     }
 
-    public TexturedSlot enable()
+    public BetterSlot enable()
     {
         enabled = true;
         return this;
     }
 
-    public TexturedSlot disable()
+    public BetterSlot disable()
     {
         enabled = false;
         return this;
@@ -33,7 +33,7 @@ public class TexturedSlot extends Slot
         return enabled;
     }
 
-    public TexturedSlot setEnabled(boolean enabled)
+    public BetterSlot setEnabled(boolean enabled)
     {
         if (enabled) enable();
         else disable();

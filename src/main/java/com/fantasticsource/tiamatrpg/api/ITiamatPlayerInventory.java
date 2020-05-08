@@ -7,10 +7,6 @@ import java.util.ArrayList;
 
 public interface ITiamatPlayerInventory extends IInventory
 {
-    ItemStack getActiveMainhand();
-
-    ItemStack getActiveOffhand();
-
     ItemStack getInactiveMainhand();
 
     ItemStack getInactiveOffhand();

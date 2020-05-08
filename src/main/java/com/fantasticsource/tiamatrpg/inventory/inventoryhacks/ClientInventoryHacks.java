@@ -81,7 +81,7 @@ public class ClientInventoryHacks extends GuiButton
     public static void guiPostInit(GuiScreenEvent.InitGuiEvent.Post event)
     {
         Gui gui = event.getGui();
-        if (!(gui instanceof GuiContainer)) return;
+        if (gui instanceof TiamatInventoryGUI || !(gui instanceof GuiContainer)) return;
 
         event.getButtonList().add(new ClientInventoryHacks((GuiContainer) gui));
     }

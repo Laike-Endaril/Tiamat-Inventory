@@ -34,14 +34,12 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatServerInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
 
-    public final NonNullList<ItemStack> activeMainhand = NonNullList.withSize(1, ItemStack.EMPTY);
-    public final NonNullList<ItemStack> activeOffhand = NonNullList.withSize(1, ItemStack.EMPTY);
     public final NonNullList<ItemStack> inactiveMainhand = NonNullList.withSize(1, ItemStack.EMPTY);
     public final NonNullList<ItemStack> inactiveOffhand = NonNullList.withSize(1, ItemStack.EMPTY);
 
     public final NonNullList<ItemStack> armor = NonNullList.withSize(2, ItemStack.EMPTY);
 
-    public final NonNullList<ItemStack> quickSlots = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> quickSlots = NonNullList.withSize(3, ItemStack.EMPTY);
 
     public final NonNullList<ItemStack> backpack = NonNullList.withSize(1, ItemStack.EMPTY);
 
@@ -69,7 +67,8 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
-        allInventories = Arrays.asList(activeMainhand, activeOffhand, inactiveMainhand, inactiveOffhand,
+        allInventories = Arrays.asList(
+                inactiveMainhand, inactiveOffhand,
                 armor,
                 quickSlots,
                 backpack,
@@ -621,18 +620,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
-    public ItemStack getActiveMainhand()
-    {
-        return activeMainhand.get(0);
-    }
-
-    @Override
-    public ItemStack getActiveOffhand()
-    {
-        return activeOffhand.get(0);
-    }
-
-    @Override
     public ItemStack getInactiveMainhand()
     {
         return inactiveMainhand.get(0);
@@ -737,10 +724,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         for (NonNullList<ItemStack> inventory : allInventories)
         {
             if (inventory == inactiveMainhand || inventory == inactiveOffhand) continue;
-            if (!unsheathed)
-            {
-                if (inventory == activeMainhand || inventory == activeOffhand) continue;
-            }
 
             result.addAll(inventory);
         }

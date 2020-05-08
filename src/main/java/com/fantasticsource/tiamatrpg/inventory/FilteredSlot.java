@@ -7,13 +7,13 @@ import net.minecraft.item.ItemStack;
 
 import java.util.function.Predicate;
 
-public class TexturedFilteredSlot extends TexturedSlot
+public class FilteredSlot extends BetterSlot
 {
     public final Predicate<ItemStack> filter;
     public final boolean bindingCursable;
     public final int slotStackLimit;
 
-    public TexturedFilteredSlot(IInventory inventoryIn, int index, int x, int y, int u, int v, boolean bindingCursable, int slotStackLimit, Predicate<ItemStack> filter)
+    public FilteredSlot(IInventory inventoryIn, int index, int x, int y, int u, int v, boolean bindingCursable, int slotStackLimit, Predicate<ItemStack> filter)
     {
         super(inventoryIn, index, x, y, u, v);
 
