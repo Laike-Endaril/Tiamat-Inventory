@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClientInventoryHacks extends GuiButton
 {
@@ -99,7 +100,17 @@ public class ClientInventoryHacks extends GuiButton
         Gui gui = event.getGui();
         if (!(gui instanceof GuiContainer)) return;
 
-        event.getButtonList().add(new ClientInventoryHacks((GuiContainer) gui));
+        List<GuiButton> buttonList = event.getButtonList();
+        boolean found = false;
+        for (GuiButton button : buttonList)
+        {
+            if (button instanceof ClientInventoryHacks)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found) buttonList.add(new ClientInventoryHacks((GuiContainer) gui));
 
         ArrayList<Integer> availableSlots = InventoryHacks.getAvailableClientInventorySlots();
 

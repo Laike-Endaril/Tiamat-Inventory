@@ -33,14 +33,14 @@ public class TiamatInventoryContainer extends Container
         //Active mainhand and offhand
         //Index 0 - 1
         //Internal index 0 and 40 (vanilla)
-        addSlotToContainer(new FilteredSlot(playerInventory, 0, 24, 114, 608, 0, true, 1, stack -> getSlot(1).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(1).getStack()))));
-        addSlotToContainer(new FilteredSlot(playerInventory, 40, 42, 114, 624, 0, true, 1, stack -> getSlot(0).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(0).getStack()))));
+        addSlotToContainer(new FilteredSlot(playerInventory, 0, 43, 114, 608, 0, true, 1, stack -> getSlot(1).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(1).getStack()))));
+        addSlotToContainer(new FilteredSlot(playerInventory, 40, 61, 114, 624, 0, true, 1, stack -> getSlot(0).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(0).getStack()))));
 
         //Inactive mainhand and offhand
         //Index 2 - 3
         //Internal index 0 and 1 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 0, 78, 114, 608, 0, false, 1, stack -> getSlot(3).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(3).getStack()))));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 1, 96, 114, 624, 0, false, 1, stack -> getSlot(2).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(2).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 0, 97, 114, 608, 0, false, 1, stack -> getSlot(3).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(3).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 1, 115, 114, 624, 0, false, 1, stack -> getSlot(2).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(2).getStack()))));
 
         //"Cargo" inventory
         //Index 4 - 30
@@ -49,7 +49,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 9; ++xx)
             {
-                addSlotToContainer(new BetterSlot(playerInventory, xx + (yy + 1) * 9, 114 + xx * 18, 42 + yy * 18, -1, -1));
+                addSlotToContainer(new BetterSlot(playerInventory, xx + (yy + 1) * 9, 133 + xx * 18, 42 + yy * 18, -1, -1));
             }
         }
 
@@ -62,35 +62,35 @@ public class TiamatInventoryContainer extends Container
         //...38 (vanilla chest)
         //...37 (vanilla legs)
         //...36 (vanilla feet)
-        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.HEAD, 39, 6, 6, 512, 0);
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 2, 6, 24, 528, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Shoulders")));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 3, 6, 42, 544, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Cape")));
-        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.CHEST, 38, 6, 60, 560, 0);
-        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.LEGS, 37, 6, 78, 576, 0);
-        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.FEET, 36, 6, 96, 592, 0);
+        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.HEAD, 39, 25, 6, 512, 0);
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 2, 25, 24, 528, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Shoulders")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 3, 25, 42, 544, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Cape")));
+        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.CHEST, 38, 25, 60, 560, 0);
+        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.LEGS, 37, 25, 78, 576, 0);
+        addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.FEET, 36, 25, 96, 592, 0);
 
         //Quick slots
         //Index 37 - 39
         //Internal index 4 - 6 (tiamat)
         for (int xx = 0; xx < 3; xx++)
         {
-            addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 4 + xx, 222 + xx * 18, 96, 784, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Quick Item")));
+            addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 4 + xx, 241 + xx * 18, 96, 784, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Quick Item")));
         }
 
         //Backpack slot
         //Index 40
         //Internal index 7 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 7, 114, 24, 768, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Backpack")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 7, 133, 24, 768, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Backpack")));
 
         //Pet slot
         //Index 41
         //Internal index 8 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 8, 132, 96, 640, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Pet")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 8, 151, 96, 640, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Pet")));
 
         //Deck slot
         //Index 42
         //Internal index 9 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 9, 114, 96, 752, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Deck")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 9, 133, 96, 752, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Deck")));
     }
 
     public static boolean canCombine(ItemStack from, ItemStack to)

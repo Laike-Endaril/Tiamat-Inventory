@@ -3,8 +3,6 @@ package com.fantasticsource.tiamatrpg.inventory;
 import com.fantasticsource.tiamatrpg.AttributeDisplayData;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
-import moe.plushie.armourers_workshop.common.network.PacketHandler;
-import moe.plushie.armourers_workshop.common.network.messages.client.MessageClientKeyPress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
@@ -25,8 +23,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
@@ -45,9 +43,9 @@ public class TiamatInventoryGUI extends GuiContainer
 {
     public static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
     public static final int TEXTURE_W = 1024, TEXTURE_H = 1024;
-    public static final int MODEL_WINDOW_X = 24, MODEL_WINDOW_Y = 6, MODEL_WINDOW_W = 88, MODEL_WINDOW_H = 106;
-    public static final int STAT_WINDOW_X = 118, STAT_WINDOW_Y = 22, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
-    public static final int STAT_SCROLLBAR_X = 219, STAT_SCROLLBAR_Y = 22, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
+    public static final int MODEL_WINDOW_X = 43, MODEL_WINDOW_Y = 6, MODEL_WINDOW_W = 88, MODEL_WINDOW_H = 106;
+    public static final int STAT_WINDOW_X = 118000, STAT_WINDOW_Y = 22000, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
+    public static final int STAT_SCROLLBAR_X = 219000, STAT_SCROLLBAR_Y = 22000, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
     public static final int STAT_SCROLLKNOB_H = 5;
     public static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
 
@@ -55,7 +53,6 @@ public class TiamatInventoryGUI extends GuiContainer
     protected static int statLineHeight;
     protected static int statHeightDif;
     protected static int tab = 0;
-    protected static boolean reopen = false;
     protected String[] stats, statTooltips;
     protected boolean buttonClicked, statsScrollGrabbed = false, modelGrabbed = false;
     protected int uOffset, vOffset, modelGrabX, modelGrabY;
@@ -100,16 +97,6 @@ public class TiamatInventoryGUI extends GuiContainer
         fontRenderer = mc.fontRenderer;
         statLineHeight = fontRenderer.FONT_HEIGHT + 1;
         statHeightDif = Tools.max(0, statLineHeight * stats.length - STAT_WINDOW_H);
-    }
-
-    @SubscribeEvent
-    public static void clientTick(TickEvent.ClientTickEvent event)
-    {
-        if (reopen && Minecraft.getMinecraft().currentScreen == null)
-        {
-            reopen = false;
-            Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
-        }
     }
 
     public static void drawEntityOnScreen(int posX, int posY, double scale, double yaw, double pitch, EntityLivingBase ent)
@@ -336,7 +323,7 @@ public class TiamatInventoryGUI extends GuiContainer
 
         TiamatInventoryContainer container = (TiamatInventoryContainer) inventorySlots;
 
-        xSize = 280;
+        xSize = 318;
         ySize = 136;
         uOffset = 0;
         vOffset = 136 * tab;
@@ -360,28 +347,20 @@ public class TiamatInventoryGUI extends GuiContainer
         guiLeft = (width - xSize) >> 1;
 
         //Tab buttons
-        GuiButtonImage button = new GuiButtonImage(0, guiLeft + 231, guiTop + 7, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
-        buttonList.add(button);
-        button = new GuiButtonImage(1, guiLeft + 231, guiTop + 32, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
-        buttonList.add(button);
-        button = new GuiButtonImage(2, guiLeft + 231, guiTop + 57, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
-        buttonList.add(button);
-        button = new GuiButtonImage(3, guiLeft + 231, guiTop + 82, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
-        buttonList.add(button);
-        button = new GuiButtonImage(4, guiLeft + 231, guiTop + 107, 18, 21, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE);
-        buttonList.add(button);
+        buttonList.add(new GuiButtonImage(0, guiLeft + 299, guiTop + 7, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
+        buttonList.add(new GuiButtonImage(1, guiLeft + 299, guiTop + 32, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
+        buttonList.add(new GuiButtonImage(2, guiLeft + 299, guiTop + 57, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
+        buttonList.add(new GuiButtonImage(3, guiLeft + 299, guiTop + 82, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
+        buttonList.add(new GuiButtonImage(4, guiLeft + 299, guiTop + 107, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
+
+        MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.InitGuiEvent.Post(this, buttonList));
     }
 
     protected void actionPerformed(GuiButton button)
     {
         buttonClicked = true;
 
-        if (button.id <= 3) setTab(button.id);
-        else if (button.id == 4)
-        {
-            reopen = true;
-            PacketHandler.networkWrapper.sendToServer(new MessageClientKeyPress(MessageClientKeyPress.Button.OPEN_WARDROBE));
-        }
+        if (button.id <= 5) setTab(button.id);
     }
 
     @Override
