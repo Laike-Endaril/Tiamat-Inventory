@@ -5,10 +5,10 @@ import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatrpg.Network;
 import com.fantasticsource.tiamatrpg.config.TiamatConfig;
+import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatrpg.nbt.SlotDataTags;
 import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -70,17 +70,33 @@ public class InventoryHacks
     @SubscribeEvent
     public static void playerContainer(PlayerContainerEvent.Open event)
     {
-        Minecraft mc = Minecraft.getMinecraft();
+        int invSize = getCurrentInventorySize((EntityPlayerMP) event.getEntityPlayer());
+        ArrayList<Integer> availableSlots = new ArrayList<>(invSize);
+        for (int i = 0; i < invSize; i++)
+        {
+            availableSlots.add(ORDERED_SLOT_INDICES[i]);
+        }
+
         Container container = event.getContainer();
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
-            if (slot == null || !slot.isHere(mc.player.inventory, slot.getSlotIndex())) continue;
+            if (slot == null || !(slot.inventory instanceof InventoryPlayer)) continue;
 
             int slotIndex = slot.getSlotIndex();
-            if (slotIndex < 9 || slotIndex == 40)
+            if (container instanceof TiamatInventoryContainer)
             {
-                container.inventorySlots.set(i, new FakeSlot(mc.player.inventory, slotIndex, slot.xPos, slot.yPos));
+                if (slotIndex > 0 && (slotIndex < 9 || (slotIndex < 36 && !availableSlots.contains(slotIndex))))
+                {
+                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                }
+            }
+            else
+            {
+                if (slotIndex < 9 || slotIndex >= 36 || !availableSlots.contains(slotIndex))
+                {
+                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                }
             }
         }
     }

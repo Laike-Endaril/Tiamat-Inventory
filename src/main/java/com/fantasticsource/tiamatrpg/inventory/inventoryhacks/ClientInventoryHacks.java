@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatrpg.inventory.inventoryhacks;
 
+import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -9,20 +10,26 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
+import java.util.ArrayList;
+
 public class ClientInventoryHacks extends GuiButton
 {
     protected GuiContainer gui;
+    protected boolean isTiamat;
 
     public ClientInventoryHacks(GuiContainer gui)
     {
         super(Integer.MIN_VALUE + 777, -10000, -10000, 0, 0, "");
         this.gui = gui;
+        isTiamat = gui instanceof TiamatInventoryGUI;
     }
 
     @Override
@@ -43,12 +50,22 @@ public class ClientInventoryHacks extends GuiButton
         for (int i = 0; i < gui.inventorySlots.inventorySlots.size(); i++)
         {
             Slot slot = gui.inventorySlots.inventorySlots.get(i);
-            if (slot == null || !slot.isHere(mc.player.inventory, slot.getSlotIndex())) continue;
+            if (slot == null || !(slot.inventory instanceof InventoryPlayer)) continue;
 
             int slotIndex = slot.getSlotIndex();
-            if (slotIndex < 9 || slotIndex == 40 || (slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex)))
+            if (isTiamat)
             {
-                drawAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, slotIndex < 9);
+                if (slotIndex > 0 && (slotIndex < 9 || (slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))))
+                {
+                    drawAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, slotIndex < 9);
+                }
+            }
+            else
+            {
+                if (slotIndex < 9 || slotIndex >= 36 || !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+                {
+                    drawAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, slotIndex < 9);
+                }
             }
         }
 
@@ -81,7 +98,7 @@ public class ClientInventoryHacks extends GuiButton
     public static void guiPostInit(GuiScreenEvent.InitGuiEvent.Post event)
     {
         Gui gui = event.getGui();
-        if (gui instanceof TiamatInventoryGUI || !(gui instanceof GuiContainer)) return;
+        if (!(gui instanceof GuiContainer)) return;
 
         event.getButtonList().add(new ClientInventoryHacks((GuiContainer) gui));
     }
@@ -89,21 +106,32 @@ public class ClientInventoryHacks extends GuiButton
     @SubscribeEvent
     public static void guiOpen(GuiOpenEvent event)
     {
+        ArrayList<Integer> availableSlots = InventoryHacks.getAvailableClientInventorySlots();
+
         Gui gui = event.getGui();
         if (!(gui instanceof GuiContainer)) return;
 
-        Minecraft mc = Minecraft.getMinecraft();
-        GuiContainer guiContainer = (GuiContainer) gui;
-        for (int i = 0; i < guiContainer.inventorySlots.inventorySlots.size(); i++)
+        Container container = ((GuiContainer) gui).inventorySlots;
+        for (int i = 0; i < container.inventorySlots.size(); i++)
         {
-            Slot slot = guiContainer.inventorySlots.inventorySlots.get(i);
-            if (slot == null || !slot.isHere(mc.player.inventory, slot.getSlotIndex())) continue;
+            Slot slot = container.inventorySlots.get(i);
+            if (slot == null || !(slot.inventory instanceof InventoryPlayer)) continue;
 
             int slotIndex = slot.getSlotIndex();
             //Graphically block hotbar, vanilla offhand, armor, and blocked cargo slots
-            if (slotIndex < 9 || slotIndex >= 36 || !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+            if (container instanceof TiamatInventoryContainer)
             {
-                guiContainer.inventorySlots.inventorySlots.set(i, new FakeSlot(mc.player.inventory, slotIndex, slot.xPos, slot.yPos));
+                if (slotIndex > 0 && (slotIndex < 9 || (slotIndex < 36 && !availableSlots.contains(slotIndex))))
+                {
+                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                }
+            }
+            else
+            {
+                if (slotIndex < 9 || slotIndex >= 36 || !availableSlots.contains(slotIndex))
+                {
+                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                }
             }
         }
     }
