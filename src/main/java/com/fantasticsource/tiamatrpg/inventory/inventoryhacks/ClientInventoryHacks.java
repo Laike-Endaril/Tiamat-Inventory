@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
-import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
@@ -79,17 +78,17 @@ public class ClientInventoryHacks extends GuiButton
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
         if (hotbarSlot)
         {
-            bufferbuilder.pos(x, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 64, TiamatInventoryGUI.V_PIXEL * (512 + 18)).endVertex();
-            bufferbuilder.pos(x + 18, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (64 + 18), TiamatInventoryGUI.V_PIXEL * (512 + 18)).endVertex();
-            bufferbuilder.pos(x + 18, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (64 + 18), TiamatInventoryGUI.V_PIXEL * 512).endVertex();
-            bufferbuilder.pos(x, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 64, TiamatInventoryGUI.V_PIXEL * 512).endVertex();
+            bufferbuilder.pos(x, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * (16 + 18)).endVertex();
+            bufferbuilder.pos(x + 18, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (544 + 18), TiamatInventoryGUI.V_PIXEL * (16 + 18)).endVertex();
+            bufferbuilder.pos(x + 18, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (544 + 18), TiamatInventoryGUI.V_PIXEL * 16).endVertex();
+            bufferbuilder.pos(x, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16).endVertex();
         }
         else
         {
-            bufferbuilder.pos(x, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 32, TiamatInventoryGUI.V_PIXEL * (512 + 18)).endVertex();
-            bufferbuilder.pos(x + 18, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (32 + 18), TiamatInventoryGUI.V_PIXEL * (512 + 18)).endVertex();
-            bufferbuilder.pos(x + 18, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (32 + 18), TiamatInventoryGUI.V_PIXEL * 512).endVertex();
-            bufferbuilder.pos(x, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 32, TiamatInventoryGUI.V_PIXEL * 512).endVertex();
+            bufferbuilder.pos(x, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * (16 + 18)).endVertex();
+            bufferbuilder.pos(x + 18, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (576 + 18), TiamatInventoryGUI.V_PIXEL * (16 + 18)).endVertex();
+            bufferbuilder.pos(x + 18, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (576 + 18), TiamatInventoryGUI.V_PIXEL * 16).endVertex();
+            bufferbuilder.pos(x, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16).endVertex();
         }
         tessellator.draw();
     }
@@ -101,15 +100,8 @@ public class ClientInventoryHacks extends GuiButton
         if (!(gui instanceof GuiContainer)) return;
 
         event.getButtonList().add(new ClientInventoryHacks((GuiContainer) gui));
-    }
 
-    @SubscribeEvent
-    public static void guiOpen(GuiOpenEvent event)
-    {
         ArrayList<Integer> availableSlots = InventoryHacks.getAvailableClientInventorySlots();
-
-        Gui gui = event.getGui();
-        if (!(gui instanceof GuiContainer)) return;
 
         Container container = ((GuiContainer) gui).inventorySlots;
         for (int i = 0; i < container.inventorySlots.size(); i++)
