@@ -128,10 +128,8 @@ public class TiamatInventoryGUI extends GuiContainer
 
     public void initGui()
     {
-        inventorySlots = new TiamatInventoryContainer(Minecraft.getMinecraft().player);
         setTab(tab);
 
-        mc.player.openContainer = inventorySlots;
         guiLeft = (width - xSize) / 2;
         guiTop = (height - ySize) / 2;
     }
@@ -157,90 +155,93 @@ public class TiamatInventoryGUI extends GuiContainer
             labelList.get(j).drawLabel(mc, mouseX, mouseY);
         }
 
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) guiLeft, (float) guiTop, 0);
-        GlStateManager.color(1, 1, 1, 1);
-        GlStateManager.enableRescaleNormal();
-        hoveredSlot = null;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
-        GlStateManager.color(1, 1, 1, 1);
-
-        for (int i1 = 0; i1 < inventorySlots.inventorySlots.size(); ++i1)
+        if (inventorySlots != null)
         {
-            Slot slot = inventorySlots.inventorySlots.get(i1);
+            RenderHelper.enableGUIStandardItemLighting();
+            GlStateManager.pushMatrix();
+            GlStateManager.translate((float) guiLeft, (float) guiTop, 0);
+            GlStateManager.color(1, 1, 1, 1);
+            GlStateManager.enableRescaleNormal();
+            hoveredSlot = null;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
+            GlStateManager.color(1, 1, 1, 1);
 
-            if (slot.isEnabled())
+            for (int i1 = 0; i1 < inventorySlots.inventorySlots.size(); ++i1)
             {
-                drawSlot(slot);
-            }
+                Slot slot = inventorySlots.inventorySlots.get(i1);
 
-            if (isMouseOverSlot(slot, mouseX, mouseY) && slot.isEnabled())
-            {
-                hoveredSlot = slot;
-                GlStateManager.disableLighting();
-                GlStateManager.disableDepth();
-                GlStateManager.colorMask(true, true, true, false);
-                drawGradientRect(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, -2130706433, -2130706433);
-                GlStateManager.colorMask(true, true, true, true);
-                GlStateManager.enableLighting();
-                GlStateManager.enableDepth();
-            }
-        }
-
-        RenderHelper.disableStandardItemLighting();
-        drawGuiContainerForegroundLayer(mouseX, mouseY);
-        RenderHelper.enableGUIStandardItemLighting();
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
-        InventoryPlayer inventoryplayer = mc.player.inventory;
-        ItemStack itemstack = draggedStack.isEmpty() ? inventoryplayer.getItemStack() : draggedStack;
-
-        if (!itemstack.isEmpty())
-        {
-            String s = null;
-
-            if (!draggedStack.isEmpty() && isRightMouseClick)
-            {
-                itemstack = itemstack.copy();
-                itemstack.setCount(MathHelper.ceil((float) itemstack.getCount() / 2));
-            }
-            else if (dragSplitting && dragSplittingSlots.size() > 1)
-            {
-                itemstack = itemstack.copy();
-                itemstack.setCount(dragSplittingRemnant);
-
-                if (itemstack.isEmpty())
+                if (slot.isEnabled())
                 {
-                    s = "" + TextFormatting.YELLOW + "0";
+                    drawSlot(slot);
+                }
+
+                if (isMouseOverSlot(slot, mouseX, mouseY) && slot.isEnabled())
+                {
+                    hoveredSlot = slot;
+                    GlStateManager.disableLighting();
+                    GlStateManager.disableDepth();
+                    GlStateManager.colorMask(true, true, true, false);
+                    drawGradientRect(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, -2130706433, -2130706433);
+                    GlStateManager.colorMask(true, true, true, true);
+                    GlStateManager.enableLighting();
+                    GlStateManager.enableDepth();
                 }
             }
 
-            drawItemStack(itemstack, mouseX - guiLeft - 8, mouseY - guiTop - (draggedStack.isEmpty() ? 8 : 16), s);
-        }
+            RenderHelper.disableStandardItemLighting();
+            drawGuiContainerForegroundLayer(mouseX, mouseY);
+            RenderHelper.enableGUIStandardItemLighting();
+            net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiContainerEvent.DrawForeground(this, mouseX, mouseY));
+            InventoryPlayer inventoryplayer = mc.player.inventory;
+            ItemStack itemstack = draggedStack.isEmpty() ? inventoryplayer.getItemStack() : draggedStack;
 
-        if (!returningStack.isEmpty())
-        {
-            float f = (float) (Minecraft.getSystemTime() - returningStackTime) / 100;
-
-            if (f >= 1)
+            if (!itemstack.isEmpty())
             {
-                f = 1;
-                returningStack = ItemStack.EMPTY;
+                String s = null;
+
+                if (!draggedStack.isEmpty() && isRightMouseClick)
+                {
+                    itemstack = itemstack.copy();
+                    itemstack.setCount(MathHelper.ceil((float) itemstack.getCount() / 2));
+                }
+                else if (dragSplitting && dragSplittingSlots.size() > 1)
+                {
+                    itemstack = itemstack.copy();
+                    itemstack.setCount(dragSplittingRemnant);
+
+                    if (itemstack.isEmpty())
+                    {
+                        s = "" + TextFormatting.YELLOW + "0";
+                    }
+                }
+
+                drawItemStack(itemstack, mouseX - guiLeft - 8, mouseY - guiTop - (draggedStack.isEmpty() ? 8 : 16), s);
             }
 
-            int l2 = returningStackDestSlot.xPos - touchUpX;
-            int i3 = returningStackDestSlot.yPos - touchUpY;
-            int l1 = touchUpX + (int) ((float) l2 * f);
-            int i2 = touchUpY + (int) ((float) i3 * f);
-            drawItemStack(returningStack, l1, i2, null);
+            if (!returningStack.isEmpty())
+            {
+                float f = (float) (Minecraft.getSystemTime() - returningStackTime) / 100;
+
+                if (f >= 1)
+                {
+                    f = 1;
+                    returningStack = ItemStack.EMPTY;
+                }
+
+                int l2 = returningStackDestSlot.xPos - touchUpX;
+                int i3 = returningStackDestSlot.yPos - touchUpY;
+                int l1 = touchUpX + (int) ((float) l2 * f);
+                int i2 = touchUpY + (int) ((float) i3 * f);
+                drawItemStack(returningStack, l1, i2, null);
+            }
+
+            GlStateManager.popMatrix();
+            GlStateManager.enableLighting();
+            GlStateManager.enableDepth();
+            RenderHelper.enableStandardItemLighting();
+
+            renderHoveredToolTip(mouseX, mouseY);
         }
-
-        GlStateManager.popMatrix();
-        GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
-        RenderHelper.enableStandardItemLighting();
-
-        renderHoveredToolTip(mouseX, mouseY);
     }
 
     @Override
@@ -310,38 +311,27 @@ public class TiamatInventoryGUI extends GuiContainer
         bufferbuilder.pos(guiLeft, guiTop, zLevel).tex(uOffset * U_PIXEL, vOffset * V_PIXEL).endVertex();
         tessellator.draw();
 
-        scissor(MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_W, MODEL_WINDOW_H);
-        drawEntityOnScreen(guiLeft + MODEL_WINDOW_X + (MODEL_WINDOW_W >> 1), guiTop + MODEL_WINDOW_Y + (MODEL_WINDOW_H >> 1), modelScale, modelYaw, modelPitch, mc.player);
-        unScissor();
+        if (tab == 0)
+        {
+            scissor(MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_W, MODEL_WINDOW_H);
+            drawEntityOnScreen(guiLeft + MODEL_WINDOW_X + (MODEL_WINDOW_W >> 1), guiTop + MODEL_WINDOW_Y + (MODEL_WINDOW_H >> 1), modelScale, modelYaw, modelPitch, mc.player);
+            unScissor();
+        }
     }
 
     private void setTab(int tab)
     {
+        inventorySlots = tab == 0 ? new TiamatInventoryContainer(Minecraft.getMinecraft().player) : null;
+        mc.player.openContainer = inventorySlots;
+
         TiamatInventoryGUI.tab = tab;
 
         buttonList.clear();
-
-        TiamatInventoryContainer container = (TiamatInventoryContainer) inventorySlots;
 
         xSize = 318;
         ySize = 136;
         uOffset = 0;
         vOffset = 136 * tab;
-
-        if (tab == 0)
-        {
-            for (Slot slot : container.inventorySlots)
-            {
-                if (slot instanceof BetterSlot) ((BetterSlot) slot).enable();
-            }
-        }
-        else
-        {
-            for (Slot slot : container.inventorySlots)
-            {
-                if (slot instanceof BetterSlot) ((BetterSlot) slot).disable();
-            }
-        }
 
         guiTop = (height - ySize) >> 1;
         guiLeft = (width - xSize) >> 1;
@@ -958,6 +948,8 @@ public class TiamatInventoryGUI extends GuiContainer
 
     protected Slot getSlotAtPosition(int x, int y)
     {
+        if (inventorySlots == null) return null;
+
         for (int i = 0; i < inventorySlots.inventorySlots.size(); ++i)
         {
             Slot slot = inventorySlots.inventorySlots.get(i);

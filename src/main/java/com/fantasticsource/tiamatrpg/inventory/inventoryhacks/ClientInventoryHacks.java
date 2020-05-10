@@ -100,6 +100,10 @@ public class ClientInventoryHacks extends GuiButton
         Gui gui = event.getGui();
         if (!(gui instanceof GuiContainer)) return;
 
+        Container container = ((GuiContainer) gui).inventorySlots;
+        if (container == null) return;
+
+
         List<GuiButton> buttonList = event.getButtonList();
         boolean found = false;
         for (GuiButton button : buttonList)
@@ -114,7 +118,6 @@ public class ClientInventoryHacks extends GuiButton
 
         ArrayList<Integer> availableSlots = InventoryHacks.getAvailableClientInventorySlots();
 
-        Container container = ((GuiContainer) gui).inventorySlots;
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
