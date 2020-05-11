@@ -143,38 +143,39 @@ public class TiamatInventoryContainer extends Container
 
         ItemStack stack = slot.getStack();
 
-        if (index <= 3)
-        {
-            //From any weaponset slot
-            //To main inventory or hotbar, in that order
-            tryMergeItemStackRanges(stack, 12, 38);
-            tryMergeItemStackRanges(stack, 4, 11);
-        }
-        else if (index <= 11)
-        {
-            //From hotbar
-            //To any armor slot, if applicable, or to a weaponset slot or main inventory otherwise
-
-            tryMergeItemStackRanges(stack, 39, 44);
-            tryMergeItemStackRanges(stack, 0, 3);
-            tryMergeItemStackRanges(stack, 12, 38);
-        }
-        else if (index <= 38)
-        {
-            //From main inventory
-            //To any equipment slot, if applicable, or to a weaponset slot or hotbar otherwise
-            tryMergeItemStackRanges(stack, 39, 44);
-            tryMergeItemStackRanges(stack, 0, 3);
-            tryMergeItemStackRanges(stack, 4, 11);
-        }
-        else if (index <= 44)
-        {
-            //From armor slots
-            //To main inventory, hotbar, or weaponset slot, in that order
-            tryMergeItemStackRanges(stack, 12, 38);
-            tryMergeItemStackRanges(stack, 4, 11);
-            tryMergeItemStackRanges(stack, 0, 3);
-        }
+        //TODO redo or remove; indices are old ones and would need to be changed, hotbar is no longer accessible, etc
+//        if (index <= 3)
+//        {
+//            //From any weaponset slot
+//            //To main inventory or hotbar, in that order
+//            tryMergeItemStackRanges(stack, 12, 38);
+//            tryMergeItemStackRanges(stack, 4, 11);
+//        }
+//        else if (index <= 11)
+//        {
+//            //From hotbar
+//            //To any armor slot, if applicable, or to a weaponset slot or main inventory otherwise
+//
+//            tryMergeItemStackRanges(stack, 39, 44);
+//            tryMergeItemStackRanges(stack, 0, 3);
+//            tryMergeItemStackRanges(stack, 12, 38);
+//        }
+//        else if (index <= 38)
+//        {
+//            //From main inventory
+//            //To any equipment slot, if applicable, or to a weaponset slot or hotbar otherwise
+//            tryMergeItemStackRanges(stack, 39, 44);
+//            tryMergeItemStackRanges(stack, 0, 3);
+//            tryMergeItemStackRanges(stack, 4, 11);
+//        }
+//        else if (index <= 44)
+//        {
+//            //From armor slots
+//            //To main inventory, hotbar, or weaponset slot, in that order
+//            tryMergeItemStackRanges(stack, 12, 38);
+//            tryMergeItemStackRanges(stack, 4, 11);
+//            tryMergeItemStackRanges(stack, 0, 3);
+//        }
 
 
         if (stack.isEmpty()) slot.putStack(ItemStack.EMPTY);
