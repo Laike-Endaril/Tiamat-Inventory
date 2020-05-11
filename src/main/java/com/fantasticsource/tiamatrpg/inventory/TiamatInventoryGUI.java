@@ -19,6 +19,7 @@ import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.CPacketCloseWindow;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
@@ -52,7 +53,7 @@ public class TiamatInventoryGUI extends GuiContainer
     protected static double statsScroll = 0;
     protected static int statLineHeight;
     protected static int statHeightDif;
-    protected static int tab = 0;
+    protected int tab = 0;
     protected String[] stats, statTooltips;
     protected boolean buttonClicked, statsScrollGrabbed = false, modelGrabbed = false;
     protected int uOffset, vOffset, modelGrabX, modelGrabY;
@@ -126,12 +127,19 @@ public class TiamatInventoryGUI extends GuiContainer
         GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
     }
 
+    @Override
     public void initGui()
     {
         setTab(tab);
 
         guiLeft = (width - xSize) / 2;
         guiTop = (height - ySize) / 2;
+    }
+
+    @Override
+    public void onGuiClosed()
+    {
+        if (mc.player != null && inventorySlots != null) inventorySlots.onContainerClosed(mc.player);
     }
 
     @Override
@@ -324,7 +332,7 @@ public class TiamatInventoryGUI extends GuiContainer
         inventorySlots = tab == 0 ? new TiamatInventoryContainer(Minecraft.getMinecraft().player) : null;
         mc.player.openContainer = inventorySlots;
 
-        TiamatInventoryGUI.tab = tab;
+        this.tab = tab;
 
         buttonList.clear();
 
@@ -892,7 +900,8 @@ public class TiamatInventoryGUI extends GuiContainer
     {
         if (keyCode == 1 || mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode))
         {
-            mc.player.closeScreen();
+            if (tab == 0) mc.player.connection.sendPacket(new CPacketCloseWindow(mc.player.openContainer.windowId));
+            mc.player.closeScreenAndDropStack();
         }
 
         checkHotbarKeys(keyCode);
