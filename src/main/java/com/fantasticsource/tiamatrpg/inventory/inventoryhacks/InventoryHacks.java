@@ -33,7 +33,7 @@ import java.util.List;
 
 public class InventoryHacks
 {
-    protected static final Field CONTAINER_LISTENERS_FIELD = ReflectionTool.getField(Container.class, "listeners");
+    protected static final Field CONTAINER_LISTENERS_FIELD = ReflectionTool.getField(Container.class, "field_75149_d", "listeners");
 
     public static final int[] ORDERED_SLOT_INDICES = new int[]
             {
