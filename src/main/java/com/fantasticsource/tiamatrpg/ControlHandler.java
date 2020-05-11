@@ -39,8 +39,9 @@ public class ControlHandler
                     }
                     else if (Minecraft.getMinecraft().player.inventory.currentItem == 0)
                     {
-                        Network.WRAPPER.sendToServer(new Network.ActionPacket(Network.ACTION_MAINHAND));
-                        event.cancelOriginal();
+                        //TODO reenable this and do the actions for it
+//                        Network.WRAPPER.sendToServer(new Network.ActionPacket(Network.ACTION_MAINHAND));
+//                        event.cancelOriginal();
                     }
                 }
                 else if (event.name.equals("key.use"))
@@ -60,8 +61,9 @@ public class ControlHandler
                     }
                     else if (Minecraft.getMinecraft().player.inventory.currentItem == 0)
                     {
-                        Network.WRAPPER.sendToServer(new Network.ActionPacket(Network.ACTION_OFFHAND));
-                        event.cancelOriginal();
+                        //TODO reenable this and do the actions for it
+//                        Network.WRAPPER.sendToServer(new Network.ActionPacket(Network.ACTION_OFFHAND));
+//                        event.cancelOriginal();
                     }
                 }
             }

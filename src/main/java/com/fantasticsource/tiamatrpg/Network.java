@@ -251,14 +251,17 @@ public class Network
                 switch (packet.action)
                 {
                     case ACTION_MAINHAND:
+                        //TODO
                         System.out.println("mainhand");
                         break;
 
                     case ACTION_OFFHAND:
+                        //TODO
                         System.out.println("offhand");
                         break;
 
                     default:
+                        //TODO
                         System.out.println("skill " + packet.action);
                 }
             });
