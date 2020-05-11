@@ -71,13 +71,19 @@ public class InventoryHacks
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent event)
     {
+        if (event.player.isCreative()) return;
+
         event.player.inventory.currentItem = 0;
     }
 
     @SubscribeEvent
     public static void playerContainer(PlayerContainerEvent.Open event)
     {
-        int invSize = getCurrentInventorySize((EntityPlayerMP) event.getEntityPlayer());
+        EntityPlayer player = event.getEntityPlayer();
+        if (player.isCreative()) return;
+
+
+        int invSize = getCurrentInventorySize((EntityPlayerMP) player);
         ArrayList<Integer> availableSlots = new ArrayList<>(invSize);
         for (int i = 0; i < invSize; i++)
         {
@@ -111,9 +117,12 @@ public class InventoryHacks
     @SubscribeEvent
     public static void itemPickup1(EntityItemPickupEvent event)
     {
+        EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
+        if (player.isCreative()) return;
+
+
         ItemStack stack = event.getItem().getItem();
         int oldCount = stack.getCount();
-        EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
 
         int[] availableSlots = new int[getCurrentInventorySize(player)];
         System.arraycopy(ORDERED_SLOT_INDICES, 0, availableSlots, 0, availableSlots.length);
@@ -141,6 +150,9 @@ public class InventoryHacks
         if (!(entity instanceof EntityPlayerMP)) return;
 
         EntityPlayerMP player = (EntityPlayerMP) entity;
+        if (player.isCreative()) return;
+
+
         InventoryPlayer playerInventory = player.inventory;
 
         int slotCount = getCurrentInventorySize(player);

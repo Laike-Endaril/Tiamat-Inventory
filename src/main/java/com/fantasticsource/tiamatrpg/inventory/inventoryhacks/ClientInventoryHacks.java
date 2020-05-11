@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -98,6 +99,9 @@ public class ClientInventoryHacks extends GuiButton
     @SubscribeEvent
     public static void guiPostInit(GuiScreenEvent.InitGuiEvent.Post event)
     {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player != null && player.isCreative()) return;
+
         Gui gui = event.getGui();
         if (!(gui instanceof GuiContainer)) return;
 
@@ -146,6 +150,8 @@ public class ClientInventoryHacks extends GuiButton
     @SubscribeEvent
     public static void renderHotbar(RenderGameOverlayEvent.Pre event)
     {
+        if (Minecraft.getMinecraft().player.isCreative()) return;
+
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) event.setCanceled(true);
     }
 }
