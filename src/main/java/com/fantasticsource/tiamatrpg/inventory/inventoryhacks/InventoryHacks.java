@@ -74,7 +74,7 @@ public class InventoryHacks
     public static void playerTick(TickEvent.PlayerTickEvent event)
     {
         GameType gameType = MCTools.getGameType(event.player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         event.player.inventory.currentItem = 0;
     }
@@ -84,7 +84,7 @@ public class InventoryHacks
     {
         EntityPlayer player = event.getEntityPlayer();
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         int invSize = getCurrentInventorySize((EntityPlayerMP) player);
@@ -123,7 +123,7 @@ public class InventoryHacks
     {
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         ItemStack stack = event.getItem().getItem();
@@ -156,7 +156,7 @@ public class InventoryHacks
 
         EntityPlayerMP player = (EntityPlayerMP) entity;
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         InventoryPlayer playerInventory = player.inventory;

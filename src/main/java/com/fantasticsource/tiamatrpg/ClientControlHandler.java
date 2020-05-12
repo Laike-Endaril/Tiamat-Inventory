@@ -17,7 +17,7 @@ public class ClientControlHandler
     {
         //Early exit for creative and spectator modes
         GameType gameType = MCTools.getGameType(Minecraft.getMinecraft().player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         if (event.state)
         {

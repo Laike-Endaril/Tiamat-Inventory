@@ -106,7 +106,7 @@ public class ClientInventoryHacks extends GuiButton
         if (player == null) return;
 
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         Gui gui = event.getGui();
         if (!(gui instanceof GuiContainer)) return;
@@ -157,7 +157,7 @@ public class ClientInventoryHacks extends GuiButton
     public static void renderHotbar(RenderGameOverlayEvent.Pre event)
     {
         GameType gameType = MCTools.getGameType(Minecraft.getMinecraft().player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) event.setCanceled(true);
     }
