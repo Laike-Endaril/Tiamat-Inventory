@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatrpg.inventory.inventoryhacks;
 
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import net.minecraft.client.Minecraft;
@@ -14,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
+import net.minecraft.world.GameType;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -101,7 +103,10 @@ public class ClientInventoryHacks extends GuiButton
     public static void guiPostInit(GuiScreenEvent.InitGuiEvent.Post event)
     {
         EntityPlayer player = Minecraft.getMinecraft().player;
-        if (player != null && player.isCreative()) return;
+        if (player == null) return;
+
+        GameType gameType = MCTools.getGameType(player);
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         Gui gui = event.getGui();
         if (!(gui instanceof GuiContainer)) return;
@@ -151,7 +156,8 @@ public class ClientInventoryHacks extends GuiButton
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void renderHotbar(RenderGameOverlayEvent.Pre event)
     {
-        if (Minecraft.getMinecraft().player.isCreative()) return;
+        GameType gameType = MCTools.getGameType(Minecraft.getMinecraft().player);
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) event.setCanceled(true);
     }

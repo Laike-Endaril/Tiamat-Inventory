@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatrpg.inventory.inventoryhacks;
 
 import com.fantasticsource.mctools.GlobalInventory;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatrpg.Network;
@@ -18,6 +19,7 @@ import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
+import net.minecraft.world.GameType;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
@@ -71,7 +73,8 @@ public class InventoryHacks
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent event)
     {
-        if (event.player.isCreative()) return;
+        GameType gameType = MCTools.getGameType(event.player);
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         event.player.inventory.currentItem = 0;
     }
@@ -80,7 +83,8 @@ public class InventoryHacks
     public static void playerContainer(PlayerContainerEvent.Open event)
     {
         EntityPlayer player = event.getEntityPlayer();
-        if (player.isCreative()) return;
+        GameType gameType = MCTools.getGameType(player);
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         int invSize = getCurrentInventorySize((EntityPlayerMP) player);
@@ -118,7 +122,8 @@ public class InventoryHacks
     public static void itemPickup1(EntityItemPickupEvent event)
     {
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
-        if (player.isCreative()) return;
+        GameType gameType = MCTools.getGameType(player);
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         ItemStack stack = event.getItem().getItem();
@@ -150,7 +155,8 @@ public class InventoryHacks
         if (!(entity instanceof EntityPlayerMP)) return;
 
         EntityPlayerMP player = (EntityPlayerMP) entity;
-        if (player.isCreative()) return;
+        GameType gameType = MCTools.getGameType(player);
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         InventoryPlayer playerInventory = player.inventory;

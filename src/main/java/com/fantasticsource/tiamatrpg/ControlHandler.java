@@ -1,7 +1,9 @@
 package com.fantasticsource.tiamatrpg;
 
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.controlintercept.ControlEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
@@ -17,8 +19,9 @@ public class ControlHandler
         {
             //Client-side
 
-            //Early exit for creative mode
-            if (Minecraft.getMinecraft().player.isCreative()) return;
+            //Early exit for creative and spectator modes
+            GameType gameType = MCTools.getGameType(Minecraft.getMinecraft().player);
+            if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
             if (event.state)
             {
