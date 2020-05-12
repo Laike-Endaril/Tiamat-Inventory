@@ -36,7 +36,6 @@ public class TiamatRPG
     {
         Network.init();
         MinecraftForge.EVENT_BUS.register(TiamatRPG.class);
-        MinecraftForge.EVENT_BUS.register(ControlHandler.class);
         MinecraftForge.EVENT_BUS.register(Attacks.class);
         MinecraftForge.EVENT_BUS.register(InventoryHacks.class);
 
@@ -48,6 +47,7 @@ public class TiamatRPG
             MinecraftForge.EVENT_BUS.register(Keys.class);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
             MinecraftForge.EVENT_BUS.register(ClientInventoryHacks.class);
+            MinecraftForge.EVENT_BUS.register(ClientControlHandler.class);
         }
     }
 
