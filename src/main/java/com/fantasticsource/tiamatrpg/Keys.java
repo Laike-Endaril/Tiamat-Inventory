@@ -2,11 +2,14 @@ package com.fantasticsource.tiamatrpg;
 
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -55,7 +58,19 @@ public class Keys
 
         if (TIAMAT_INVENTORY_KEY.isKeyDown())
         {
+            Minecraft.getMinecraft().getTutorial().openInventory();
             Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
+            Network.WRAPPER.sendToServer(new Network.OpenTiamatInventoryPacket());
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    public static void interceptVanillaInventory(GuiOpenEvent event)
+    {
+        if (event.getGui() instanceof GuiInventory && !Minecraft.getMinecraft().player.isCreative())
+        {
+            Minecraft.getMinecraft().getTutorial().openInventory();
+            event.setGui(new TiamatInventoryGUI());
             Network.WRAPPER.sendToServer(new Network.OpenTiamatInventoryPacket());
         }
     }
