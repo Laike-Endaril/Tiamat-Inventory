@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatrpg.inventory;
 
 import com.fantasticsource.tiamatrpg.AttributeDisplayData;
+import com.fantasticsource.tiamatrpg.Keys;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.client.Minecraft;
@@ -898,7 +899,7 @@ public class TiamatInventoryGUI extends GuiContainer
     @Override
     protected void keyTyped(char typedChar, int keyCode)
     {
-        if (keyCode == 1 || mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode))
+        if (keyCode == 1 || Keys.TIAMAT_INVENTORY_KEY.isActiveAndMatches(keyCode))
         {
             if (tab == 0) mc.player.connection.sendPacket(new CPacketCloseWindow(mc.player.openContainer.windowId));
             mc.player.closeScreenAndDropStack();
