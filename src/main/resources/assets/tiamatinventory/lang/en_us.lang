@@ -1,0 +1,21 @@
+tiamatinventory.keyCategory=Tiamat Inventory
+tiamatinventory.key.inventory=Inventory
+
+
+
+tiamatinventory.config.serverSettings=Server Settings
+tiamatinventory.config.clientSettings=Client Settings
+
+tiamatinventory.config.clientInventory=Inventory
+
+tiamatinventory.config.displayAttributes=Attributes To Display
+tiamatinventory.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Which attributes to display in the inventory, and their descriptions\neg. tiamatinventory.autoBlock, How likely you are to automatically block an attack\n \n
+
+tiamatinventory.config.serverItems=Items
+
+
+
+server=Server
+client=Client
+
+items=Items
