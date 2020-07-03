@@ -2,14 +2,11 @@ package com.fantasticsource.tiamatrpg;
 
 import com.fantasticsource.tiamatrpg.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryContainer;
-import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.InventoryHacks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketOpenWindow;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.StatList;
@@ -36,7 +33,6 @@ public class Network
     public static void init()
     {
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
-        WRAPPER.registerMessage(SwapWeaponsetPacketHandler.class, SwapWeaponsetPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(ActionPacketHandler.class, ActionPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(InventorySizePacketHandler.class, InventorySizePacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(PickupSoundPacketHandler.class, PickupSoundPacket.class, discriminator++, Side.CLIENT);
@@ -169,45 +165,6 @@ public class Network
                 net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, new TiamatInventoryContainer(player)));
 
                 player.addStat(StatList.CRAFTING_TABLE_INTERACTION);
-            });
-            return null;
-        }
-    }
-
-
-    public static class SwapWeaponsetPacket implements IMessage
-    {
-        @Override
-        public void toBytes(ByteBuf buf)
-        {
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buf)
-        {
-        }
-    }
-
-    public static class SwapWeaponsetPacketHandler implements IMessageHandler<SwapWeaponsetPacket, IMessage>
-    {
-        @Override
-        public IMessage onMessage(SwapWeaponsetPacket packet, MessageContext ctx)
-        {
-            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-            server.addScheduledTask(() ->
-            {
-                EntityPlayerMP player = ctx.getServerHandler().player;
-                InventoryPlayer inventory = player.inventory;
-                TiamatPlayerInventory tiamatInventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
-                if (inventory == null || tiamatInventory == null) return;
-
-
-                ItemStack mainhand = tiamatInventory.inactiveMainhand.get(0);
-                ItemStack offhand = tiamatInventory.inactiveOffhand.get(0);
-                tiamatInventory.inactiveMainhand.set(0, inventory.mainInventory.get(0));
-                tiamatInventory.inactiveOffhand.set(0, inventory.offHandInventory.get(0));
-                inventory.mainInventory.set(0, mainhand);
-                inventory.offHandInventory.set(0, offhand);
             });
             return null;
         }

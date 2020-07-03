@@ -1,13 +1,5 @@
 tiamatrpg.keyCategory=Tiamat RPG
 tiamatrpg.key.inventory=Inventory
-tiamatrpg.key.swapWeaponsets=Swap Weaponsets
-tiamatrpg.key.sheatheUnsheathe=Sheathe / unsheathe weapons
-tiamatrpg.key.skillset1=Skills/Spells 1
-tiamatrpg.key.skillset2=Skills/Spells 2
-tiamatrpg.key.dodge=Sheathe / unsheathe weapons
-
-key.attack=Mainhand
-key.use=Offhand
 
 
 
@@ -21,16 +13,9 @@ tiamatrpg.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Which attribut
 
 tiamatrpg.config.serverItems=Items
 
-tiamatrpg.config.affixes=Affixes
-
-tiamatrpg.config.affixTypeNames=Affix Type Names
-tiamatrpg.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Each name entered here will create an affix type group to add affixes to\n(Need to completely close and reopen config menu to populate)\n \n
-
 
 
 server=Server
 client=Client
 
 items=Items
-
-affixes=Affixes

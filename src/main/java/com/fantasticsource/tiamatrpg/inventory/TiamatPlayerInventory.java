@@ -34,8 +34,10 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatServerInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
 
-    public final NonNullList<ItemStack> inactiveMainhand = NonNullList.withSize(1, ItemStack.EMPTY);
-    public final NonNullList<ItemStack> inactiveOffhand = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> sheathedMainhand1 = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> sheathedOffhand1 = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> sheathedMainhand2 = NonNullList.withSize(1, ItemStack.EMPTY);
+    public final NonNullList<ItemStack> sheathedOffhand2 = NonNullList.withSize(1, ItemStack.EMPTY);
 
     public final NonNullList<ItemStack> armor = NonNullList.withSize(2, ItemStack.EMPTY);
 
@@ -68,7 +70,8 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
         allInventories = Arrays.asList(
-                inactiveMainhand, inactiveOffhand,
+                sheathedMainhand1, sheathedOffhand1,
+                sheathedMainhand2, sheathedOffhand2,
                 armor,
                 quickSlots,
                 backpack,
@@ -620,15 +623,27 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
-    public ItemStack getInactiveMainhand()
+    public ItemStack getSheathedMainhand1()
     {
-        return inactiveMainhand.get(0);
+        return sheathedMainhand1.get(0);
     }
 
     @Override
-    public ItemStack getInactiveOffhand()
+    public ItemStack getSheathedOffhand1()
     {
-        return inactiveOffhand.get(0);
+        return sheathedOffhand1.get(0);
+    }
+
+    @Override
+    public ItemStack getSheathedMainhand2()
+    {
+        return sheathedMainhand2.get(0);
+    }
+
+    @Override
+    public ItemStack getSheathedOffhand2()
+    {
+        return sheathedOffhand2.get(0);
     }
 
     @Override
@@ -723,21 +738,11 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         ArrayList<ItemStack> result = new ArrayList<>();
         for (NonNullList<ItemStack> inventory : allInventories)
         {
-            if (inventory == inactiveMainhand || inventory == inactiveOffhand) continue;
+            if (inventory == sheathedMainhand1 || inventory == sheathedOffhand1) continue;
+            if (inventory == sheathedMainhand2 || inventory == sheathedOffhand2) continue;
 
             result.addAll(inventory);
         }
         return result;
-    }
-
-    @Override
-    public boolean unsheathed()
-    {
-        return unsheathed;
-    }
-
-    public void setUnsheathed(boolean unsheathed)
-    {
-        this.unsheathed = unsheathed;
     }
 }

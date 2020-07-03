@@ -1,6 +1,8 @@
 package com.fantasticsource.tiamatrpg;
 
+import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.aw.RenderModes;
+import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.tiamatrpg.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatrpg.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.ClientInventoryHacks;
@@ -8,6 +10,7 @@ import com.fantasticsource.tiamatrpg.inventory.inventoryhacks.InventoryHacks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -23,7 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.034s,);required-after:tiamatitems@[1.12.2.000b,);required-after:tiamatactions@[1.12.2.000,)")
+@Mod(modid = TiamatRPG.MODID, name = TiamatRPG.NAME, version = TiamatRPG.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.034zq,);required-after:tiamatitems@[1.12.2.000b,);required-after:tiamatactions@[1.12.2.000,)")
 public class TiamatRPG
 {
     public static final String MODID = "tiamatrpg";
@@ -44,10 +47,8 @@ public class TiamatRPG
             //Physical client
             AttributeDisplayData.updateDisplayList();
             Keys.init(event);
-            MinecraftForge.EVENT_BUS.register(Keys.class);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
             MinecraftForge.EVENT_BUS.register(ClientInventoryHacks.class);
-            MinecraftForge.EVENT_BUS.register(ClientControlHandler.class);
         }
     }
 
@@ -84,9 +85,57 @@ public class TiamatRPG
         Entity entity = event.getEntity();
         if (!entity.world.isRemote && entity instanceof EntityLivingBase && Loader.isModLoaded("armourers_workshop"))
         {
-            if (RenderModes.getRenderMode(entity, "CapeInv") == null) RenderModes.setRenderMode(entity, "CapeInv", "On");
-            if (RenderModes.getRenderMode(entity, "ShoulderL") == null) RenderModes.setRenderMode(entity, "ShoulderL", "On");
-            if (RenderModes.getRenderMode(entity, "ShoulderR") == null) RenderModes.setRenderMode(entity, "ShoulderR", "On");
+            //Cape Default
+            if (RenderModes.getRenderMode(entity, "CapeInvControl") == null) RenderModes.setRenderMode(entity, "CapeInvControl", "On");
+
+            //Shoulders Default
+            if (RenderModes.getRenderMode(entity, "ShoulderLControl") == null) RenderModes.setRenderMode(entity, "ShoulderLControl", "On");
+            if (RenderModes.getRenderMode(entity, "ShoulderRControl") == null) RenderModes.setRenderMode(entity, "ShoulderRControl", "On");
+
+
+            //Cape
+            ItemStack cape = GlobalInventory.getTiamatCapeItem(entity);
+            if (cape == null || cape.isEmpty()) RenderModes.setRenderMode(entity, "CapeInv", "Off");
+            else RenderModes.setRenderMode(entity, "CapeInv", RenderModes.getRenderMode(entity, "CapeInvControl"));
+
+            //Shoulders
+            ItemStack shoulder = GlobalInventory.getTiamatShoulderItem(entity);
+            if (shoulder == null || shoulder.isEmpty())
+            {
+                RenderModes.setRenderMode(entity, "ShoulderL", "Off");
+                RenderModes.setRenderMode(entity, "ShoulderR", "Off");
+            }
+            else
+            {
+                RenderModes.setRenderMode(entity, "ShoulderL", RenderModes.getRenderMode(entity, "ShoulderLControl"));
+                RenderModes.setRenderMode(entity, "ShoulderR", RenderModes.getRenderMode(entity, "ShoulderRControl"));
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void inventoryChanged(InventoryChangedEvent event)
+    {
+        Entity entity = event.getEntity();
+        if (!entity.world.isRemote && entity instanceof EntityLivingBase && Loader.isModLoaded("armourers_workshop"))
+        {
+            //Cape
+            ItemStack cape = GlobalInventory.getTiamatCapeItem(entity);
+            if (cape == null || cape.isEmpty()) RenderModes.setRenderMode(entity, "CapeInv", "Off");
+            else RenderModes.setRenderMode(entity, "CapeInv", RenderModes.getRenderMode(entity, "CapeInvControl"));
+
+            //Shoulders
+            ItemStack shoulder = GlobalInventory.getTiamatShoulderItem(entity);
+            if (shoulder == null || shoulder.isEmpty())
+            {
+                RenderModes.setRenderMode(entity, "ShoulderL", "Off");
+                RenderModes.setRenderMode(entity, "ShoulderR", "Off");
+            }
+            else
+            {
+                RenderModes.setRenderMode(entity, "ShoulderL", RenderModes.getRenderMode(entity, "ShoulderLControl"));
+                RenderModes.setRenderMode(entity, "ShoulderR", RenderModes.getRenderMode(entity, "ShoulderRControl"));
+            }
         }
     }
 

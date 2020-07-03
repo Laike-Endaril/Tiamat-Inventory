@@ -6,7 +6,7 @@ import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.client.settings.KeyModifier;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -22,40 +22,18 @@ import static com.fantasticsource.tiamatrpg.TiamatRPG.MODID;
 public class Keys
 {
     public static final KeyBinding
-            TIAMAT_INVENTORY_KEY = new KeyBinding(MODID + ".key.inventory", KeyConflictContext.UNIVERSAL, Keyboard.KEY_R, MODID + ".keyCategory"),
-            SWAP_WEAPONSETS_KEY = new KeyBinding(MODID + ".key.swapWeaponsets", KeyConflictContext.UNIVERSAL, Keyboard.KEY_F, MODID + ".keyCategory"),
-            SHEATHE_UNSHEATHE = new KeyBinding(MODID + ".key.sheatheUnsheathe", KeyConflictContext.UNIVERSAL, KeyModifier.CONTROL, Keyboard.KEY_F, MODID + ".keyCategory"),
-            SKILLSET_1 = new KeyBinding(MODID + ".key.skillset1", KeyConflictContext.UNIVERSAL, Keyboard.KEY_Q, MODID + ".keyCategory"),
-            SKILLSET_2 = new KeyBinding(MODID + ".key.skillset2", KeyConflictContext.UNIVERSAL, Keyboard.KEY_E, MODID + ".keyCategory"),
-            DODGE = new KeyBinding(MODID + ".key.dodge", KeyConflictContext.UNIVERSAL, Keyboard.KEY_V, MODID + ".keyCategory");
+            TIAMAT_INVENTORY_KEY = new KeyBinding(MODID + ".key.inventory", KeyConflictContext.UNIVERSAL, Keyboard.KEY_R, MODID + ".keyCategory");
 
 
     public static void init(FMLPreInitializationEvent event)
     {
-        for (KeyBinding keyBinding : new KeyBinding[]{TIAMAT_INVENTORY_KEY, SWAP_WEAPONSETS_KEY, SHEATHE_UNSHEATHE, SKILLSET_1, SKILLSET_2, DODGE})
-        {
-            ClientRegistry.registerKeyBinding(keyBinding);
-        }
+        ClientRegistry.registerKeyBinding(TIAMAT_INVENTORY_KEY);
+        MinecraftForge.EVENT_BUS.register(Keys.class);
     }
 
     @SubscribeEvent
     public static void keyPress(InputEvent event)
     {
-        if (DODGE.isKeyDown())
-        {
-            //TODO
-        }
-
-        if (SHEATHE_UNSHEATHE.isKeyDown())
-        {
-            //TODO
-        }
-
-        if (SWAP_WEAPONSETS_KEY.isKeyDown())
-        {
-            Network.WRAPPER.sendToServer(new Network.SwapWeaponsetPacket());
-        }
-
         if (TIAMAT_INVENTORY_KEY.isKeyDown())
         {
             Minecraft.getMinecraft().getTutorial().openInventory();
