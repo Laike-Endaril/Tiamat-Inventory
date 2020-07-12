@@ -64,7 +64,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public EntityPlayer player;
     private ItemStack itemStack;
     private int timesChanged;
-    private boolean unsheathed = false;
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
@@ -628,9 +627,21 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public void setSheathedMainhand1(ItemStack stack)
+    {
+        sheathedMainhand1.set(0, stack);
+    }
+
+    @Override
     public ItemStack getSheathedOffhand1()
     {
         return sheathedOffhand1.get(0);
+    }
+
+    @Override
+    public void setSheathedOffhand1(ItemStack stack)
+    {
+        sheathedOffhand1.set(0, stack);
     }
 
     @Override
@@ -640,9 +651,21 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public void setSheathedMainhand2(ItemStack stack)
+    {
+        sheathedMainhand2.set(0, stack);
+    }
+
+    @Override
     public ItemStack getSheathedOffhand2()
     {
         return sheathedOffhand2.get(0);
+    }
+
+    @Override
+    public void setSheathedOffhand2(ItemStack stack)
+    {
+        sheathedOffhand2.set(0, stack);
     }
 
     @Override
@@ -652,9 +675,39 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public ItemStack getShoulders()
+    {
+        return armor.get(0);
+    }
+
+    @Override
+    public void setShoulders(ItemStack stack)
+    {
+        armor.set(0, stack);
+    }
+
+    @Override
+    public ItemStack getCape()
+    {
+        return armor.get(1);
+    }
+
+    @Override
+    public void setCape(ItemStack stack)
+    {
+        armor.set(1, stack);
+    }
+
+    @Override
     public ArrayList<ItemStack> getQuickSlots()
     {
         return new ArrayList<>(quickSlots);
+    }
+
+    @Override
+    public void setQuickSlot(int index, ItemStack stack)
+    {
+        quickSlots.set(index, stack);
     }
 
     @Override
@@ -664,9 +717,21 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public void setBackpack(ItemStack stack)
+    {
+        backpack.set(0, stack);
+    }
+
+    @Override
     public ItemStack getPet()
     {
         return pet.get(0);
+    }
+
+    @Override
+    public void setPet(ItemStack stack)
+    {
+        pet.set(0, stack);
     }
 
     @Override
@@ -676,9 +741,21 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public void setDeck(ItemStack stack)
+    {
+        deck.set(0, stack);
+    }
+
+    @Override
     public ArrayList<ItemStack> getPlayerClasses()
     {
         return new ArrayList<>(classes);
+    }
+
+    @Override
+    public void setPlayerClass(int index, ItemStack stack)
+    {
+        classes.set(index, stack);
     }
 
     @Override
@@ -688,9 +765,21 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public void setOffensiveSkill(int index, ItemStack stack)
+    {
+        offensiveSkills.set(index, stack);
+    }
+
+    @Override
     public ArrayList<ItemStack> getUtilitySkills()
     {
         return new ArrayList<>(utilitySkills);
+    }
+
+    @Override
+    public void setUtilitySkill(int index, ItemStack stack)
+    {
+        utilitySkills.set(index, stack);
     }
 
     @Override
@@ -700,9 +789,21 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public void setUltimateSkill(ItemStack stack)
+    {
+        ultimateSkill.set(0, stack);
+    }
+
+    @Override
     public ArrayList<ItemStack> getPassiveSkills()
     {
         return new ArrayList<>(passiveSkills);
+    }
+
+    @Override
+    public void setPassiveSkill(int index, ItemStack stack)
+    {
+        passiveSkills.set(index, stack);
     }
 
     @Override
@@ -712,15 +813,33 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
     @Override
+    public void setGatheringProfession(int index, ItemStack stack)
+    {
+        gatheringProfessions.set(index, stack);
+    }
+
+    @Override
     public ArrayList<ItemStack> getCraftingProfessions()
     {
         return new ArrayList<>(craftingProfessions);
     }
 
     @Override
+    public void setCraftingProfession(int index, ItemStack stack)
+    {
+        craftingProfessions.set(index, stack);
+    }
+
+    @Override
     public ArrayList<ItemStack> getCraftingRecipes()
     {
         return new ArrayList<>(craftingRecipes);
+    }
+
+    @Override
+    public void setCraftingRecipe(int index, ItemStack stack)
+    {
+        craftingRecipes.set(index, stack);
     }
 
     @Override
