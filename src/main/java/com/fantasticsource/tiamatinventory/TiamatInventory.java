@@ -39,7 +39,6 @@ public class TiamatInventory
     {
         Network.init();
         MinecraftForge.EVENT_BUS.register(TiamatInventory.class);
-        MinecraftForge.EVENT_BUS.register(Attacks.class);
         MinecraftForge.EVENT_BUS.register(InventoryHacks.class);
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
