@@ -65,9 +65,10 @@ public class TiamatInventory
 
 
     @Mod.EventHandler
-    public static void serverStart(FMLServerStartingEvent event)
+    public static void serverStarting(FMLServerStartingEvent event)
     {
         TiamatPlayerInventory.init(event);
+        event.registerServerCommand(new Commands());
     }
 
     @SubscribeEvent
