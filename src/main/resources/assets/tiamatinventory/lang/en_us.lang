@@ -19,3 +19,9 @@ server=Server
 client=Client
 
 items=Items
+
+
+
+tiamatinventory.cmd.setSlot.comment=§dCopies your currently held item to the a Tiamat Inventory slot
+
+tiamatinventory.error.notPlayer=§cOnly players can use the "%s" subcommand
