@@ -27,8 +27,12 @@ public class TiamatInventoryContainer extends Container
         TiamatPlayerInventory tiamatPlayerInventory;
         if (player.world.isRemote)
         {
-            tiamatPlayerInventory = new TiamatPlayerInventory(player);
-            TiamatPlayerInventory.tiamatClientInventory = tiamatPlayerInventory;
+            tiamatPlayerInventory = TiamatPlayerInventory.tiamatClientInventory;
+            if (tiamatPlayerInventory == null)
+            {
+                tiamatPlayerInventory = new TiamatPlayerInventory(player);
+                TiamatPlayerInventory.tiamatClientInventory = tiamatPlayerInventory;
+            }
         }
         else
         {
