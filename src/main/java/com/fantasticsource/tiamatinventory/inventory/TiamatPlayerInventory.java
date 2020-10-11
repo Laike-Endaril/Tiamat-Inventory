@@ -30,6 +30,7 @@ import java.util.*;
 
 public class TiamatPlayerInventory implements ITiamatPlayerInventory
 {
+    public static TiamatPlayerInventory tiamatClientInventory = null;
     public static LinkedHashMap<UUID, TiamatPlayerInventory> tiamatServerInventories = new LinkedHashMap<>();
     public static File playerDataFolder;
 

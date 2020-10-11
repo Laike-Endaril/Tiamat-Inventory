@@ -1,15 +1,17 @@
 package com.fantasticsource.tiamatinventory;
 
+import com.fantasticsource.mctools.component.CItemStack;
 import com.fantasticsource.tiamatinventory.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
+import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.InventoryHacks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketOpenWindow;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.stats.StatList;
 import net.minecraft.util.SoundCategory;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -18,6 +20,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Network
 {
@@ -29,6 +35,7 @@ public class Network
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(InventorySizePacketHandler.class, InventorySizePacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(PickupSoundPacketHandler.class, PickupSoundPacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(TiamatItemSyncPacketHandler.class, TiamatItemSyncPacket.class, discriminator++, Side.CLIENT);
     }
 
 
@@ -157,6 +164,73 @@ public class Network
                 player.openContainer.addListener(player);
                 net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, new TiamatInventoryContainer(player)));
             });
+            return null;
+        }
+    }
+
+
+    public static class TiamatItemSyncPacket implements IMessage
+    {
+        public HashMap<Integer, ItemStack> newTiamatItems;
+
+        public TiamatItemSyncPacket()
+        {
+            //Required
+        }
+
+        public TiamatItemSyncPacket(HashMap<Integer, ItemStack> newTiamatItems)
+        {
+            this.newTiamatItems = newTiamatItems;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            buf.writeInt(newTiamatItems.size());
+            for (Map.Entry<Integer, ItemStack> entry : newTiamatItems.entrySet())
+            {
+                buf.writeInt(entry.getKey());
+                new CItemStack().set(entry.getValue()).write(buf);
+            }
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            CItemStack cstack = new CItemStack();
+            newTiamatItems = new HashMap<>();
+            for (int i = buf.readInt(); i > 0; i--)
+            {
+                newTiamatItems.put(buf.readInt(), cstack.read(buf).value);
+            }
+        }
+    }
+
+    public static class TiamatItemSyncPacketHandler implements IMessageHandler<TiamatItemSyncPacket, IMessage>
+    {
+        @Override
+        @SideOnly(Side.CLIENT)
+        public IMessage onMessage(TiamatItemSyncPacket packet, MessageContext ctx)
+        {
+            if (ctx.side == Side.CLIENT)
+            {
+                Minecraft mc = Minecraft.getMinecraft();
+                mc.addScheduledTask(() ->
+                {
+                    TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatClientInventory;
+                    if (inventory == null)
+                    {
+                        inventory = new TiamatPlayerInventory(mc.player);
+                        TiamatPlayerInventory.tiamatClientInventory = inventory;
+                    }
+
+                    for (Map.Entry<Integer, ItemStack> entry : packet.newTiamatItems.entrySet())
+                    {
+                        inventory.setInventorySlotContents(entry.getKey(), entry.getValue());
+                    }
+                });
+            }
+
             return null;
         }
     }

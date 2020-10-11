@@ -24,10 +24,15 @@ public class TiamatInventoryContainer extends Container
     {
         this.player = player;
         InventoryPlayer playerInventory = player.inventory;
-        TiamatPlayerInventory tiamatPlayerInventory = player.world.isRemote ? new TiamatPlayerInventory(player) : TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
-        if (tiamatPlayerInventory == null)
+        TiamatPlayerInventory tiamatPlayerInventory;
+        if (player.world.isRemote)
         {
             tiamatPlayerInventory = new TiamatPlayerInventory(player);
+            TiamatPlayerInventory.tiamatClientInventory = tiamatPlayerInventory;
+        }
+        else
+        {
+            tiamatPlayerInventory = TiamatPlayerInventory.tiamatServerInventories.computeIfAbsent(player.getPersistentID(), o -> new TiamatPlayerInventory(player));
         }
 
         //Weaponset 1
