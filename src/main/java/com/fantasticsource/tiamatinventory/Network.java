@@ -156,8 +156,6 @@ public class Network
                 player.openContainer.windowId = player.currentWindowId;
                 player.openContainer.addListener(player);
                 net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, new TiamatInventoryContainer(player)));
-
-                player.addStat(StatList.CRAFTING_TABLE_INTERACTION);
             });
             return null;
         }
