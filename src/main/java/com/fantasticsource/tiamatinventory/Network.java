@@ -21,17 +21,12 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class Network
 {
-    public static final int
-            ACTION_MAINHAND = -1,
-            ACTION_OFFHAND = -2;
-
     public static final SimpleNetworkWrapper WRAPPER = new SimpleNetworkWrapper(TiamatInventory.MODID);
     private static int discriminator = 0;
 
     public static void init()
     {
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
-        WRAPPER.registerMessage(ActionPacketHandler.class, ActionPacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(InventorySizePacketHandler.class, InventorySizePacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(PickupSoundPacketHandler.class, PickupSoundPacket.class, discriminator++, Side.CLIENT);
     }
@@ -163,62 +158,6 @@ public class Network
                 net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PlayerContainerEvent.Open(player, new TiamatInventoryContainer(player)));
 
                 player.addStat(StatList.CRAFTING_TABLE_INTERACTION);
-            });
-            return null;
-        }
-    }
-
-
-    public static class ActionPacket implements IMessage
-    {
-        public int action;
-
-        public ActionPacket()
-        {
-        }
-
-        public ActionPacket(int action)
-        {
-            this.action = action;
-        }
-
-        @Override
-        public void toBytes(ByteBuf buf)
-        {
-            buf.writeInt(action);
-        }
-
-        @Override
-        public void fromBytes(ByteBuf buf)
-        {
-            action = buf.readInt();
-        }
-    }
-
-    public static class ActionPacketHandler implements IMessageHandler<ActionPacket, IMessage>
-    {
-        @Override
-        public IMessage onMessage(ActionPacket packet, MessageContext ctx)
-        {
-            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-            server.addScheduledTask(() ->
-            {
-                switch (packet.action)
-                {
-                    case ACTION_MAINHAND:
-                        //TODO
-                        System.out.println("mainhand");
-                        break;
-
-                    case ACTION_OFFHAND:
-                        //TODO
-                        System.out.println("offhand");
-                        break;
-
-                    default:
-                        //TODO
-                        System.out.println("skill " + packet.action);
-                }
             });
             return null;
         }
