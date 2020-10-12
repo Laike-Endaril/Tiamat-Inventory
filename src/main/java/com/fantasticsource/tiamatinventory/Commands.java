@@ -5,7 +5,9 @@ import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
@@ -148,171 +150,215 @@ public class Commands extends CommandBase
                     EntityPlayerMP player = (EntityPlayerMP) sender;
                     TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
 
+                    ItemStack stack;
                     switch (args[1])
                     {
                         case "mainhand1":
+                            stack = inventory.getSheathedMainhand1();
                             inventory.setSheathedMainhand1(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "offhand1":
+                            stack = inventory.getSheathedOffhand1();
                             inventory.setSheathedOffhand1(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "mainhand2":
+                            stack = inventory.getSheathedMainhand2();
                             inventory.setSheathedMainhand2(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "offhand2":
+                            stack = inventory.getSheathedOffhand2();
                             inventory.setSheathedOffhand2(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "shoulders":
+                            stack = inventory.getShoulders();
                             inventory.setShoulders(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "cape":
+                            stack = inventory.getCape();
                             inventory.setCape(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "quickslot1":
+                            stack = inventory.getQuickSlots().get(0);
                             inventory.setQuickSlot(0, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "quickslot2":
+                            stack = inventory.getQuickSlots().get(1);
                             inventory.setQuickSlot(1, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "quickslot3":
+                            stack = inventory.getQuickSlots().get(2);
                             inventory.setQuickSlot(2, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "backpack":
+                            stack = inventory.getBackpack();
                             inventory.setBackpack(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "pet":
+                            stack = inventory.getPet();
                             inventory.setPet(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "deck":
+                            stack = inventory.getDeck();
                             inventory.setDeck(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "class1":
+                            stack = inventory.getPlayerClasses().get(0);
                             inventory.setPlayerClass(0, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "class2":
+                            stack = inventory.getPlayerClasses().get(1);
                             inventory.setPlayerClass(1, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "offensive1":
+                            stack = inventory.getOffensiveSkills().get(0);
                             inventory.setOffensiveSkill(0, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "offensive2":
+                            stack = inventory.getOffensiveSkills().get(1);
                             inventory.setOffensiveSkill(1, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "utility1":
+                            stack = inventory.getUtilitySkills().get(0);
                             inventory.setUtilitySkill(0, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "utility2":
+                            stack = inventory.getUtilitySkills().get(1);
                             inventory.setUtilitySkill(1, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "ultimate":
+                            stack = inventory.getUltimateSkill();
                             inventory.setUltimateSkill(MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "passive1":
+                            stack = inventory.getPassiveSkills().get(0);
                             inventory.setPassiveSkill(0, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "passive2":
+                            stack = inventory.getPassiveSkills().get(1);
                             inventory.setPassiveSkill(1, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "gathering1":
+                            stack = inventory.getGatheringProfessions().get(0);
                             inventory.setGatheringProfession(0, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "gathering2":
+                            stack = inventory.getGatheringProfessions().get(1);
                             inventory.setGatheringProfession(1, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "crafting1":
+                            stack = inventory.getCraftingProfessions().get(0);
                             inventory.setCraftingProfession(0, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "crafting2":
+                            stack = inventory.getCraftingProfessions().get(1);
                             inventory.setCraftingProfession(1, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe1":
+                            stack = inventory.getCraftingRecipes().get(0);
                             inventory.setCraftingRecipe(0, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe2":
+                            stack = inventory.getCraftingRecipes().get(1);
                             inventory.setCraftingRecipe(1, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe3":
+                            stack = inventory.getCraftingRecipes().get(2);
                             inventory.setCraftingRecipe(2, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe4":
+                            stack = inventory.getCraftingRecipes().get(3);
                             inventory.setCraftingRecipe(3, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe5":
+                            stack = inventory.getCraftingRecipes().get(4);
                             inventory.setCraftingRecipe(4, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe6":
+                            stack = inventory.getCraftingRecipes().get(5);
                             inventory.setCraftingRecipe(5, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe7":
+                            stack = inventory.getCraftingRecipes().get(6);
                             inventory.setCraftingRecipe(6, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe8":
+                            stack = inventory.getCraftingRecipes().get(7);
                             inventory.setCraftingRecipe(7, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe9":
+                            stack = inventory.getCraftingRecipes().get(8);
                             inventory.setCraftingRecipe(8, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe10":
+                            stack = inventory.getCraftingRecipes().get(9);
                             inventory.setCraftingRecipe(9, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe11":
+                            stack = inventory.getCraftingRecipes().get(10);
                             inventory.setCraftingRecipe(10, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe12":
+                            stack = inventory.getCraftingRecipes().get(11);
                             inventory.setCraftingRecipe(11, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe13":
+                            stack = inventory.getCraftingRecipes().get(12);
                             inventory.setCraftingRecipe(12, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe14":
+                            stack = inventory.getCraftingRecipes().get(13);
                             inventory.setCraftingRecipe(13, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         case "recipe15":
+                            stack = inventory.getCraftingRecipes().get(14);
                             inventory.setCraftingRecipe(14, MCTools.cloneItemStack(player.getHeldItemMainhand()));
                             break;
 
                         default:
                             notifyCommandListener(sender, this, subUsage(cmd));
+                            return;
                     }
+
+                    player.setHeldItem(EnumHand.MAIN_HAND, stack);
                 }
                 break;
 
