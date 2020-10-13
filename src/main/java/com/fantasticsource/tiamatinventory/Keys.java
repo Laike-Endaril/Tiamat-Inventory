@@ -35,17 +35,17 @@ public class Keys
     @SubscribeEvent
     public static void keyPress(InputEvent event)
     {
-        if (INVENTORY.isKeyDown())
+        if (INVENTORY.isKeyDown() && INVENTORY.isPressed())
         {
             Minecraft.getMinecraft().getTutorial().openInventory();
             Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
             Network.WRAPPER.sendToServer(new Network.OpenTiamatInventoryPacket());
         }
-        else if (SHEATHE.isKeyDown())
+        else if (SHEATHE.isKeyDown() && SHEATHE.isPressed())
         {
             Network.WRAPPER.sendToServer(new Network.SheatheUnsheathePacket());
         }
-        else if (SWAP.isKeyDown())
+        else if (SWAP.isKeyDown() && SWAP.isPressed())
         {
             Network.WRAPPER.sendToServer(new Network.SwapWeaponsetsPacket());
         }
