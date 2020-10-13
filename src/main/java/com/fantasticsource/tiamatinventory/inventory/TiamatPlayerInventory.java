@@ -453,7 +453,13 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void dropAllItems()
     {
-        for (List<ItemStack> list : allInventories)
+        for (List<ItemStack> list : Arrays.asList(
+                sheathedMainhand1, sheathedOffhand1,
+                sheathedMainhand2, sheathedOffhand2,
+                armor,
+                quickSlots,
+                backpack
+        ))
         {
             for (int i = 0; i < list.size(); ++i)
             {

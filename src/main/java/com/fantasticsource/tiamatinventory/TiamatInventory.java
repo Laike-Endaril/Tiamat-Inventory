@@ -15,6 +15,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -160,5 +161,12 @@ public class TiamatInventory
     public static void serverStop(FMLServerStoppedEvent event)
     {
         TiamatPlayerInventory.saveUnloadAll(event);
+    }
+
+    @SubscribeEvent
+    public static void playerDrops(PlayerDropsEvent event)
+    {
+        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(event.getEntityPlayer().getPersistentID());
+        if (inventory != null) inventory.dropAllItems();
     }
 }
