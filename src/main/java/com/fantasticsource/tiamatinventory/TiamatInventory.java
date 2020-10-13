@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = TiamatInventory.MODID, name = TiamatInventory.NAME, version = TiamatInventory.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.038a,);required-after:tiamatitems@[1.12.2.000b,);required-after:tiamatactions@[1.12.2.000,)")
+@Mod(modid = TiamatInventory.MODID, name = TiamatInventory.NAME, version = TiamatInventory.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.038d,);required-after:tiamatitems@[1.12.2.000b,);required-after:tiamatactions@[1.12.2.000,)")
 public class TiamatInventory
 {
     public static final String MODID = "tiamatinventory";
@@ -69,7 +69,9 @@ public class TiamatInventory
     public static void serverStarting(FMLServerStartingEvent event)
     {
         TiamatPlayerInventory.init(event);
+
         event.registerServerCommand(new Commands());
+        event.registerServerCommand(new CommandGive());
     }
 
     @SubscribeEvent
