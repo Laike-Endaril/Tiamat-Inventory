@@ -47,7 +47,7 @@ public class Keys
         }
         else if (SWAP.isKeyDown())
         {
-
+            Network.WRAPPER.sendToServer(new Network.SwapWeaponsetsPacket());
         }
     }
 

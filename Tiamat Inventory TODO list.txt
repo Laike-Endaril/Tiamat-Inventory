@@ -1,5 +1,4 @@
-Implement sheathe/unsheathe and swap
-When sheathed, nothing should be in either hand
+Implement swap
 When unsheathed, the active weaponset should be in hands and the other...well...not in hands, and the active weaponset tiamat slots should be empty
 When swapping, swap the tiamat slots if sheathed, and if unsheathed, swap the in-hand items with weaponset 2 slots (the "inactive" weaponset)
 

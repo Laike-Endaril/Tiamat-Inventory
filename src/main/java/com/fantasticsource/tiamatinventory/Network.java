@@ -36,6 +36,8 @@ public class Network
         WRAPPER.registerMessage(InventorySizePacketHandler.class, InventorySizePacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(PickupSoundPacketHandler.class, PickupSoundPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(TiamatItemSyncPacketHandler.class, TiamatItemSyncPacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(SheatheUnsheathePacketHandler.class, SheatheUnsheathePacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(SwapWeaponsetsPacketHandler.class, SwapWeaponsetsPacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -264,7 +266,7 @@ public class Network
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
                 if (inventory == null) return;
 
-                //TODO
+                inventory.sheatheUnsheathe();
             });
             return null;
         }
