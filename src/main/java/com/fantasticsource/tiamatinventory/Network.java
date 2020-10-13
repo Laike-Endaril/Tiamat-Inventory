@@ -298,7 +298,7 @@ public class Network
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
                 if (inventory == null) return;
 
-                //TODO
+                inventory.swap();
             });
             return null;
         }

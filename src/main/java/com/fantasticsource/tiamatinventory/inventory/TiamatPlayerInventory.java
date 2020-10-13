@@ -982,7 +982,13 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         }
         else
         {
+            ItemStack swap = getSheathedMainhand2();
+            setSheathedMainhand2(player.getHeldItemMainhand());
+            player.setHeldItem(EnumHand.MAIN_HAND, swap);
 
+            swap = getSheathedOffhand2();
+            setSheathedOffhand2(player.getHeldItemOffhand());
+            player.setHeldItem(EnumHand.OFF_HAND, swap);
         }
     }
 }
