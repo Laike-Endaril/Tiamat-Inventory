@@ -20,23 +20,34 @@ import org.lwjgl.input.Keyboard;
 public class Keys
 {
     public static final KeyBinding
-            TIAMAT_INVENTORY_KEY = new KeyBinding(TiamatInventory.MODID + ".key.inventory", KeyConflictContext.UNIVERSAL, Keyboard.KEY_R, TiamatInventory.MODID + ".keyCategory");
+            INVENTORY = new KeyBinding(TiamatInventory.MODID + ".key.inventory", KeyConflictContext.UNIVERSAL, Keyboard.KEY_R, TiamatInventory.MODID + ".keyCategory"),
+            SWAP = new KeyBinding(TiamatInventory.MODID + ".key.swap", KeyConflictContext.IN_GAME, Keyboard.KEY_Q, TiamatInventory.MODID + ".keyCategory"),
+            SHEATHE = new KeyBinding(TiamatInventory.MODID + ".key.sheathe", KeyConflictContext.IN_GAME, Keyboard.KEY_E, TiamatInventory.MODID + ".keyCategory");
 
 
     public static void init(FMLPreInitializationEvent event)
     {
-        ClientRegistry.registerKeyBinding(TIAMAT_INVENTORY_KEY);
         MinecraftForge.EVENT_BUS.register(Keys.class);
+
+        for (KeyBinding keyBinding : new KeyBinding[]{INVENTORY, SWAP, SHEATHE}) ClientRegistry.registerKeyBinding(keyBinding);
     }
 
     @SubscribeEvent
     public static void keyPress(InputEvent event)
     {
-        if (TIAMAT_INVENTORY_KEY.isKeyDown())
+        if (INVENTORY.isKeyDown())
         {
             Minecraft.getMinecraft().getTutorial().openInventory();
             Minecraft.getMinecraft().displayGuiScreen(new TiamatInventoryGUI());
             Network.WRAPPER.sendToServer(new Network.OpenTiamatInventoryPacket());
+        }
+        else if (SHEATHE.isKeyDown())
+        {
+            Network.WRAPPER.sendToServer(new Network.SheatheUnsheathePacket());
+        }
+        else if (SWAP.isKeyDown())
+        {
+
         }
     }
 

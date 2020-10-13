@@ -810,7 +810,7 @@ public class TiamatInventoryGUI extends GuiContainer
     @Override
     protected void keyTyped(char typedChar, int keyCode)
     {
-        if (keyCode == 1 || Keys.TIAMAT_INVENTORY_KEY.isActiveAndMatches(keyCode))
+        if (keyCode == 1 || Keys.INVENTORY.isActiveAndMatches(keyCode))
         {
             if (tab == 0) mc.player.connection.sendPacket(new CPacketCloseWindow(mc.player.openContainer.windowId));
             mc.player.closeScreenAndDropStack();

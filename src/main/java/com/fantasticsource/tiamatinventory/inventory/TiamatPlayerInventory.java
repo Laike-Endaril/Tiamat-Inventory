@@ -4,6 +4,7 @@ import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatinventory.TiamatInventory;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
@@ -12,6 +13,8 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -869,5 +872,117 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
             result.addAll(inventory);
         }
         return result;
+    }
+
+
+    public boolean isSheathed()
+    {
+        return player.getHeldItemMainhand().isEmpty() && player.getHeldItemOffhand().isEmpty();
+    }
+
+    public boolean forceSheathe()
+    {
+        //Return if sheathed
+        if (isSheathed()) return true;
+
+
+        //Attempt to force sheathe (sheathe current items but not swap to items in sheathed slots)
+        if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty())
+        {
+            sheatheUnsheathe();
+            return true;
+        }
+        if (getSheathedMainhand2().isEmpty() && getSheathedOffhand2().isEmpty())
+        {
+            sheatheUnsheathe(true);
+            return true;
+        }
+
+
+        //Try to drop vanilla hand items if forced sheathing failed
+        boolean dropFailed = false;
+        for (int index : new int[]{player.inventory.currentItem, 40})
+        {
+            ItemStack stack = player.inventory.getStackInSlot(index);
+            if (!stack.isEmpty())
+            {
+                if (stack.getItem().onDroppedByPlayer(stack, player))
+                {
+                    player.dropItem(stack, false, true);
+                    player.inventory.setInventorySlotContents(index, ItemStack.EMPTY);
+                    ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(-2, index, ItemStack.EMPTY));
+                }
+                else dropFailed = true;
+            }
+        }
+        return !dropFailed;
+    }
+
+    public void sheatheUnsheathe()
+    {
+        sheatheUnsheathe(false);
+    }
+
+    public void sheatheUnsheathe(boolean to2ndSet)
+    {
+        ItemStack swap1, swap2;
+        if (!to2ndSet)
+        {
+            swap1 = player.getHeldItemMainhand();
+            swap2 = getSheathedMainhand1();
+            if (swap1.isEmpty() != swap2.isEmpty())
+            {
+                setSheathedMainhand1(swap1);
+                player.setHeldItem(EnumHand.MAIN_HAND, swap2);
+                ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(-2, player.inventory.currentItem, swap2));
+            }
+
+            swap1 = player.getHeldItemOffhand();
+            swap2 = getSheathedOffhand1();
+            if (swap1.isEmpty() != swap2.isEmpty())
+            {
+                setSheathedOffhand1(swap1);
+                player.setHeldItem(EnumHand.OFF_HAND, swap2);
+                ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(-2, 40, swap2));
+            }
+        }
+        else
+        {
+            swap1 = player.getHeldItemMainhand();
+            swap2 = getSheathedMainhand2();
+            if (swap1.isEmpty() != swap2.isEmpty())
+            {
+                setSheathedMainhand2(swap1);
+                player.setHeldItem(EnumHand.MAIN_HAND, swap2);
+                ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(-2, player.inventory.currentItem, swap2));
+            }
+
+            swap1 = player.getHeldItemOffhand();
+            swap2 = getSheathedOffhand2();
+            if (swap1.isEmpty() != swap2.isEmpty())
+            {
+                setSheathedOffhand2(swap1);
+                player.setHeldItem(EnumHand.OFF_HAND, swap2);
+                ((EntityPlayerMP) player).connection.sendPacket(new SPacketSetSlot(-2, 40, swap2));
+            }
+        }
+    }
+
+    public void swap()
+    {
+        if (isSheathed())
+        {
+            ItemStack swap = getSheathedMainhand1();
+            setSheathedMainhand1(getSheathedMainhand2());
+            setSheathedMainhand2(swap);
+
+            swap = getSheathedOffhand1();
+            setSheathedOffhand1(getSheathedOffhand2());
+            setSheathedOffhand2(swap);
+        }
+        else
+        {
+
+        }
     }
 }

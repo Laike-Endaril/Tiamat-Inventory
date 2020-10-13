@@ -153,9 +153,12 @@ public class Network
             MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
             server.addScheduledTask(() ->
             {
+                EntityPlayerMP player = ctx.getServerHandler().player;
+                TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+                if (inventory != null && !inventory.forceSheathe()) return; //Don't open if we failed to force sheathe
+
                 InterfaceTiamatInventory iface = new InterfaceTiamatInventory();
 
-                EntityPlayerMP player = ctx.getServerHandler().player;
                 player.getNextWindowId();
                 player.connection.sendPacket(new SPacketOpenWindow(player.currentWindowId, iface.getGuiID(), iface.getDisplayName()));
 
@@ -231,6 +234,70 @@ public class Network
                 });
             }
 
+            return null;
+        }
+    }
+
+
+    public static class SheatheUnsheathePacket implements IMessage
+    {
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+        }
+    }
+
+    public static class SheatheUnsheathePacketHandler implements IMessageHandler<SheatheUnsheathePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(SheatheUnsheathePacket packet, MessageContext ctx)
+        {
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            server.addScheduledTask(() ->
+            {
+                EntityPlayerMP player = ctx.getServerHandler().player;
+                TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+                if (inventory == null) return;
+
+                //TODO
+            });
+            return null;
+        }
+    }
+
+
+    public static class SwapWeaponsetsPacket implements IMessage
+    {
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+        }
+    }
+
+    public static class SwapWeaponsetsPacketHandler implements IMessageHandler<SwapWeaponsetsPacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(SwapWeaponsetsPacket packet, MessageContext ctx)
+        {
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            server.addScheduledTask(() ->
+            {
+                EntityPlayerMP player = ctx.getServerHandler().player;
+                TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+                if (inventory == null) return;
+
+                //TODO
+            });
             return null;
         }
     }
