@@ -880,13 +880,13 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         return player.getHeldItemMainhand().isEmpty() && player.getHeldItemOffhand().isEmpty();
     }
 
-    public boolean forceSheathe()
+    public boolean forceEmptyHands()
     {
         //Return if sheathed
         if (isSheathed()) return true;
 
 
-        //Attempt to force sheathe (sheathe current items but not swap to items in sheathed slots)
+        //Sheathe normally if possible
         if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty())
         {
             sheatheUnsheathe();

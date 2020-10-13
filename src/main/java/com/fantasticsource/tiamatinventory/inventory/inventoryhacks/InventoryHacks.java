@@ -119,7 +119,7 @@ public class InventoryHacks
     }
 
     @SubscribeEvent
-    public static void itemPickup1(EntityItemPickupEvent event)
+    public static void itemPickup(EntityItemPickupEvent event)
     {
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
         GameType gameType = MCTools.getGameType(player);

@@ -157,7 +157,7 @@ public class Network
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
-                if (inventory != null && !inventory.forceSheathe()) return; //Don't open if we failed to force sheathe
+                if (inventory != null && !inventory.forceEmptyHands()) return; //Don't open if we failed to force sheathe
 
                 InterfaceTiamatInventory iface = new InterfaceTiamatInventory();
 
