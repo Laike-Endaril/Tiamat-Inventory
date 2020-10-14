@@ -6,8 +6,9 @@ import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatinventory.Network;
 import com.fantasticsource.tiamatinventory.config.TiamatConfig;
-import com.fantasticsource.tiamatinventory.nbt.SlotDataTags;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
+import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
+import com.fantasticsource.tiamatinventory.nbt.SlotDataTags;
 import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
@@ -82,19 +83,27 @@ public class InventoryHacks
     @SubscribeEvent
     public static void playerContainer(PlayerContainerEvent.Open event)
     {
-        EntityPlayer player = event.getEntityPlayer();
+        EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
         GameType gameType = MCTools.getGameType(player);
         if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
-        int invSize = getCurrentInventorySize((EntityPlayerMP) player);
+        Container container = event.getContainer();
+        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+        if (inventory != null && !inventory.forceEmptyHands())
+        {
+            player.closeScreen();
+            return;
+        }
+
+
+        int invSize = getCurrentInventorySize(player);
         ArrayList<Integer> availableSlots = new ArrayList<>(invSize);
         for (int i = 0; i < invSize; i++)
         {
             availableSlots.add(ORDERED_SLOT_INDICES[i]);
         }
 
-        Container container = event.getContainer();
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);

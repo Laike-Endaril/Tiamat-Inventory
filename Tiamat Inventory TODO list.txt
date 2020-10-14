@@ -1,2 +1,4 @@
-Make auto-pickup only pickup to vanilla mainhand and offhand?
+Get hacked inventories to show weaponset slots in place of first 4 hotbar slots (if the inventory would normally have shown the hotbar slots)
+
+Make auto-pickup only pickup to vanilla mainhand and offhand
 Make sure to account for 2H items!
