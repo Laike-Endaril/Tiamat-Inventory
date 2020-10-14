@@ -6,9 +6,11 @@ import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatinventory.Network;
 import com.fantasticsource.tiamatinventory.config.TiamatConfig;
+import com.fantasticsource.tiamatinventory.inventory.FilteredSlot;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.nbt.SlotDataTags;
+import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
@@ -32,7 +34,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InventoryHacks
 {
@@ -104,6 +108,7 @@ public class InventoryHacks
             availableSlots.add(ORDERED_SLOT_INDICES[i]);
         }
 
+        HashMap<Integer, Integer> tiamatSlotToCurrentSlot = new HashMap<>();
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
@@ -112,17 +117,39 @@ public class InventoryHacks
             int slotIndex = slot.getSlotIndex();
             if (container instanceof TiamatInventoryContainer)
             {
-                if (slotIndex > 0 && (slotIndex < 9 || (slotIndex < 36 && !availableSlots.contains(slotIndex))))
+                if (slotIndex < 36 && !availableSlots.contains(slotIndex))
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
             }
             else
             {
-                if (slotIndex < 9 || slotIndex >= 36 || !availableSlots.contains(slotIndex))
+                if (inventory != null && slotIndex < 4)
+                {
+                    tiamatSlotToCurrentSlot.put(slotIndex, i);
+                }
+                else if (slotIndex < 9 || slotIndex >= 36 || !availableSlots.contains(slotIndex))
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
+            }
+        }
+
+        if (inventory != null)
+        {
+            for (Map.Entry<Integer, Integer> entry : tiamatSlotToCurrentSlot.entrySet())
+            {
+                int tiamatIndex = entry.getKey(), currentIndex = entry.getValue();
+                int pairedIndex = tiamatIndex % 2 == 0 ? tiamatIndex + 1 : tiamatIndex - 1;
+
+                Slot oldSlot = container.inventorySlots.get(currentIndex);
+                Slot newSlot = new FilteredSlot(inventory, tiamatIndex, oldSlot.xPos, oldSlot.yPos, 608, 0, false, 1, stack ->
+                {
+                    ItemStack other = inventory.getStackInSlot(pairedIndex);
+                    return other.isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(other));
+                });
+                newSlot.slotNumber = oldSlot.slotNumber;
+                container.inventorySlots.set(currentIndex, newSlot);
             }
         }
     }
