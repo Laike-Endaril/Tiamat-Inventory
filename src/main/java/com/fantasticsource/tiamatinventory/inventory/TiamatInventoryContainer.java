@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 
 public class TiamatInventoryContainer extends Container
 {
+    public static final int WEAPON_SLOT_STACK_LIMIT = 64;
     private final EntityPlayer player;
 
     public TiamatInventoryContainer(EntityPlayer player)
@@ -42,14 +43,14 @@ public class TiamatInventoryContainer extends Container
         //Weaponset 1
         //Index 0 - 1
         //Internal index 0 and 1 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 0, 43, 114, 608, 0, false, 1, stack -> getSlot(1).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(1).getStack()))));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 1, 61, 114, 624, 0, false, 1, stack -> getSlot(0).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(0).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 0, 43, 114, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(1).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(1).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 1, 61, 114, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(0).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(0).getStack()))));
 
         //Weaponset 2
         //Index 2 - 3
         //Internal index 2 and 3 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 2, 97, 114, 608, 0, false, 1, stack -> getSlot(3).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(3).getStack()))));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 3, 115, 114, 624, 0, false, 1, stack -> getSlot(2).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(2).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 2, 97, 114, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(3).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(3).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 3, 115, 114, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(2).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(2).getStack()))));
 
         //"Cargo" inventory
         //Index 4 - 30
