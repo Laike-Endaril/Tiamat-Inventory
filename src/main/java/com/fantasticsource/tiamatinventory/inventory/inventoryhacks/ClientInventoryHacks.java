@@ -1,7 +1,7 @@
 package com.fantasticsource.tiamatinventory.inventory.inventoryhacks;
 
 import com.fantasticsource.mctools.MCTools;
-import com.fantasticsource.tiamatinventory.inventory.FilteredSlot;
+import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;

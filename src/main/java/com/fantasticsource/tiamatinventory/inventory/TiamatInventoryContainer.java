@@ -1,5 +1,7 @@
 package com.fantasticsource.tiamatinventory.inventory;
 
+import com.fantasticsource.mctools.inventory.slot.BetterSlot;
+import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
 import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.enchantment.EnchantmentHelper;

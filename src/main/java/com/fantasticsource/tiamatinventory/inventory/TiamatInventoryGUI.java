@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatinventory.inventory;
 
+import com.fantasticsource.mctools.inventory.slot.BetterSlot;
 import com.fantasticsource.tiamatinventory.AttributeDisplayData;
 import com.fantasticsource.tiamatinventory.Keys;
 import com.fantasticsource.tools.Collision;
