@@ -62,26 +62,35 @@ public class ClientInventoryHacks extends GuiButton
 
         TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatClientInventory;
 
-        for (int i = 0; i < gui.inventorySlots.inventorySlots.size(); i++)
+        Container container = gui.inventorySlots;
+        if (container == null) return;
+
+        for (int i = 0; i < container.inventorySlots.size(); i++)
         {
-            Slot slot = gui.inventorySlots.inventorySlots.get(i);
-            if (slot == null || !(slot.inventory instanceof InventoryPlayer)) continue;
+            Slot slot = container.inventorySlots.get(i);
+            if (slot == null) continue;
 
             int slotIndex = slot.getSlotIndex();
             if (isTiamat)
             {
-                if (slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+                if (slot.inventory instanceof InventoryPlayer && slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
                 {
-                    hideSlotAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, false);
+                    renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
                 }
             }
             else
             {
-                if (inventory != null && slotIndex < 4) continue;
-
-                if (slotIndex < 9 || slotIndex >= 36 || !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+                if (slot.inventory == inventory && slotIndex < 4)
                 {
-                    hideSlotAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, slotIndex < 9);
+                    if (inventory.getStackInSlot(slotIndex).isEmpty())
+                    {
+                        renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * (slotIndex % 2 == 0 ? 608 : 624), 0, 16);
+                    }
+                }
+                else if (slot.inventory instanceof InventoryPlayer && (slotIndex < 9 || slotIndex >= 36 || !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex)))
+                {
+                    if (slotIndex < 9) renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    else renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
                 }
             }
         }
@@ -89,25 +98,17 @@ public class ClientInventoryHacks extends GuiButton
         GlStateManager.disableBlend();
     }
 
-    protected void hideSlotAt(int x, int y, boolean hotbarSlot)
+    protected void renderTextureAt(int x, int y, double u, double v, int size)
     {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
-        if (hotbarSlot)
-        {
-            bufferbuilder.pos(x, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * (16 + 18)).endVertex();
-            bufferbuilder.pos(x + 18, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (544 + 18), TiamatInventoryGUI.V_PIXEL * (16 + 18)).endVertex();
-            bufferbuilder.pos(x + 18, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (544 + 18), TiamatInventoryGUI.V_PIXEL * 16).endVertex();
-            bufferbuilder.pos(x, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16).endVertex();
-        }
-        else
-        {
-            bufferbuilder.pos(x, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * (16 + 18)).endVertex();
-            bufferbuilder.pos(x + 18, y + 18, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (576 + 18), TiamatInventoryGUI.V_PIXEL * (16 + 18)).endVertex();
-            bufferbuilder.pos(x + 18, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * (576 + 18), TiamatInventoryGUI.V_PIXEL * 16).endVertex();
-            bufferbuilder.pos(x, y, zLevel).tex(TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16).endVertex();
-        }
+
+        bufferbuilder.pos(x, y + size, zLevel).tex(u, v + TiamatInventoryGUI.V_PIXEL * size).endVertex();
+        bufferbuilder.pos(x + size, y + size, zLevel).tex(u + TiamatInventoryGUI.U_PIXEL * size, v + TiamatInventoryGUI.V_PIXEL * size).endVertex();
+        bufferbuilder.pos(x + size, y, zLevel).tex(u + TiamatInventoryGUI.U_PIXEL * size, v).endVertex();
+        bufferbuilder.pos(x, y, zLevel).tex(u, v).endVertex();
+
         tessellator.draw();
     }
 
