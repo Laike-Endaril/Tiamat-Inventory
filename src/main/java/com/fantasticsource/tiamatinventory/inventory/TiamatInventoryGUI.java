@@ -886,27 +886,31 @@ public class TiamatInventoryGUI extends GuiContainer
     }
 
 
-    @javax.annotation.Nullable
+    @Override
     public Slot getSlotUnderMouse()
     {
         return hoveredSlot;
     }
 
+    @Override
     public int getGuiLeft()
     {
         return guiLeft;
     }
 
+    @Override
     public int getGuiTop()
     {
         return guiTop;
     }
 
+    @Override
     public int getXSize()
     {
         return xSize;
     }
 
+    @Override
     public int getYSize()
     {
         return ySize;

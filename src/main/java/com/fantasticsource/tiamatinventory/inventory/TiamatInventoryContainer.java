@@ -18,6 +18,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
+import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI.*;
+
 public class TiamatInventoryContainer extends Container
 {
     public static final int WEAPON_SLOT_STACK_LIMIT = 64;
@@ -45,14 +47,14 @@ public class TiamatInventoryContainer extends Container
         //Weaponset 1
         //Index 0 - 1
         //Internal index 0 and 1 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 0, 43, 114, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(1).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(1).getStack()))));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 1, 61, 114, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(0).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(0).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 0, 43, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(1).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(1).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 1, 61, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(0).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(0).getStack()))));
 
         //Weaponset 2
         //Index 2 - 3
         //Internal index 2 and 3 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 2, 97, 114, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(3).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(3).getStack()))));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 3, 115, 114, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(2).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(2).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 2, 97, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(3).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(3).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 3, 115, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(2).getStack().isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(getSlot(2).getStack()))));
 
         //"Cargo" inventory
         //Index 4 - 30
@@ -61,7 +63,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 9; ++xx)
             {
-                addSlotToContainer(new BetterSlot(playerInventory, xx + (yy + 1) * 9, 133 + xx * 18, 42 + yy * 18, -1, -1));
+                addSlotToContainer(new BetterSlot(playerInventory, xx + (yy + 1) * 9, 133 + xx * 18, 42 + yy * 18, TEXTURE, TEXTURE_W, TEXTURE_H, -16, -16));
             }
         }
 
@@ -75,8 +77,8 @@ public class TiamatInventoryContainer extends Container
         //...37 (vanilla legs)
         //...36 (vanilla feet)
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.HEAD, 39, 25, 6, 512, 0);
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 4, 25, 24, 528, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Shoulders")));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 5, 25, 42, 544, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Cape")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 4, 25, 24, TEXTURE, TEXTURE_W, TEXTURE_H, 528, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Shoulders")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 5, 25, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 544, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Cape")));
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.CHEST, 38, 25, 60, 560, 0);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.LEGS, 37, 25, 78, 576, 0);
         addVanillaEquipmentSlot(playerInventory, EntityEquipmentSlot.FEET, 36, 25, 96, 592, 0);
@@ -86,23 +88,23 @@ public class TiamatInventoryContainer extends Container
         //Internal index 6 - 8 (tiamat)
         for (int xx = 0; xx < 3; xx++)
         {
-            addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 6 + xx, 241 + xx * 18, 96, 784, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Quick Item")));
+            addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 6 + xx, 241 + xx * 18, 96, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Quick Item")));
         }
 
         //Backpack slot
         //Index 40
         //Internal index 9 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 9, 133, 24, 768, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Backpack")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 9, 133, 24, TEXTURE, TEXTURE_W, TEXTURE_H, 768, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Backpack")));
 
         //Pet slot
         //Index 41
         //Internal index 10 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 10, 151, 96, 640, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Pet")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 10, 151, 96, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Pet")));
 
         //Deck slot
         //Index 42
         //Internal index 11 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 11, 133, 96, 752, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Deck")));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 11, 133, 96, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Deck")));
     }
 
     public static boolean canCombine(ItemStack from, ItemStack to)
@@ -114,7 +116,7 @@ public class TiamatInventoryContainer extends Container
 
     private void addVanillaEquipmentSlot(IInventory inventory, EntityEquipmentSlot slotEnum, int index, int x, int y, int u, int v)
     {
-        addSlotToContainer(new BetterSlot(inventory, index, x, y, u, v)
+        addSlotToContainer(new BetterSlot(inventory, index, x, y, TEXTURE, TEXTURE_W, TEXTURE_H, u, v)
         {
             public int getSlotStackLimit()
             {

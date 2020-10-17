@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.WEAPON_SLOT_STACK_LIMIT;
+import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI.*;
 
 public class ClientInventoryHacks extends GuiButton
 {
@@ -178,7 +179,7 @@ public class ClientInventoryHacks extends GuiButton
                 int pairedIndex = tiamatIndex % 2 == 0 ? tiamatIndex + 1 : tiamatIndex - 1;
 
                 Slot oldSlot = container.inventorySlots.get(currentIndex);
-                Slot newSlot = new FilteredSlot(inventory, tiamatIndex, oldSlot.xPos, oldSlot.yPos, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
+                Slot newSlot = new FilteredSlot(inventory, tiamatIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
                 {
                     ItemStack other = inventory.getStackInSlot(pairedIndex);
                     return other.isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(other));
