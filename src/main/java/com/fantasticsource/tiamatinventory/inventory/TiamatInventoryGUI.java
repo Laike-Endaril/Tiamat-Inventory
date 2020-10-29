@@ -16,7 +16,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.network.play.client.CPacketCloseWindow;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,15 +27,13 @@ import org.lwjgl.opengl.GL11;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static com.fantasticsource.tiamatinventory.TiamatInventory.MODID;
+import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends BetterContainerGUI
 {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
-    public static final int TEXTURE_W = 1024, TEXTURE_H = 1024;
     public static final int MODEL_WINDOW_X = 43, MODEL_WINDOW_Y = 6, MODEL_WINDOW_W = 88, MODEL_WINDOW_H = 106;
     public static final int STAT_WINDOW_X = 118000, STAT_WINDOW_Y = 22000, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
     public static final int STAT_SCROLLBAR_X = 219000, STAT_SCROLLBAR_Y = 22000, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;

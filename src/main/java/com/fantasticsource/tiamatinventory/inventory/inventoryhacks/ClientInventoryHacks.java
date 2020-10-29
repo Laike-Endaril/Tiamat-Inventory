@@ -31,8 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.WEAPON_SLOT_STACK_LIMIT;
-import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI.*;
+import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
 
 public class ClientInventoryHacks extends GuiButton
 {
@@ -59,7 +58,7 @@ public class ClientInventoryHacks extends GuiButton
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
-        mc.renderEngine.bindTexture(TiamatInventoryGUI.TEXTURE);
+        mc.renderEngine.bindTexture(TEXTURE);
 
         TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatClientInventory;
 

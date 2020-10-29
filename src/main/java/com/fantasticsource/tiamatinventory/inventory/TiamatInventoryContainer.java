@@ -13,15 +13,19 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
-import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI.*;
+import static com.fantasticsource.tiamatinventory.TiamatInventory.MODID;
 
 public class TiamatInventoryContainer extends Container
 {
+    public static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "gui/inventory.png");
+    public static final int TEXTURE_W = 1024, TEXTURE_H = 1024;
+
     public static final int WEAPON_SLOT_STACK_LIMIT = 64;
     private final EntityPlayer player;
 

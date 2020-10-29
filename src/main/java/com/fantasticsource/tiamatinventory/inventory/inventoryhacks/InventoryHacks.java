@@ -38,8 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.WEAPON_SLOT_STACK_LIMIT;
-import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI.*;
+import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
 
 public class InventoryHacks
 {
