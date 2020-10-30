@@ -882,8 +882,8 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public boolean forceEmptyHands()
     {
-        //Return if sheathed
-        if (isSheathed()) return true;
+        //Return if sheathed or creative
+        if (player.isCreative() || isSheathed()) return true;
 
 
         //Sheathe normally if possible
@@ -920,6 +920,10 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void sheatheUnsheathe()
     {
+        //Return if creative
+        if (player.isCreative()) return;
+
+
         if (isSheathed())
         {
             if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) swap();
@@ -930,6 +934,10 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void sheatheUnsheathe(boolean to2ndSet)
     {
+        //Return if creative
+        if (player.isCreative()) return;
+
+
         ItemStack swap1, swap2;
         if (!to2ndSet)
         {
@@ -975,6 +983,10 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void swap()
     {
+        //Return if creative
+        if (player.isCreative()) return;
+
+
         if (isSheathed())
         {
             ItemStack swap = getSheathedMainhand1();
