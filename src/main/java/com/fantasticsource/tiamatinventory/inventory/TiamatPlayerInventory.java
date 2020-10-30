@@ -920,6 +920,11 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void sheatheUnsheathe()
     {
+        if (isSheathed())
+        {
+            if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) swap();
+            if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) return;
+        }
         sheatheUnsheathe(false);
     }
 
@@ -983,6 +988,8 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         else
         {
             ItemStack swap = getSheathedMainhand2();
+            if (swap.isEmpty() && getSheathedOffhand2().isEmpty()) return;
+
             setSheathedMainhand2(player.getHeldItemMainhand());
             player.setHeldItem(EnumHand.MAIN_HAND, swap);
 
