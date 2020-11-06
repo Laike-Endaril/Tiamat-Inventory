@@ -15,8 +15,17 @@ public class AttributeDisplayData
         for (int i = 0; i < array.length; i++)
         {
             String s = array[i];
-            displayAttributes[i] = s.substring(0, s.indexOf(',')).trim();
-            displayAttributeDescriptions[i] = s.substring(s.indexOf(',') + 1).trim();
+            int index = s.indexOf(',');
+            if (index == -1)
+            {
+                displayAttributes[i] = s.trim();
+                displayAttributeDescriptions[i] = "";
+            }
+            else
+            {
+                displayAttributes[i] = s.substring(0, index).trim();
+                displayAttributeDescriptions[i] = s.substring(index + 1).trim();
+            }
         }
     }
 }

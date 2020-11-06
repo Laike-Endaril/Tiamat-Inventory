@@ -16,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.network.play.client.CPacketCloseWindow;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,6 +27,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
@@ -35,16 +37,16 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 public class TiamatInventoryGUI extends BetterContainerGUI
 {
     public static final int MODEL_WINDOW_X = 43, MODEL_WINDOW_Y = 6, MODEL_WINDOW_W = 88, MODEL_WINDOW_H = 106;
-    public static final int STAT_WINDOW_X = 118000, STAT_WINDOW_Y = 22000, STAT_WINDOW_W = 99, STAT_WINDOW_H = 106;
-    public static final int STAT_SCROLLBAR_X = 219000, STAT_SCROLLBAR_Y = 22000, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 106;
-    public static final int STAT_SCROLLKNOB_H = 5;
+    public static final int STAT_WINDOW_X = 25, STAT_WINDOW_Y = 6, STAT_WINDOW_W = 261, STAT_WINDOW_H = 124;
+    public static final int STAT_SCROLLBAR_X = 288, STAT_SCROLLBAR_Y = 6, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 124;
+    public static final int STAT_SCROLLKNOB_SIZE = 5;
     public static final double U_PIXEL = 1d / TEXTURE_W, V_PIXEL = 1d / TEXTURE_H;
 
     protected static double statsScroll = 0;
     protected static int statLineHeight;
     protected static int statHeightDif;
     protected int tab = 0;
-    protected String[] stats, statTooltips;
+    protected String[] rawStats, stats, statTooltips;
     protected boolean statsScrollGrabbed = false, modelGrabbed = false;
     protected int uOffset, vOffset, modelGrabX, modelGrabY;
     protected double modelYaw = 0, modelPitch = 0, modelScale = 1;
@@ -53,11 +55,15 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     {
         super(new TiamatInventoryContainer(Minecraft.getMinecraft().player));
 
-        stats = new String[AttributeDisplayData.displayAttributes.length];
-        statTooltips = new String[stats.length];
+        rawStats = new String[AttributeDisplayData.displayAttributes.length];
+        stats = new String[rawStats.length];
+        statTooltips = new String[rawStats.length];
         for (int i = 0; i < stats.length; i++)
         {
-            stats[i] = I18n.translateToLocal("attribute.name." + AttributeDisplayData.displayAttributes[i]);
+            String name = AttributeDisplayData.displayAttributes[i];
+            rawStats[i] = name;
+            if (name.isEmpty()) stats[i] = "";
+            else stats[i] = name.replace(TextFormatting.getTextWithoutFormattingCodes(name), I18n.translateToLocal("attribute.name." + name));
             statTooltips[i] = I18n.translateToLocal(AttributeDisplayData.displayAttributeDescriptions[i]);
         }
         statLineHeight = fontRenderer.FONT_HEIGHT + 1;
@@ -109,37 +115,63 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        if (tab == 0)
+        if (tab == 1)
         {
             //Render scrollknob
             GlStateManager.color(1, 1, 1, 1);
             mc.getTextureManager().bindTexture(TEXTURE);
 
-            double scrollKnobY = STAT_SCROLLBAR_Y + (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H) * statsScroll;
+            double scrollKnobY = STAT_SCROLLBAR_Y + (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_SIZE) * statsScroll;
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferbuilder = tessellator.getBuffer();
             bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-            bufferbuilder.pos(STAT_SCROLLBAR_X, scrollKnobY + STAT_SCROLLKNOB_H, zLevel).tex(288 * U_PIXEL, (240 + STAT_SCROLLKNOB_H) * V_PIXEL).endVertex();
-            bufferbuilder.pos(STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, scrollKnobY + STAT_SCROLLKNOB_H, zLevel).tex((288 + STAT_SCROLLBAR_W) * U_PIXEL, (240 + STAT_SCROLLKNOB_H) * V_PIXEL).endVertex();
-            bufferbuilder.pos(STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, scrollKnobY, zLevel).tex((288 + STAT_SCROLLBAR_W) * U_PIXEL, 240 * V_PIXEL).endVertex();
-            bufferbuilder.pos(STAT_SCROLLBAR_X, scrollKnobY, zLevel).tex(288 * U_PIXEL, 240 * V_PIXEL).endVertex();
+            bufferbuilder.pos(STAT_SCROLLBAR_X, scrollKnobY + STAT_SCROLLKNOB_SIZE, zLevel).tex(544 * U_PIXEL, (64 + STAT_SCROLLKNOB_SIZE) * V_PIXEL).endVertex();
+            bufferbuilder.pos(STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, scrollKnobY + STAT_SCROLLKNOB_SIZE, zLevel).tex((544 + STAT_SCROLLBAR_W) * U_PIXEL, (64 + STAT_SCROLLKNOB_SIZE) * V_PIXEL).endVertex();
+            bufferbuilder.pos(STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, scrollKnobY, zLevel).tex((544 + STAT_SCROLLBAR_W) * U_PIXEL, 64 * V_PIXEL).endVertex();
+            bufferbuilder.pos(STAT_SCROLLBAR_X, scrollKnobY, zLevel).tex(544 * U_PIXEL, 64 * V_PIXEL).endVertex();
             tessellator.draw();
 
 
             //Render stats
+            int hoveredIndex = -1;
+            if (Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_WINDOW_X, STAT_WINDOW_Y, STAT_WINDOW_X + STAT_WINDOW_W, STAT_WINDOW_Y + STAT_WINDOW_H))
+            {
+                hoveredIndex = (int) ((mouseY - guiTop - STAT_WINDOW_Y + statHeightDif * statsScroll) / statLineHeight);
+            }
+
             scissor(STAT_WINDOW_X, STAT_WINDOW_Y, STAT_WINDOW_W, STAT_WINDOW_H);
 
             int yy = STAT_WINDOW_Y;
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, -statsScroll * statHeightDif, 0);
-            for (String stat : stats)
+            int spacing = fontRenderer.getCharWidth('0');
+            for (int i = 0; i < stats.length; i++)
             {
-                IAttributeInstance attributeInstance = mc.player.getAttributeMap().getAttributeInstanceByName(stat);
-                if (attributeInstance == null) continue;
+                String rawStat = rawStats[i];
+                if (rawStat.isEmpty())
+                {
+                    yy += statLineHeight;
+                    continue;
+                }
 
-                drawString(fontRenderer, stat + ": " + attributeInstance.getAttributeValue(), STAT_WINDOW_X, yy, 0xffffffff);
+                IAttributeInstance attributeInstance = mc.player.getAttributeMap().getAttributeInstanceByName(TextFormatting.getTextWithoutFormattingCodes(rawStat));
+                if (attributeInstance == null)
+                {
+                    drawString(fontRenderer, TextFormatting.RED + "ERROR: <" + rawStat + ">", STAT_WINDOW_X, yy, 0xffffffff);
+                    yy += statLineHeight;
+                    continue;
+                }
+
+                String stat = stats[i];
+                int color = hoveredIndex == i ? 0xffffffff : 0xff777777;
+                drawString(fontRenderer, stat, STAT_WINDOW_X, yy, color);
+                String amount = String.format("%.2f", attributeInstance.getAttributeValue());
+                int xx = STAT_WINDOW_X + STAT_WINDOW_W - fontRenderer.getStringWidth(amount);
+                drawString(fontRenderer, amount, xx, yy, color);
+
+                drawHorizontalLine(STAT_WINDOW_X + fontRenderer.getStringWidth(stat) + spacing, xx - spacing, yy + (statLineHeight >>> 1) - 1, color);
                 yy += statLineHeight;
             }
             GlStateManager.popMatrix();
@@ -148,12 +180,14 @@ public class TiamatInventoryGUI extends BetterContainerGUI
 
 
             //Render stat tooltips
-            if (Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_WINDOW_X, STAT_WINDOW_Y, STAT_WINDOW_X + STAT_WINDOW_W, STAT_WINDOW_Y + STAT_WINDOW_H))
+            if (hoveredIndex >= 0 && hoveredIndex < statTooltips.length)
             {
-                int index = (int) ((mouseY - guiTop - STAT_WINDOW_Y + statHeightDif * statsScroll) / statLineHeight);
-                if (index >= 0 && index < statTooltips.length)
+                String tooltip = statTooltips[hoveredIndex];
+                if (!tooltip.trim().isEmpty())
                 {
-                    drawHoveringText(Arrays.asList(Tools.fixedSplit(statTooltips[index], "\n")), mouseX - guiLeft, mouseY - guiTop, fontRenderer);
+                    List<String> list = Arrays.asList(Tools.fixedSplit(tooltip, "\n"));
+                    for (int i = 0; i < list.size(); i++) list.set(i, TextFormatting.DARK_PURPLE + list.get(i));
+                    drawHoveringText(list, mouseX - guiLeft, mouseY - guiTop);
                 }
             }
         }
@@ -223,19 +257,22 @@ public class TiamatInventoryGUI extends BetterContainerGUI
         int scroll = Mouse.getDWheel();
         if (scroll != 0)
         {
-            ScaledResolution sr = new ScaledResolution(mc);
+            if (tab == 1)
+            {
+                ScaledResolution sr = new ScaledResolution(mc);
 
-            int mouseX = Mouse.getX() / sr.getScaleFactor(), mouseY = sr.getScaledHeight() - Mouse.getY() / sr.getScaleFactor();
-            if (Collision.pointRectangle(mouseX, mouseY, guiLeft + STAT_WINDOW_X, guiTop + STAT_WINDOW_Y, guiLeft + STAT_WINDOW_X + STAT_WINDOW_W, guiTop + STAT_WINDOW_Y + STAT_WINDOW_H)
-                    || Collision.pointRectangle(mouseX, mouseY, guiLeft + STAT_SCROLLBAR_X, guiTop + STAT_SCROLLBAR_Y, guiLeft + STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, guiTop + STAT_SCROLLBAR_Y + STAT_SCROLLBAR_H))
-            {
-                if (scroll > 0) statsScroll = Tools.max(0, statsScroll - (double) statLineHeight / statHeightDif);
-                else statsScroll = Tools.min(1, statsScroll + (double) statLineHeight / statHeightDif);
-            }
-            else if (Collision.pointRectangle(mouseX, mouseY, guiLeft + MODEL_WINDOW_X, guiTop + MODEL_WINDOW_Y, guiLeft + MODEL_WINDOW_X + MODEL_WINDOW_W, guiTop + MODEL_WINDOW_Y + MODEL_WINDOW_H))
-            {
-                if (scroll > 0) modelScale *= 1.1;
-                else modelScale /= 1.1;
+                int mouseX = Mouse.getX() / sr.getScaleFactor(), mouseY = sr.getScaledHeight() - Mouse.getY() / sr.getScaleFactor();
+                if (Collision.pointRectangle(mouseX, mouseY, guiLeft + STAT_WINDOW_X, guiTop + STAT_WINDOW_Y, guiLeft + STAT_WINDOW_X + STAT_WINDOW_W, guiTop + STAT_WINDOW_Y + STAT_WINDOW_H)
+                        || Collision.pointRectangle(mouseX, mouseY, guiLeft + STAT_SCROLLBAR_X, guiTop + STAT_SCROLLBAR_Y, guiLeft + STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, guiTop + STAT_SCROLLBAR_Y + STAT_SCROLLBAR_H))
+                {
+                    if (scroll > 0) statsScroll = Tools.max(0, statsScroll - (double) statLineHeight / statHeightDif);
+                    else statsScroll = Tools.min(1, statsScroll + (double) statLineHeight / statHeightDif);
+                }
+                else if (Collision.pointRectangle(mouseX, mouseY, guiLeft + MODEL_WINDOW_X, guiTop + MODEL_WINDOW_Y, guiLeft + MODEL_WINDOW_X + MODEL_WINDOW_W, guiTop + MODEL_WINDOW_Y + MODEL_WINDOW_H))
+                {
+                    if (scroll > 0) modelScale *= 1.1;
+                    else modelScale /= 1.1;
+                }
             }
         }
     }
@@ -245,16 +282,22 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     {
         super.mouseClicked(mouseX, mouseY, mouseButton);
 
-        if (mouseButton == 0 && Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_SCROLLBAR_X, STAT_SCROLLBAR_Y, STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, STAT_SCROLLBAR_Y + STAT_SCROLLBAR_H))
+        if (tab == 0)
         {
-            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) (STAT_SCROLLKNOB_H >> 1)) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
-            statsScrollGrabbed = true;
+            if (Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_X + MODEL_WINDOW_W, MODEL_WINDOW_Y + MODEL_WINDOW_H))
+            {
+                modelGrabbed = true;
+                modelGrabX = mouseX;
+                modelGrabY = mouseY;
+            }
         }
-        else if (Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_X + MODEL_WINDOW_W, MODEL_WINDOW_Y + MODEL_WINDOW_H))
+        if (tab == 1)
         {
-            modelGrabbed = true;
-            modelGrabX = mouseX;
-            modelGrabY = mouseY;
+            if (mouseButton == 0 && Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_SCROLLBAR_X, STAT_SCROLLBAR_Y, STAT_SCROLLBAR_X + STAT_SCROLLBAR_W, STAT_SCROLLBAR_Y + STAT_SCROLLBAR_H))
+            {
+                statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) (STAT_SCROLLKNOB_SIZE >> 1)) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_SIZE), 0), 1);
+                statsScrollGrabbed = true;
+            }
         }
     }
 
@@ -265,7 +308,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
 
         if (statsScrollGrabbed)
         {
-            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) (STAT_SCROLLKNOB_H >> 1)) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_H), 0), 1);
+            statsScroll = Tools.min(Tools.max((mouseY - guiTop - STAT_SCROLLBAR_Y - (double) (STAT_SCROLLKNOB_SIZE >> 1)) / (STAT_SCROLLBAR_H - STAT_SCROLLKNOB_SIZE), 0), 1);
         }
         else if (modelGrabbed)
         {
