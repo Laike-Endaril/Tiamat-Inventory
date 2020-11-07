@@ -109,6 +109,14 @@ public class TiamatInventoryContainer extends Container
         //Index 42
         //Internal index 11 (tiamat)
         addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 11, 133, 96, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && MiscTags.stackFitsSlot(stack, "Tiamat Deck")));
+
+        //Hotbar slots (for creative usage)
+        //Index 43 - 51
+        //Internal index 0 - 8 (vanilla)
+        for (int xx = 0; xx < 9; ++xx)
+        {
+            addSlotToContainer(new BetterSlot(playerInventory, xx, 133 + xx * 18, 114, TEXTURE, TEXTURE_W, TEXTURE_H, -16, -16));
+        }
     }
 
     public static boolean canCombine(ItemStack from, ItemStack to)
