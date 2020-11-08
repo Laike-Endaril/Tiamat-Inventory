@@ -228,8 +228,8 @@ public class InventoryHacks
     protected static void autoPickup(EntityPlayerMP player, ItemStack stack)
     {
         ArrayList<Integer> slotOrder = new ArrayList<>();
-        if (player.isCreative() || TiamatConfig.serverSettings.allowPickupMainHand) slotOrder.add(player.inventory.currentItem);
-        if (player.isCreative() || TiamatConfig.serverSettings.allowPickupOffhand) slotOrder.add(40);
+        if (player.isCreative() || (TiamatConfig.serverSettings.allowPickupMainHand && (!Slottings.isTwoHanded(stack) || player.getHeldItemOffhand().isEmpty()))) slotOrder.add(player.inventory.currentItem);
+        if (player.isCreative() || (TiamatConfig.serverSettings.allowPickupOffhand && (!Slottings.isTwoHanded(stack) || player.getHeldItemMainhand().isEmpty()))) slotOrder.add(40);
         if (player.isCreative() || TiamatConfig.serverSettings.allowPickupHotbar)
         {
             for (int i = 1; i <= 8; i++)
