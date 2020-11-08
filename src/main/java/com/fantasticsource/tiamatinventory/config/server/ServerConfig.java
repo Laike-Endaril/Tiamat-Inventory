@@ -16,4 +16,24 @@ public class ServerConfig
     @Config.Comment("Whether the hotbar is enabled in non-creative mode (always enabled in creative)")
     @Config.LangKey(MODID + ".config.allowHotbar")
     public boolean allowHotbar = true;
+
+    @Config.Name("Allow Auto-Pickup to Main Hand")
+    @Config.Comment("Whether players can auto-pickup items to their vanilla main hand slot")
+    @Config.LangKey(MODID + ".config.allowPickupMainHand")
+    public boolean allowPickupMainHand = true;
+
+    @Config.Name("Allow Auto-Pickup to Offhand")
+    @Config.Comment("Whether players can auto-pickup items to their vanilla offhand slot")
+    @Config.LangKey(MODID + ".config.allowPickupOffhand")
+    public boolean allowPickupOffhand = true;
+
+    @Config.Name("Allow Auto-Pickup to Hotbar")
+    @Config.Comment("Whether players can auto-pickup items to their not-in-hand hotbar slots (requires hotbar to be enabled)")
+    @Config.LangKey(MODID + ".config.allowPickupHotbar")
+    public boolean allowPickupHotbar = true;
+
+    @Config.Name("Allow Auto-Pickup to Cargo")
+    @Config.Comment("Whether players can auto-pickup items to their main/cargo inventory slots")
+    @Config.LangKey(MODID + ".config.allowPickupCargo")
+    public boolean allowPickupCargo = true;
 }

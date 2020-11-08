@@ -29,8 +29,6 @@ import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -44,29 +42,8 @@ public class InventoryHacks
 {
     protected static final Field CONTAINER_LISTENERS_FIELD = ReflectionTool.getField(Container.class, "field_75149_d", "listeners");
 
-    public static final int[] ORDERED_SLOT_INDICES = new int[]
-            {
-                    9, 18, 27,
-                    10, 19, 28,
-                    11, 20, 29,
-                    12, 21, 30,
-                    13, 22, 31,
-                    14, 23, 32,
-                    15, 24, 33,
-                    16, 25, 34,
-                    17, 26, 35
-            };
-
     public static int clientInventorySize = TiamatConfig.serverSettings.defaultInventorySize;
     public static boolean clientAllowHotbar = TiamatConfig.serverSettings.allowHotbar;
-
-    @SideOnly(Side.CLIENT)
-    public static ArrayList<Integer> getAvailableClientInventorySlots()
-    {
-        ArrayList<Integer> result = new ArrayList<>(clientInventorySize);
-        for (int i = 0; i < clientInventorySize; i++) result.add(ORDERED_SLOT_INDICES[i]);
-        return result;
-    }
 
     public static int getCurrentInventorySize(EntityPlayerMP player)
     {
@@ -105,12 +82,6 @@ public class InventoryHacks
 
 
         int invSize = getCurrentInventorySize(player);
-        ArrayList<Integer> availableSlots = new ArrayList<>(invSize);
-        for (int i = 0; i < invSize; i++)
-        {
-            availableSlots.add(ORDERED_SLOT_INDICES[i]);
-        }
-
         HashMap<Integer, Integer> tiamatSlotToCurrentSlot = new HashMap<>();
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
@@ -124,7 +95,7 @@ public class InventoryHacks
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
-                else if (slotIndex >= 9 && slotIndex < 36 && !availableSlots.contains(slotIndex))
+                else if (slotIndex >= 9 + invSize && slotIndex < 36)
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
@@ -138,7 +109,7 @@ public class InventoryHacks
                         tiamatSlotToCurrentSlot.put(slotIndex, i);
                     }
                 }
-                else if (slotIndex >= 9 && slotIndex < 36 && !availableSlots.contains(slotIndex))
+                else if (slotIndex >= 9 + invSize && slotIndex < 36)
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
@@ -169,26 +140,14 @@ public class InventoryHacks
     {
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == null || gameType == GameType.SPECTATOR) return;
 
 
         ItemStack stack = event.getItem().getItem();
         int oldCount = stack.getCount();
 
-        int[] availableSlots;
-        if (TiamatConfig.serverSettings.allowHotbar)
-        {
-            availableSlots = new int[getCurrentInventorySize(player) + 9];
-            for (int i = 0; i < 9; i++) availableSlots[i] = i;
-            System.arraycopy(ORDERED_SLOT_INDICES, 0, availableSlots, 9, availableSlots.length - 9);
-        }
-        else
-        {
-            availableSlots = new int[getCurrentInventorySize(player)];
-            System.arraycopy(ORDERED_SLOT_INDICES, 0, availableSlots, 0, availableSlots.length);
-        }
 
-        autoplaceItem(event.getEntityPlayer(), stack, availableSlots);
+        autoPickup(player, stack);
         if (!stack.isEmpty()) event.setCanceled(true);
 
         int pickedUpCount = oldCount - stack.getCount();
@@ -219,8 +178,6 @@ public class InventoryHacks
         InventoryPlayer playerInventory = player.inventory;
 
         int slotCount = getCurrentInventorySize(player);
-        int[] availableSlots = new int[Tools.min(Tools.max(slotCount, 0), 27)];
-        System.arraycopy(ORDERED_SLOT_INDICES, 0, availableSlots, 0, availableSlots.length);
 
         boolean changed = false;
 
@@ -232,7 +189,7 @@ public class InventoryHacks
                 ItemStack stack = playerInventory.getStackInSlot(i);
                 if (!stack.isEmpty())
                 {
-                    autoplaceItem(player, stack, availableSlots);
+                    autoPickup(player, stack);
                     if (!stack.isEmpty())
                     {
                         ItemStack copy = stack.copy();
@@ -245,14 +202,12 @@ public class InventoryHacks
         }
 
         //Completely blocked "cargo" slots
-        int[] blockedSlots = new int[Tools.min(Tools.max(27 - slotCount, 0), 27)];
-        System.arraycopy(ORDERED_SLOT_INDICES, slotCount, blockedSlots, 0, blockedSlots.length);
-        for (int i : blockedSlots)
+        for (int i = 9 + getCurrentInventorySize(player); i < 36; i++)
         {
             ItemStack stack = playerInventory.getStackInSlot(i);
             if (!stack.isEmpty())
             {
-                autoplaceItem(player, stack, availableSlots);
+                autoPickup(player, stack);
                 if (!stack.isEmpty())
                 {
                     ItemStack copy = stack.copy();
@@ -272,19 +227,31 @@ public class InventoryHacks
         }
     }
 
-    protected static void autoplaceItem(EntityPlayer player, ItemStack stack, int[] availableSlots)
+    protected static void autoPickup(EntityPlayerMP player, ItemStack stack)
     {
+        ArrayList<Integer> slotOrder = new ArrayList<>();
+        if (player.isCreative() || TiamatConfig.serverSettings.allowPickupMainHand) slotOrder.add(player.inventory.currentItem);
+        if (player.isCreative() || TiamatConfig.serverSettings.allowPickupOffhand) slotOrder.add(40);
+        if (player.isCreative() || TiamatConfig.serverSettings.allowPickupHotbar)
+        {
+            for (int i = 1; i <= 8; i++)
+            {
+                slotOrder.add(Tools.posMod(i + player.inventory.currentItem, 9));
+            }
+        }
+        if (player.isCreative() || TiamatConfig.serverSettings.allowPickupCargo)
+        {
+            for (int i = getCurrentInventorySize(player) + 8; i >= 9; i--) slotOrder.add(i);
+        }
+
+
         InventoryPlayer playerInventory = player.inventory;
 
-        ArrayList<Integer> emptySlots = new ArrayList<>();
-        for (int i : availableSlots)
+        //Fill slots that already have the same type of item
+        for (int i : slotOrder)
         {
             ItemStack stack2 = playerInventory.getStackInSlot(i);
-            if (stack2.isEmpty())
-            {
-                emptySlots.add(i);
-                continue;
-            }
+            if (stack2.isEmpty()) continue;
 
             int moveAmount = Tools.min(stack2.getMaxStackSize() - stack2.getCount(), stack.getCount());
             if (moveAmount > 0 && ItemMatcher.stacksMatch(stack, stack2))
@@ -295,11 +262,14 @@ public class InventoryHacks
             }
         }
 
+        //Fill empty slots
         if (!stack.isEmpty())
         {
             int max = stack.getMaxStackSize();
-            for (int i : emptySlots)
+            for (int i : slotOrder)
             {
+                if (!playerInventory.getStackInSlot(i).isEmpty()) continue;
+
                 ItemStack copy = stack.copy();
                 int moveAmount = Tools.min(max, stack.getCount());
                 stack.shrink(moveAmount);

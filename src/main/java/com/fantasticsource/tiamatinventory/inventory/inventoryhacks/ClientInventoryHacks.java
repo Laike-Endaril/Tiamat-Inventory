@@ -26,7 +26,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +70,7 @@ public class ClientInventoryHacks extends GuiButton
             if (slot == null) continue;
 
             int slotIndex = slot.getSlotIndex();
+            int invSize = InventoryHacks.clientInventorySize;
             if (isTiamat)
             {
                 if (slot.inventory instanceof InventoryPlayer)
@@ -79,7 +79,7 @@ public class ClientInventoryHacks extends GuiButton
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
-                    else if (slotIndex >= 9 && slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+                    else if (slotIndex >= 9 + invSize && slotIndex < 36)
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
@@ -100,7 +100,7 @@ public class ClientInventoryHacks extends GuiButton
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
-                    else if (slotIndex >= 9 && slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+                    else if (slotIndex >= 9 + invSize && slotIndex < 36)
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
@@ -153,8 +153,7 @@ public class ClientInventoryHacks extends GuiButton
         }
         if (!found) buttonList.add(new ClientInventoryHacks((GuiContainer) gui));
 
-        ArrayList<Integer> availableSlots = InventoryHacks.getAvailableClientInventorySlots();
-
+        int invSize = InventoryHacks.clientInventorySize;
         TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatClientInventory;
         HashMap<Integer, Integer> tiamatSlotToCurrentSlot = new HashMap<>();
         for (int i = 0; i < container.inventorySlots.size(); i++)
@@ -169,7 +168,7 @@ public class ClientInventoryHacks extends GuiButton
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
-                else if (slotIndex >= 9 && slotIndex < 36 && !availableSlots.contains(slotIndex))
+                else if (slotIndex >= 9 + invSize && slotIndex < 36)
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
@@ -183,7 +182,7 @@ public class ClientInventoryHacks extends GuiButton
                         tiamatSlotToCurrentSlot.put(slotIndex, i);
                     }
                 }
-                else if (slotIndex >= 9 && slotIndex < 36 && !availableSlots.contains(slotIndex))
+                else if (slotIndex >= 9 + invSize && slotIndex < 36)
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }

@@ -1,2 +1,5 @@
-Make auto-pickup only pickup to vanilla mainhand and offhand
-Make sure to account for 2H items!
+Account for 2H items when picking up to a hand slot
+
+Alter tooltip to show 2H status
+
+Improve auto-pickup to account for inventory areas where it found partial stacks
