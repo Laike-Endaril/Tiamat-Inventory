@@ -8,6 +8,9 @@ tiamatinventory.key.sheathe=Sheathe / Unsheathe
 tiamatinventory.config.serverSettings=Server Settings
 tiamatinventory.config.clientSettings=Client Settings
 
+tiamatinventory.config.defaultInvSize=Default Inventory Size
+tiamatinventory.config.defaultInvSize.tooltip=FILLSCREEN FIXNEWLINES The default inventory size, without a backpack\n \n
+
 tiamatinventory.config.clientInventory=Inventory
 
 tiamatinventory.config.displayAttributes=Attributes To Display
