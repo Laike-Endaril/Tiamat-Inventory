@@ -17,6 +17,14 @@ tiamatinventory.config.displayAttributes=Attributes To Display
 tiamatinventory.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Which attributes to display in the inventory, and their descriptions\neg. tiamatinventory.autoBlock, How likely you are to automatically block an attack\n \n
 tiamatinventory.config.allowHotbar=Allow Hotbar
 tiamatinventory.config.allowHotbar.tooltip=FILLSCREEN FIXNEWLINES Whether the hotbar is enabled in non-creative mode (always enabled in creative)\n \n
+tiamatinventory.config.allowPickupMainHand=Allow Auto-Pickup to Main Hand
+tiamatinventory.config.allowPickupMainHand.tooltip=FILLSCREEN FIXNEWLINES Whether players can auto-pickup items to their vanilla main hand slot\n \n
+tiamatinventory.config.allowPickupOffhand=Allow Auto-Pickup to Offhand
+tiamatinventory.config.allowPickupOffhand.tooltip=FILLSCREEN FIXNEWLINES Whether players can auto-pickup items to their vanilla offhand slot\n \n
+tiamatinventory.config.allowPickupHotbar=Allow Auto-Pickup to Hotbar
+tiamatinventory.config.allowPickupHotbar.tooltip=FILLSCREEN FIXNEWLINES Whether players can auto-pickup items to their not-in-hand hotbar slots (requires hotbar to be enabled)\n \n
+tiamatinventory.config.allowPickupCargo=Allow Auto-Pickup to Cargo
+tiamatinventory.config.allowPickupCargo.tooltip=FILLSCREEN FIXNEWLINES Whether players can auto-pickup items to their main/cargo inventory slots\n \n
 
 tiamatinventory.config.serverItems=Items
 
