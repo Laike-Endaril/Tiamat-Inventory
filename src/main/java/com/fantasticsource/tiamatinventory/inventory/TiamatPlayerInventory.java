@@ -3,6 +3,7 @@ package com.fantasticsource.tiamatinventory.inventory;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatinventory.TiamatInventory;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
+import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ItemStackHelper;
@@ -882,8 +883,8 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public boolean forceEmptyHands()
     {
-        //Return if sheathed or creative
-        if (player.isCreative() || isSheathed()) return true;
+        //Return if sheathed or creative, or if hotbar is enabled
+        if (TiamatConfig.serverSettings.allowHotbar || player.isCreative() || isSheathed()) return true;
 
 
         //Sheathe normally if possible
@@ -924,7 +925,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         if (player.isCreative()) return;
 
 
-        if (isSheathed())
+        if (!TiamatConfig.serverSettings.allowHotbar && isSheathed())
         {
             if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) swap();
             if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) return;
@@ -987,7 +988,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         if (player.isCreative()) return;
 
 
-        if (isSheathed())
+        if (TiamatConfig.serverSettings.allowHotbar || isSheathed())
         {
             ItemStack swap = getSheathedMainhand1();
             setSheathedMainhand1(getSheathedMainhand2());

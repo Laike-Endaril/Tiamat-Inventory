@@ -92,27 +92,31 @@ public class Network
     public static class InventorySizePacket implements IMessage
     {
         public int currentInventorySize;
+        public boolean allowHotbar;
 
         public InventorySizePacket()
         {
             //Required
         }
 
-        public InventorySizePacket(int currentInventorySize)
+        public InventorySizePacket(int currentInventorySize, boolean allowHotbar)
         {
             this.currentInventorySize = currentInventorySize;
+            this.allowHotbar = allowHotbar;
         }
 
         @Override
         public void toBytes(ByteBuf buf)
         {
             buf.writeInt(currentInventorySize);
+            buf.writeBoolean(allowHotbar);
         }
 
         @Override
         public void fromBytes(ByteBuf buf)
         {
             currentInventorySize = buf.readInt();
+            allowHotbar = buf.readBoolean();
         }
     }
 
@@ -126,6 +130,7 @@ public class Network
                 Minecraft.getMinecraft().addScheduledTask(() ->
                 {
                     InventoryHacks.clientInventorySize = packet.currentInventorySize;
+                    InventoryHacks.clientAllowHotbar = packet.allowHotbar;
                 });
             }
 

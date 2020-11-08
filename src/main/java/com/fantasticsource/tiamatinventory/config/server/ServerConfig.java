@@ -11,4 +11,9 @@ public class ServerConfig
     @Config.LangKey(MODID + ".config.defaultInvSize")
     @Config.RangeInt(min = 0, max = 27)
     public int defaultInventorySize = 27;
+
+    @Config.Name("Allow Hotbar")
+    @Config.Comment("Whether the hotbar is enabled in non-creative mode (always enabled in creative)")
+    @Config.LangKey(MODID + ".config.allowHotbar")
+    public boolean allowHotbar = true;
 }

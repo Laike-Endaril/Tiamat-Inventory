@@ -15,6 +15,8 @@ tiamatinventory.config.clientInventory=Inventory
 
 tiamatinventory.config.displayAttributes=Attributes To Display
 tiamatinventory.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Which attributes to display in the inventory, and their descriptions\neg. tiamatinventory.autoBlock, How likely you are to automatically block an attack\n \n
+tiamatinventory.config.allowHotbar=Allow Hotbar
+tiamatinventory.config.allowHotbar.tooltip=FILLSCREEN FIXNEWLINES Whether the hotbar is enabled in non-creative mode (always enabled in creative)\n \n
 
 tiamatinventory.config.serverItems=Items
 

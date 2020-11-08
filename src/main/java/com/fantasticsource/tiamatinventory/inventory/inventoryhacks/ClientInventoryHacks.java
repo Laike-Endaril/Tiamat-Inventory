@@ -73,24 +73,37 @@ public class ClientInventoryHacks extends GuiButton
             int slotIndex = slot.getSlotIndex();
             if (isTiamat)
             {
-                if (slot.inventory instanceof InventoryPlayer && slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+                if (slot.inventory instanceof InventoryPlayer)
                 {
-                    renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    if (slotIndex < 9 && !InventoryHacks.clientAllowHotbar)
+                    {
+                        renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    }
+                    else if (slotIndex >= 9 && slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+                    {
+                        renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    }
                 }
             }
             else
             {
-                if (slot.inventory == inventory && slotIndex < 4)
+                if (slot.inventory == inventory)
                 {
-                    if (inventory.getStackInSlot(slotIndex).isEmpty())
+                    if (slotIndex < 4 && inventory.getStackInSlot(slotIndex).isEmpty())
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * (slotIndex % 2 == 0 ? 608 : 624), 0, 16);
                     }
                 }
-                else if (slot.inventory instanceof InventoryPlayer && (slotIndex < 9 || slotIndex >= 36 || !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex)))
+                else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9) renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16, 18);
-                    else renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    if (slotIndex < 9 && !InventoryHacks.clientAllowHotbar)
+                    {
+                        renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    }
+                    else if (slotIndex >= 9 && slotIndex < 36 && !InventoryHacks.getAvailableClientInventorySlots().contains(slotIndex))
+                    {
+                        renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    }
                 }
             }
         }
@@ -152,18 +165,25 @@ public class ClientInventoryHacks extends GuiButton
             int slotIndex = slot.getSlotIndex();
             if (container instanceof TiamatInventoryContainer)
             {
-                if (slotIndex < 36 && !availableSlots.contains(slotIndex))
+                if (slotIndex < 9 && !InventoryHacks.clientAllowHotbar)
+                {
+                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                }
+                else if (slotIndex >= 9 && slotIndex < 36 && !availableSlots.contains(slotIndex))
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
             }
             else
             {
-                if (inventory != null && slotIndex < 4)
+                if (slotIndex < 9 && !InventoryHacks.clientAllowHotbar)
                 {
-                    tiamatSlotToCurrentSlot.put(slotIndex, i);
+                    if (slotIndex < 4 && inventory != null)
+                    {
+                        tiamatSlotToCurrentSlot.put(slotIndex, i);
+                    }
                 }
-                else if (slotIndex < 9 || slotIndex >= 36 || !availableSlots.contains(slotIndex))
+                else if (slotIndex >= 9 && slotIndex < 36 && !availableSlots.contains(slotIndex))
                 {
                     container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                 }
@@ -193,7 +213,7 @@ public class ClientInventoryHacks extends GuiButton
     public static void renderHotbar(RenderGameOverlayEvent.Pre event)
     {
         GameType gameType = MCTools.getGameType(Minecraft.getMinecraft().player);
-        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (InventoryHacks.clientAllowHotbar || gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) event.setCanceled(true);
     }

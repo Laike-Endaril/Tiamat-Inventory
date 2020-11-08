@@ -3,6 +3,7 @@ package com.fantasticsource.tiamatinventory;
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.aw.RenderModes;
 import com.fantasticsource.mctools.event.InventoryChangedEvent;
+import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.ClientInventoryHacks;
@@ -79,7 +80,7 @@ public class TiamatInventory
     {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         TiamatPlayerInventory.load(event);
-        Network.WRAPPER.sendTo(new Network.InventorySizePacket(InventoryHacks.getCurrentInventorySize(player)), player);
+        Network.WRAPPER.sendTo(new Network.InventorySizePacket(InventoryHacks.getCurrentInventorySize(player), TiamatConfig.serverSettings.allowHotbar), player);
     }
 
     @SubscribeEvent
