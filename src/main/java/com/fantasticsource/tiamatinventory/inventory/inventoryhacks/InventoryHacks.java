@@ -177,8 +177,6 @@ public class InventoryHacks
 
         InventoryPlayer playerInventory = player.inventory;
 
-        int slotCount = getCurrentInventorySize(player);
-
         boolean changed = false;
 
         //Completely blocked hotbar slots (all except first, unless hotbar is enabled)
@@ -241,43 +239,71 @@ public class InventoryHacks
         }
         if (player.isCreative() || TiamatConfig.serverSettings.allowPickupCargo)
         {
-            for (int i = getCurrentInventorySize(player) + 8; i >= 9; i--) slotOrder.add(i);
+            int last = getCurrentInventorySize(player) + 8;
+            for (int i = 9; i <= last; i++) slotOrder.add(i);
         }
 
 
         InventoryPlayer playerInventory = player.inventory;
 
-        //Fill slots that already have the same type of item
-        for (int i : slotOrder)
+        //Fill slots that already have the same type of item in forward order, track whether any did (even if they were full), and remove them from the list if they're not empty
+        Boolean[] found = new Boolean[]{false};
+        slotOrder.removeIf(slot ->
         {
-            ItemStack stack2 = playerInventory.getStackInSlot(i);
-            if (stack2.isEmpty()) continue;
+            ItemStack stack2 = playerInventory.getStackInSlot(slot);
+            if (stack2.isEmpty()) return false;
 
-            int moveAmount = Tools.min(stack2.getMaxStackSize() - stack2.getCount(), stack.getCount());
-            if (moveAmount > 0 && ItemMatcher.stacksMatch(stack, stack2))
+            if (ItemMatcher.stacksMatch(stack, stack2))
             {
-                stack.shrink(moveAmount);
-                stack2.grow(moveAmount);
-                if (stack.isEmpty()) break;
+                found[0] = true;
+
+                int moveAmount = Tools.min(stack2.getMaxStackSize() - stack2.getCount(), stack.getCount());
+                if (moveAmount > 0)
+                {
+                    stack.shrink(moveAmount);
+                    stack2.grow(moveAmount);
+                }
             }
-        }
+            return true;
+        });
+        if (stack.isEmpty() || slotOrder.isEmpty()) return;
 
-        //Fill empty slots
-        if (!stack.isEmpty())
+
+        //If none were already in inventory, fill up to one empty slot in forward order and remove it from the list
+        int max = stack.getMaxStackSize();
+        if (!found[0])
         {
-            int max = stack.getMaxStackSize();
-            for (int i : slotOrder)
+            for (int slot : slotOrder)
             {
-                if (!playerInventory.getStackInSlot(i).isEmpty()) continue;
+                if (!playerInventory.getStackInSlot(slot).isEmpty()) continue;
 
                 ItemStack copy = stack.copy();
                 int moveAmount = Tools.min(max, stack.getCount());
                 stack.shrink(moveAmount);
                 copy.setCount(moveAmount);
-                playerInventory.setInventorySlotContents(i, copy);
+                playerInventory.setInventorySlotContents(slot, copy);
 
-                if (stack.isEmpty()) break;
+                //Only filling one slot max!
+                slotOrder.remove(slot);
+                break;
             }
+            if (stack.isEmpty() || slotOrder.isEmpty()) return;
+        }
+
+
+        //Fill empty slots in reverse order
+        for (int i = slotOrder.size() - 1; i >= 0; i--)
+        {
+            int slot = slotOrder.get(i);
+            if (!playerInventory.getStackInSlot(slot).isEmpty()) continue;
+
+            ItemStack copy = stack.copy();
+            int moveAmount = Tools.min(max, stack.getCount());
+            stack.shrink(moveAmount);
+            copy.setCount(moveAmount);
+            playerInventory.setInventorySlotContents(slot, copy);
+
+            if (stack.isEmpty()) break;
         }
     }
 }
