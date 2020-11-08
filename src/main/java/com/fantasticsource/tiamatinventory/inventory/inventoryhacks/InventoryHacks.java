@@ -2,6 +2,7 @@ package com.fantasticsource.tiamatinventory.inventory.inventoryhacks;
 
 import com.fantasticsource.mctools.GlobalInventory;
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
 import com.fantasticsource.mctools.items.ItemMatcher;
@@ -10,7 +11,6 @@ import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.nbt.SlotDataTags;
-import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
@@ -156,7 +156,7 @@ public class InventoryHacks
                 Slot newSlot = new FilteredSlot(inventory, tiamatIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
                 {
                     ItemStack other = inventory.getStackInSlot(pairedIndex);
-                    return other.isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(other));
+                    return other.isEmpty() || (!Slottings.isTwoHanded(stack) && !Slottings.isTwoHanded(other));
                 });
                 newSlot.slotNumber = oldSlot.slotNumber;
                 container.inventorySlots.set(currentIndex, newSlot);

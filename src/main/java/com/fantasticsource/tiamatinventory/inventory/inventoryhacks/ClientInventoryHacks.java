@@ -1,11 +1,11 @@
 package com.fantasticsource.tiamatinventory.inventory.inventoryhacks;
 
 import com.fantasticsource.mctools.MCTools;
+import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
-import com.fantasticsource.tiamatitems.nbt.MiscTags;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
@@ -201,7 +201,7 @@ public class ClientInventoryHacks extends GuiButton
                 Slot newSlot = new FilteredSlot(inventory, tiamatIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
                 {
                     ItemStack other = inventory.getStackInSlot(pairedIndex);
-                    return other.isEmpty() || (!MiscTags.isTwoHanded(stack) && !MiscTags.isTwoHanded(other));
+                    return other.isEmpty() || (!Slottings.isTwoHanded(stack) && !Slottings.isTwoHanded(other));
                 });
                 newSlot.slotNumber = oldSlot.slotNumber;
                 container.inventorySlots.set(currentIndex, newSlot);
