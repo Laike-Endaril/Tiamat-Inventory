@@ -295,7 +295,7 @@ public class InventoryHacks
                 playerInventory.setInventorySlotContents(slot, copy);
 
                 //Only filling one slot max!
-                slotOrder.remove(slot);
+                slotOrder.remove((Integer) slot);
                 break;
             }
             if (stack.isEmpty() || slotOrder.isEmpty()) return;
