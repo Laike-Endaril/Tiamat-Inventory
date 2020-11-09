@@ -53,14 +53,14 @@ public class TiamatInventoryContainer extends Container
         //Weaponset 1
         //Index 0 - 1
         //Internal index 0 and 1 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 0, 43, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(1).getStack().isEmpty() || (!isTwoHanded(stack) && !isTwoHanded(getSlot(1).getStack()))));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 1, 61, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(0).getStack().isEmpty() || (!isTwoHanded(stack) && !isTwoHanded(getSlot(0).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 0, 61, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(1).getStack().isEmpty() || (!isTwoHanded(stack) && !isTwoHanded(getSlot(1).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 1, 43, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(0).getStack().isEmpty() || (!isTwoHanded(stack) && !isTwoHanded(getSlot(0).getStack()))));
 
         //Weaponset 2
         //Index 2 - 3
         //Internal index 2 and 3 (tiamat)
         addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 2, 97, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(3).getStack().isEmpty() || (!isTwoHanded(stack) && !isTwoHanded(getSlot(3).getStack()))));
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 3, 115, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(2).getStack().isEmpty() || (!isTwoHanded(stack) && !isTwoHanded(getSlot(2).getStack()))));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 3, 79, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 624, 0, false, WEAPON_SLOT_STACK_LIMIT, stack -> getSlot(2).getStack().isEmpty() || (!isTwoHanded(stack) && !isTwoHanded(getSlot(2).getStack()))));
 
         //"Cargo" inventory
         //Index 4 - 30
@@ -69,7 +69,7 @@ public class TiamatInventoryContainer extends Container
         {
             for (int xx = 0; xx < 9; ++xx)
             {
-                addSlotToContainer(new BetterSlot(playerInventory, xx + (yy + 1) * 9, 133 + xx * 18, 42 + yy * 18, TEXTURE, TEXTURE_W, TEXTURE_H, -16, -16));
+                addSlotToContainer(new BetterSlot(playerInventory, xx + (yy + 1) * 9, 133 + xx * 18, 60 + yy * 18, TEXTURE, TEXTURE_W, TEXTURE_H, -16, -16));
             }
         }
 
@@ -94,31 +94,36 @@ public class TiamatInventoryContainer extends Container
         //Internal index 6 - 8 (tiamat)
         for (int xx = 0; xx < 3; xx++)
         {
-            addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 6 + xx, 241 + xx * 18, 96, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player)));
+            addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 6 + xx, 169 + xx * 18, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player)));
         }
 
         //Backpack slot
         //Index 40
         //Internal index 9 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 9, 133, 24, TEXTURE, TEXTURE_W, TEXTURE_H, 768, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Backpack", player)));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 9, 133, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 768, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Backpack", player)));
 
         //Pet slot
         //Index 41
         //Internal index 10 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 10, 151, 96, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player)));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 10, 223, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player)));
 
         //Deck slot
         //Index 42
         //Internal index 11 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 11, 133, 96, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player)));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 11, 241, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player)));
 
         //Hotbar slots (for creative usage or if hotbar is enabled)
         //Index 43 - 51
         //Internal index 0 - 8 (vanilla)
         for (int xx = 0; xx < 9; ++xx)
         {
-            addSlotToContainer(new BetterSlot(playerInventory, xx, 133 + xx * 18, 114, TEXTURE, TEXTURE_W, TEXTURE_H, -16, -16));
+            addSlotToContainer(new BetterSlot(playerInventory, xx, 133 + xx * 18, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0));
         }
+
+        //Vanilla offhand slot
+        //Index 52
+        //Internal index 40 (vanilla)
+        addSlotToContainer(new BetterSlot(playerInventory, 40, 115, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 624, 0));
     }
 
     public static boolean isTwoHanded(ItemStack stack)
