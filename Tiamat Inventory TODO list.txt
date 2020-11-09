@@ -1,7 +1,10 @@
+Crafting grid w/h attributes
+Option for default crafting grid w/h
+
+Cargo slot attribute instead of current implementation
+
 Options for auto-pickup to armor slots
 Options for auto-pickup to weaponset slots
-
-Options for crafting grid availability/size
 
 
 Before public release: consider editing vanilla inventory instead of Tiamat Inventory being a completely new GUI, for mod compat
