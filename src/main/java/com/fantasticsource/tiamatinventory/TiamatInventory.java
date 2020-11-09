@@ -50,6 +50,7 @@ public class TiamatInventory
             Keys.init(event);
             MinecraftForge.EVENT_BUS.register(TiamatInventoryGUI.class);
             MinecraftForge.EVENT_BUS.register(ClientInventoryHacks.class);
+            MinecraftForge.EVENT_BUS.register(TooltipAlterer.class);
         }
     }
 

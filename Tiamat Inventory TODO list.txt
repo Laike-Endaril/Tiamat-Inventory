@@ -1,1 +1,1 @@
-Alter tooltip to show 2H status (should be doable via client-side nbt read)
+Options for auto-pickup to weaponset slots?
