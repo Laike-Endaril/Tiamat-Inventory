@@ -164,7 +164,7 @@ public class InventoryHacks
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void inventoryChanged(InventoryChangedEvent event)
     {
         Entity entity = event.getEntity();
@@ -179,7 +179,7 @@ public class InventoryHacks
 
         boolean changed = false;
 
-        //Completely blocked hotbar slots (all except first, unless hotbar is enabled)
+        //Blocked hotbar slots (all except first, unless hotbar is enabled)
         if (!TiamatConfig.serverSettings.allowHotbar)
         {
             for (int i = 1; i < 9; i++)
@@ -199,7 +199,7 @@ public class InventoryHacks
             }
         }
 
-        //Completely blocked "cargo" slots
+        //Blocked "cargo" slots
         for (int i = 9 + getCurrentInventorySize(player); i < 36; i++)
         {
             ItemStack stack = playerInventory.getStackInSlot(i);
@@ -214,6 +214,17 @@ public class InventoryHacks
                 }
                 changed = true;
             }
+        }
+
+        //If neither hand is empty and one of them is 2H, drop offhand
+        ItemStack mainhand = player.getHeldItemMainhand(), offhand = player.getHeldItemOffhand();
+        if (!mainhand.isEmpty() && !offhand.isEmpty() && (Slottings.isTwoHanded(mainhand) || Slottings.isTwoHanded(offhand)))
+        {
+            ItemStack copy = offhand.copy();
+            offhand.setCount(0);
+            player.entityDropItem(copy, 0);
+
+            changed = true;
         }
 
         if (changed)
