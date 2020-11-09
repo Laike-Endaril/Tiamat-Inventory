@@ -33,7 +33,7 @@ public class TiamatInventoryContainer extends Container
     public static final int WEAPON_SLOT_STACK_LIMIT = 64;
     protected final EntityPlayer player;
 
-    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
+    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
     public InventoryCraftResult craftResult = new InventoryCraftResult();
 
     public TiamatInventoryContainer(EntityPlayer player)
@@ -99,7 +99,7 @@ public class TiamatInventoryContainer extends Container
         //Internal index 6 - 8 (tiamat)
         for (int xx = 0; xx < 3; xx++)
         {
-            addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 6 + xx, 169 + xx * 18, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player)));
+            addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 6 + xx, 133 + xx * 18, 24, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player)));
         }
 
         //Backpack slot
@@ -110,12 +110,12 @@ public class TiamatInventoryContainer extends Container
         //Pet slot
         //Index 41
         //Internal index 10 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 10, 223, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player)));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 10, 151, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player)));
 
         //Deck slot
         //Index 42
         //Internal index 11 (tiamat)
-        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 11, 241, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player)));
+        addSlotToContainer(new FilteredSlot(tiamatPlayerInventory, 11, 169, 42, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player)));
 
         //Hotbar slots (for creative usage or if hotbar is enabled)
         //Index 43 - 51
@@ -133,16 +133,16 @@ public class TiamatInventoryContainer extends Container
         //Crafting result slot
         //Index 53
         //Internal index 0 (crafting result)
-        addSlotToContainer(new SlotCrafting(player, craftMatrix, craftResult, 0, 277, 42));
+        addSlotToContainer(new SlotCrafting(player, craftMatrix, craftResult, 0, 223, 42));
 
         //Crafting matrix slots
-        //Index 54 - 57
-        //Internal index 0-3 (crafting matrix)
-        for (int i = 0; i < 2; ++i)
+        //Index 54 - 62
+        //Internal index 0-8 (crafting matrix)
+        for (int i = 0; i < craftMatrix.getWidth(); ++i)
         {
-            for (int j = 0; j < 2; ++j)
+            for (int j = 0; j < craftMatrix.getHeight(); ++j)
             {
-                addSlotToContainer(new Slot(craftMatrix, j + i * 2, 259 + j * 18, 6 + i * 18));
+                addSlotToContainer(new Slot(craftMatrix, j + i * craftMatrix.getWidth(), 241 + j * 18, 6 + i * 18));
             }
         }
     }

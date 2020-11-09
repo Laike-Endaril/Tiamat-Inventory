@@ -1,5 +1,7 @@
-Options for auto-pickup to weaponset slots?
+Options for auto-pickup to armor slots
+Options for auto-pickup to weaponset slots
 
+Options for crafting grid availability/size
 
 
 Before public release: consider editing vanilla inventory instead of Tiamat Inventory being a completely new GUI, for mod compat
