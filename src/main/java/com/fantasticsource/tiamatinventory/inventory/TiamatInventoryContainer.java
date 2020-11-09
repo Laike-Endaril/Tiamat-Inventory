@@ -7,12 +7,17 @@ import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -142,6 +147,7 @@ public class TiamatInventoryContainer extends Container
         }
     }
 
+
     @Override
     public void onContainerClosed(EntityPlayer player)
     {
@@ -162,6 +168,27 @@ public class TiamatInventoryContainer extends Container
     {
         return slotIn.inventory != craftResult && super.canMergeSlot(stack, slotIn);
     }
+
+    @Override
+    protected void slotChangedCraftingGrid(World world, EntityPlayer player, InventoryCrafting craftMatrix, InventoryCraftResult craftResult)
+    {
+        if (!world.isRemote)
+        {
+            EntityPlayerMP entityplayermp = (EntityPlayerMP) player;
+            ItemStack itemstack = ItemStack.EMPTY;
+            IRecipe irecipe = CraftingManager.findMatchingRecipe(craftMatrix, world);
+
+            if (irecipe != null && (irecipe.isDynamic() || !world.getGameRules().getBoolean("doLimitedCrafting") || entityplayermp.getRecipeBook().isUnlocked(irecipe)))
+            {
+                craftResult.setRecipeUsed(irecipe);
+                itemstack = irecipe.getCraftingResult(craftMatrix);
+            }
+
+            craftResult.setInventorySlotContents(0, itemstack);
+            entityplayermp.connection.sendPacket(new SPacketSetSlot(windowId, 53, itemstack));
+        }
+    }
+
 
     public static boolean isTwoHanded(ItemStack stack)
     {

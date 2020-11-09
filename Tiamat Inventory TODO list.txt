@@ -1,5 +1,7 @@
-Fix craft result sync
-
 Fix weaponset behavior with hotbar (make swap cycle through, make sheathe put into current)
 
 Options for auto-pickup to weaponset slots?
+
+
+
+Before public release: consider editing vanilla inventory instead of Tiamat Inventory being a completely new GUI, for mod compat
