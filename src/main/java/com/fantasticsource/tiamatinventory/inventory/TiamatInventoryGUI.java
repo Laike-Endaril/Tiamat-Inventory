@@ -169,6 +169,11 @@ public class TiamatInventoryGUI extends BetterContainerGUI
 
                 String stat = stats[i];
                 int color = hoveredIndex == i ? 0xffffffff : 0xff777777;
+                if (!attributeInstance.getAttribute().getShouldWatch())
+                {
+                    color = hoveredIndex == i ? 0xffff0000 : 0xff770000;
+                    stat += " (not synced)";
+                }
                 drawString(fontRenderer, stat, STAT_WINDOW_X, yy, color);
                 String amount = String.format("%.2f", attributeInstance.getAttributeValue());
                 int xx = STAT_WINDOW_X + STAT_WINDOW_W - fontRenderer.getStringWidth(amount);
