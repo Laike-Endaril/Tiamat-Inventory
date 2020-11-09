@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.Container;
 import net.minecraft.network.play.client.CPacketCloseWindow;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
@@ -50,10 +51,12 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     protected boolean statsScrollGrabbed = false, modelGrabbed = false;
     protected int uOffset, vOffset, modelGrabX, modelGrabY;
     protected double modelYaw = 0, modelPitch = 0, modelScale = 1;
+    protected Container inventorySlotsSaved;
 
     public TiamatInventoryGUI()
     {
         super(new TiamatInventoryContainer(Minecraft.getMinecraft().player));
+        inventorySlotsSaved = inventorySlots;
 
         rawStats = new String[AttributeDisplayData.displayAttributes.length];
         stats = new String[rawStats.length];
@@ -217,7 +220,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
 
     private void setTab(int tab)
     {
-        inventorySlots = tab == 0 ? new TiamatInventoryContainer(Minecraft.getMinecraft().player) : null;
+        inventorySlots = tab == 0 ? inventorySlotsSaved : null;
         mc.player.openContainer = inventorySlots;
 
         this.tab = tab;

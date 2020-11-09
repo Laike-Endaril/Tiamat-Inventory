@@ -1,3 +1,5 @@
+When closing GUI, make held stack go back into inventory instead of dropping forward
+
 Crafting grid w/h attributes
 Option for default crafting grid w/h
 
