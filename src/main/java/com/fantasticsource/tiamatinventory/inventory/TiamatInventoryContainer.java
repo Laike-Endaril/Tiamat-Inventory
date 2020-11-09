@@ -9,10 +9,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -29,7 +26,10 @@ public class TiamatInventoryContainer extends Container
     public static final int TEXTURE_W = 1024, TEXTURE_H = 1024;
 
     public static final int WEAPON_SLOT_STACK_LIMIT = 64;
-    private final EntityPlayer player;
+    protected final EntityPlayer player;
+
+    public InventoryCrafting craftMatrix = new InventoryCrafting(this, 2, 2);
+    public InventoryCraftResult craftResult = new InventoryCraftResult();
 
     public TiamatInventoryContainer(EntityPlayer player)
     {
@@ -124,6 +124,43 @@ public class TiamatInventoryContainer extends Container
         //Index 52
         //Internal index 40 (vanilla)
         addSlotToContainer(new BetterSlot(playerInventory, 40, 115, 114, TEXTURE, TEXTURE_W, TEXTURE_H, 624, 0));
+
+        //Crafting result slot
+        //Index 53
+        //Internal index 0 (crafting result)
+        addSlotToContainer(new SlotCrafting(player, craftMatrix, craftResult, 0, 277, 42));
+
+        //Crafting matrix slots
+        //Index 54 - 57
+        //Internal index 0-3 (crafting matrix)
+        for (int i = 0; i < 2; ++i)
+        {
+            for (int j = 0; j < 2; ++j)
+            {
+                addSlotToContainer(new Slot(craftMatrix, j + i * 2, 259 + j * 18, 6 + i * 18));
+            }
+        }
+    }
+
+    @Override
+    public void onContainerClosed(EntityPlayer player)
+    {
+        super.onContainerClosed(player);
+
+        craftResult.clear();
+        if (!player.world.isRemote) clearContainer(player, player.world, craftMatrix);
+    }
+
+    @Override
+    public void onCraftMatrixChanged(IInventory inventoryIn)
+    {
+        slotChangedCraftingGrid(player.world, player, craftMatrix, craftResult);
+    }
+
+    @Override
+    public boolean canMergeSlot(ItemStack stack, Slot slotIn)
+    {
+        return slotIn.inventory != craftResult && super.canMergeSlot(stack, slotIn);
     }
 
     public static boolean isTwoHanded(ItemStack stack)
