@@ -1,3 +1,1 @@
-Drop offhand when putting a 2H in mainhand and vice-versa
-
 Alter tooltip to show 2H status (should be doable via client-side nbt read)
