@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatinventory;
 
 import com.fantasticsource.mctools.component.CItemStack;
+import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
 import com.fantasticsource.tiamatinventory.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
@@ -279,7 +280,9 @@ public class Network
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
                 if (inventory == null) return;
 
-                inventory.sheatheUnsheathe();
+
+                if (player.isCreative() || TiamatConfig.serverSettings.allowHotbar) inventory.cycle(true);
+                else inventory.sheatheUnsheathe();
             });
             return null;
         }
@@ -311,7 +314,8 @@ public class Network
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
                 if (inventory == null) return;
 
-                inventory.swap();
+                if (player.isCreative() || TiamatConfig.serverSettings.allowHotbar) inventory.cycle(false);
+                else inventory.swap();
             });
             return null;
         }

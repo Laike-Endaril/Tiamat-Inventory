@@ -715,7 +715,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         {
             swap1 = player.getHeldItemMainhand();
             swap2 = getSheathedMainhand2();
-            if (swap1.isEmpty() != swap2.isEmpty())
+            if (!(swap1.isEmpty() && swap2.isEmpty()))
             {
                 setSheathedMainhand2(swap1);
                 player.setHeldItem(EnumHand.MAIN_HAND, swap2);
@@ -724,7 +724,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
             swap1 = player.getHeldItemOffhand();
             swap2 = getSheathedOffhand2();
-            if (swap1.isEmpty() != swap2.isEmpty())
+            if (!(swap1.isEmpty() && swap2.isEmpty()))
             {
                 setSheathedOffhand2(swap1);
                 player.setHeldItem(EnumHand.OFF_HAND, swap2);
@@ -735,7 +735,33 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void swap()
     {
-        if (player.isCreative() || TiamatConfig.serverSettings.allowHotbar)
+        if (isSheathed())
+        {
+            ItemStack swap = getSheathedMainhand1();
+            setSheathedMainhand1(getSheathedMainhand2());
+            setSheathedMainhand2(swap);
+
+            swap = getSheathedOffhand1();
+            setSheathedOffhand1(getSheathedOffhand2());
+            setSheathedOffhand2(swap);
+        }
+        else
+        {
+            ItemStack swap = getSheathedMainhand2();
+            if (swap.isEmpty() && getSheathedOffhand2().isEmpty()) return;
+
+            setSheathedMainhand2(player.getHeldItemMainhand());
+            player.setHeldItem(EnumHand.MAIN_HAND, swap);
+
+            swap = getSheathedOffhand2();
+            setSheathedOffhand2(player.getHeldItemOffhand());
+            player.setHeldItem(EnumHand.OFF_HAND, swap);
+        }
+    }
+
+    public void cycle(boolean forward)
+    {
+        if (forward)
         {
             sheatheUnsheathe(false);
 
@@ -749,28 +775,15 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         }
         else
         {
-            if (isSheathed())
-            {
-                ItemStack swap = getSheathedMainhand1();
-                setSheathedMainhand1(getSheathedMainhand2());
-                setSheathedMainhand2(swap);
+            sheatheUnsheathe(true);
 
-                swap = getSheathedOffhand1();
-                setSheathedOffhand1(getSheathedOffhand2());
-                setSheathedOffhand2(swap);
-            }
-            else
-            {
-                ItemStack swap = getSheathedMainhand2();
-                if (swap.isEmpty() && getSheathedOffhand2().isEmpty()) return;
+            ItemStack swap = getSheathedMainhand1();
+            setSheathedMainhand1(getSheathedMainhand2());
+            setSheathedMainhand2(swap);
 
-                setSheathedMainhand2(player.getHeldItemMainhand());
-                player.setHeldItem(EnumHand.MAIN_HAND, swap);
-
-                swap = getSheathedOffhand2();
-                setSheathedOffhand2(player.getHeldItemOffhand());
-                player.setHeldItem(EnumHand.OFF_HAND, swap);
-            }
+            swap = getSheathedOffhand1();
+            setSheathedOffhand1(getSheathedOffhand2());
+            setSheathedOffhand2(swap);
         }
     }
 }
