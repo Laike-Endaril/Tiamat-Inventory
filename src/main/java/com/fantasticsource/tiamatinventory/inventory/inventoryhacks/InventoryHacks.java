@@ -287,9 +287,8 @@ public class InventoryHacks
             if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanilla, 37));
             if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanilla, 36));
 
-            //Vanilla hands
+            //Vanilla mainhand
             slotOrder.add(new Pair<>(vanilla, player.inventory.currentItem));
-            slotOrder.add(new Pair<>(vanilla, 40));
 
             //Hotbar
             for (int i = 1; i <= 8; i++)
@@ -300,6 +299,9 @@ public class InventoryHacks
             //Cargo
             int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
             for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
+
+            //Vanilla offhand
+            slotOrder.add(new Pair<>(vanilla, 40));
 
             //Weaponsets
             for (int i = 0; i < 4; i++) slotOrder.add(new Pair<>(tiamat, i));
@@ -319,10 +321,6 @@ public class InventoryHacks
             {
                 slotOrder.add(new Pair<>(vanilla, player.inventory.currentItem));
             }
-            if (TiamatConfig.serverSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
-            {
-                slotOrder.add(new Pair<>(vanilla, 40));
-            }
             if (TiamatConfig.serverSettings.allowPickupHotbar)
             {
                 for (int i = 1; i <= 8; i++)
@@ -334,6 +332,10 @@ public class InventoryHacks
             {
                 int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
                 for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
+            }
+            if (TiamatConfig.serverSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
+            {
+                slotOrder.add(new Pair<>(vanilla, 40));
             }
             if (TiamatConfig.serverSettings.allowPickupWeaponset)
             {
