@@ -7,13 +7,10 @@ import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
@@ -23,10 +20,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -65,10 +59,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
 
     private final List<NonNullList<ItemStack>> allInventories;
-    public int currentItem;
     public EntityPlayer player;
-    private ItemStack itemStack;
-    private int timesChanged;
 
     public TiamatPlayerInventory(EntityPlayer playerIn)
     {
@@ -84,7 +75,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
                 gatheringProfessions, craftingProfessions, craftingRecipes);
 
 
-        itemStack = ItemStack.EMPTY;
         player = playerIn;
     }
 
@@ -119,28 +109,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         if (inventory == null) return;
 
         inventory.save();
-    }
-
-
-    public void decrementAnimations()
-    {
-        for (NonNullList<ItemStack> nonnulllist : allInventories)
-        {
-            for (int i = 0; i < nonnulllist.size(); ++i)
-            {
-                if (!nonnulllist.get(i).isEmpty())
-                {
-                    nonnulllist.get(i).updateAnimation(player.world, player, i, currentItem == i);
-                }
-            }
-        }
-        for (ItemStack is : armor) // FORGE: Tick armor on animation ticks
-        {
-            if (!is.isEmpty())
-            {
-                is.getItem().onArmorTick(player.world, player, is);
-            }
-        }
     }
 
     public ItemStack decrStackSize(int index, int count)
@@ -357,16 +325,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public boolean isItemValidForSlot(int index, ItemStack stack)
     {
         return true;
-    }
-
-    public void copyInventory(TiamatPlayerInventory tiamatPlayerInventory)
-    {
-        for (int i = 0; i < getSizeInventory(); ++i)
-        {
-            setInventorySlotContents(i, tiamatPlayerInventory.getStackInSlot(i));
-        }
-
-        currentItem = tiamatPlayerInventory.currentItem;
     }
 
     public int getField(int id)
