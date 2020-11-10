@@ -17,9 +17,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IContainerListener;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.world.GameType;
@@ -31,10 +29,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
 
@@ -42,8 +37,6 @@ public class InventoryHacks
 {
     protected static final Field CONTAINER_LISTENERS_FIELD = ReflectionTool.getField(Container.class, "field_75149_d", "listeners");
 
-    public static int clientInventorySize = TiamatConfig.serverSettings.defaultInventorySize;
-    public static boolean clientAllowHotbar = TiamatConfig.serverSettings.allowHotbar;
 
     public static int getCurrentInventorySize(EntityPlayerMP player)
     {
@@ -85,23 +78,53 @@ public class InventoryHacks
         }
 
 
+        HashSet<Integer> allowedCraftingSlots = new HashSet<>();
+        for (int x = 0; x < TiamatConfig.serverSettings.craftW; x++)
+        {
+            for (int y = 0; y < TiamatConfig.serverSettings.craftH; y++)
+            {
+                //Expand from bottom-left
+                allowedCraftingSlots.add(6 + x - y * 3);
+            }
+        }
+
+
+        //Limit slots
         int invSize = getCurrentInventorySize(player);
         HashMap<Integer, Integer> tiamatSlotToCurrentSlot = new HashMap<>();
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
-            if (slot == null || !(slot.inventory instanceof InventoryPlayer)) continue;
+            if (slot == null) continue;
+
 
             int slotIndex = slot.getSlotIndex();
             if (container instanceof TiamatInventoryContainer)
             {
-                if (slotIndex < 9 && !TiamatConfig.serverSettings.allowHotbar)
+                if (slot.inventory instanceof InventoryCraftResult)
                 {
-                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    if (TiamatConfig.serverSettings.craftW == 0 || TiamatConfig.serverSettings.craftH == 0)
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
                 }
-                else if (slotIndex >= 9 + invSize && slotIndex < 36)
+                else if (slot.inventory instanceof InventoryCrafting)
                 {
-                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    if (!allowedCraftingSlots.contains(slotIndex))
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
+                }
+                else if (slot.inventory instanceof InventoryPlayer)
+                {
+                    if (slotIndex < 9 && !TiamatConfig.serverSettings.allowHotbar)
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
+                    else if (slotIndex >= 9 + invSize && slotIndex < 36)
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
                 }
             }
             else

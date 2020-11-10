@@ -8,13 +8,12 @@ tiamatinventory.key.sheathe=Sheathe / Unsheathe
 tiamatinventory.config.serverSettings=Server Settings
 tiamatinventory.config.clientSettings=Client Settings
 
+tiamatinventory.config.craftW=Crafting Grid Width
+tiamatinventory.config.craftW.tooltip=FILLSCREEN FIXNEWLINES The width of the crafting grid in the Tiamat Inventory\n \n
+tiamatinventory.config.craftH=Crafting Grid Height
+tiamatinventory.config.craftH.tooltip=FILLSCREEN FIXNEWLINES The height of the crafting grid in the Tiamat Inventory\n \n
 tiamatinventory.config.defaultInvSize=Default Inventory Size
 tiamatinventory.config.defaultInvSize.tooltip=FILLSCREEN FIXNEWLINES The default inventory size, without a backpack\n \n
-
-tiamatinventory.config.clientInventory=Inventory
-
-tiamatinventory.config.displayAttributes=Attributes To Display
-tiamatinventory.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Which attributes to display in the inventory, and their descriptions\neg. tiamatinventory.autoBlock, How likely you are to automatically block an attack\n \n
 tiamatinventory.config.allowHotbar=Allow Hotbar
 tiamatinventory.config.allowHotbar.tooltip=FILLSCREEN FIXNEWLINES Whether the hotbar is enabled in non-creative mode (always enabled in creative)\n \n
 tiamatinventory.config.allowPickupMainHand=Allow Auto-Pickup to Main Hand
@@ -25,6 +24,11 @@ tiamatinventory.config.allowPickupHotbar=Allow Auto-Pickup to Hotbar
 tiamatinventory.config.allowPickupHotbar.tooltip=FILLSCREEN FIXNEWLINES Whether players can auto-pickup items to their not-in-hand hotbar slots (requires hotbar to be enabled)\n \n
 tiamatinventory.config.allowPickupCargo=Allow Auto-Pickup to Cargo
 tiamatinventory.config.allowPickupCargo.tooltip=FILLSCREEN FIXNEWLINES Whether players can auto-pickup items to their main/cargo inventory slots\n \n
+
+tiamatinventory.config.clientInventory=Inventory
+
+tiamatinventory.config.displayAttributes=Attributes To Display
+tiamatinventory.config.displayAttributes.tooltip=FILLSCREEN FIXNEWLINES Which attributes to display in the inventory, and their descriptions\neg. tiamatinventory.autoBlock, How likely you are to automatically block an attack\n \n
 
 tiamatinventory.config.serverItems=Items
 

@@ -3,6 +3,7 @@ package com.fantasticsource.tiamatinventory.inventory.inventoryhacks;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
+import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
@@ -17,6 +18,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.InventoryCraftResult;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.GameType;
@@ -27,6 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -64,18 +68,44 @@ public class ClientInventoryHacks extends GuiButton
         Container container = gui.inventorySlots;
         if (container == null) return;
 
+
+        HashSet<Integer> allowedCraftingSlots = new HashSet<>();
+        for (int x = 0; x < ClientInventoryData.craftW; x++)
+        {
+            for (int y = 0; y < ClientInventoryData.craftH; y++)
+            {
+                //Expand from bottom-left
+                allowedCraftingSlots.add(6 + x - y * 3);
+            }
+        }
+
+
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
             if (slot == null) continue;
 
             int slotIndex = slot.getSlotIndex();
-            int invSize = InventoryHacks.clientInventorySize;
+            int invSize = ClientInventoryData.inventorySize;
             if (isTiamat)
             {
-                if (slot.inventory instanceof InventoryPlayer)
+                if (slot.inventory instanceof InventoryCraftResult)
                 {
-                    if (slotIndex < 9 && !InventoryHacks.clientAllowHotbar)
+                    if (ClientInventoryData.craftW == 0 || ClientInventoryData.craftH == 0)
+                    {
+                        renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    }
+                }
+                else if (slot.inventory instanceof InventoryCrafting)
+                {
+                    if (!allowedCraftingSlots.contains(slotIndex))
+                    {
+                        renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
+                    }
+                }
+                else if (slot.inventory instanceof InventoryPlayer)
+                {
+                    if (slotIndex < 9 && !ClientInventoryData.allowHotbar)
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
@@ -89,6 +119,7 @@ public class ClientInventoryHacks extends GuiButton
             {
                 if (slot.inventory == inventory)
                 {
+                    //Textures for tiamat slots that exist in non-tiamat-inventory GUIs
                     if (slotIndex < 4 && inventory.getStackInSlot(slotIndex).isEmpty())
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * (slotIndex % 2 == 0 ? 608 : 624), 0, 16);
@@ -96,7 +127,7 @@ public class ClientInventoryHacks extends GuiButton
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !InventoryHacks.clientAllowHotbar)
+                    if (slotIndex < 9 && !ClientInventoryData.allowHotbar)
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
@@ -153,38 +184,72 @@ public class ClientInventoryHacks extends GuiButton
         }
         if (!found) buttonList.add(new ClientInventoryHacks((GuiContainer) gui));
 
-        int invSize = InventoryHacks.clientInventorySize;
+
+        HashSet<Integer> allowedCraftingSlots = new HashSet<>();
+        for (int x = 0; x < ClientInventoryData.craftW; x++)
+        {
+            for (int y = 0; y < ClientInventoryData.craftH; y++)
+            {
+                //Expand from bottom-left
+                allowedCraftingSlots.add(6 + x - y * 3);
+            }
+        }
+
+
+        int invSize = ClientInventoryData.inventorySize;
         TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatClientInventory;
         HashMap<Integer, Integer> tiamatSlotToCurrentSlot = new HashMap<>();
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
-            if (slot == null || !(slot.inventory instanceof InventoryPlayer)) continue;
+            if (slot == null) continue;
+
 
             int slotIndex = slot.getSlotIndex();
+
             if (container instanceof TiamatInventoryContainer)
             {
-                if (slotIndex < 9 && !InventoryHacks.clientAllowHotbar)
+                if (slot.inventory instanceof InventoryCraftResult)
                 {
-                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    if (ClientInventoryData.craftW == 0 || ClientInventoryData.craftH == 0)
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
                 }
-                else if (slotIndex >= 9 + invSize && slotIndex < 36)
+                else if (slot.inventory instanceof InventoryCrafting)
                 {
-                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    if (!allowedCraftingSlots.contains(slotIndex))
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
+                }
+                else if (slot.inventory instanceof InventoryPlayer)
+                {
+                    if (slotIndex < 9 && !ClientInventoryData.allowHotbar)
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
+                    else if (slotIndex >= 9 + invSize && slotIndex < 36)
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
                 }
             }
             else
             {
-                if (slotIndex < 9 && !InventoryHacks.clientAllowHotbar)
+                if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 4 && inventory != null)
+                    if (slotIndex < 9 && !ClientInventoryData.allowHotbar)
                     {
-                        tiamatSlotToCurrentSlot.put(slotIndex, i);
+                        if (slotIndex < 4 && inventory != null)
+                        {
+                            tiamatSlotToCurrentSlot.put(slotIndex, i);
+                        }
                     }
-                }
-                else if (slotIndex >= 9 + invSize && slotIndex < 36)
-                {
-                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    else if (slotIndex >= 9 + invSize && slotIndex < 36)
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
                 }
             }
         }
@@ -212,7 +277,7 @@ public class ClientInventoryHacks extends GuiButton
     public static void renderHotbar(RenderGameOverlayEvent.Pre event)
     {
         GameType gameType = MCTools.getGameType(Minecraft.getMinecraft().player);
-        if (InventoryHacks.clientAllowHotbar || gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (ClientInventoryData.allowHotbar || gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) event.setCanceled(true);
     }

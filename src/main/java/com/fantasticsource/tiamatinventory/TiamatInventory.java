@@ -81,7 +81,7 @@ public class TiamatInventory
     {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         TiamatPlayerInventory.load(event);
-        Network.WRAPPER.sendTo(new Network.InventorySizePacket(InventoryHacks.getCurrentInventorySize(player), TiamatConfig.serverSettings.allowHotbar), player);
+        Network.WRAPPER.sendTo(new Network.InventorySizePacket(InventoryHacks.getCurrentInventorySize(player), TiamatConfig.serverSettings.craftW, TiamatConfig.serverSettings.craftH, TiamatConfig.serverSettings.allowHotbar), player);
     }
 
     @SubscribeEvent

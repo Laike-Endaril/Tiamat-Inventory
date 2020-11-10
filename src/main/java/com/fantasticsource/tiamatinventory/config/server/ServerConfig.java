@@ -6,6 +6,18 @@ import static com.fantasticsource.tiamatinventory.TiamatInventory.MODID;
 
 public class ServerConfig
 {
+    @Config.Name("Crafting Grid Width")
+    @Config.Comment("The width of the crafting grid in the Tiamat Inventory")
+    @Config.LangKey(MODID + ".config.craftW")
+    @Config.RangeInt(min = 0, max = 3)
+    public int craftW = 2;
+
+    @Config.Name("Crafting Grid Height")
+    @Config.Comment("The height of the crafting grid in the Tiamat Inventory")
+    @Config.LangKey(MODID + ".config.craftH")
+    @Config.RangeInt(min = 0, max = 3)
+    public int craftH = 2;
+
     @Config.Name("Default Inventory Size")
     @Config.Comment("The default inventory size, without a backpack")
     @Config.LangKey(MODID + ".config.defaultInvSize")

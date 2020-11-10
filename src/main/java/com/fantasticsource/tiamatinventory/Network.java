@@ -1,10 +1,10 @@
 package com.fantasticsource.tiamatinventory;
 
 import com.fantasticsource.mctools.component.CItemStack;
+import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
 import com.fantasticsource.tiamatinventory.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
-import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.InventoryHacks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -91,7 +91,7 @@ public class Network
 
     public static class InventorySizePacket implements IMessage
     {
-        public int currentInventorySize;
+        public int inventorySize, craftW, craftH;
         public boolean allowHotbar;
 
         public InventorySizePacket()
@@ -99,23 +99,29 @@ public class Network
             //Required
         }
 
-        public InventorySizePacket(int currentInventorySize, boolean allowHotbar)
+        public InventorySizePacket(int inventorySize, int craftW, int craftH, boolean allowHotbar)
         {
-            this.currentInventorySize = currentInventorySize;
+            this.inventorySize = inventorySize;
+            this.craftW = craftW;
+            this.craftH = craftH;
             this.allowHotbar = allowHotbar;
         }
 
         @Override
         public void toBytes(ByteBuf buf)
         {
-            buf.writeInt(currentInventorySize);
+            buf.writeInt(inventorySize);
+            buf.writeInt(craftW);
+            buf.writeInt(craftH);
             buf.writeBoolean(allowHotbar);
         }
 
         @Override
         public void fromBytes(ByteBuf buf)
         {
-            currentInventorySize = buf.readInt();
+            inventorySize = buf.readInt();
+            craftW = buf.readInt();
+            craftH = buf.readInt();
             allowHotbar = buf.readBoolean();
         }
     }
@@ -129,8 +135,10 @@ public class Network
             {
                 Minecraft.getMinecraft().addScheduledTask(() ->
                 {
-                    InventoryHacks.clientInventorySize = packet.currentInventorySize;
-                    InventoryHacks.clientAllowHotbar = packet.allowHotbar;
+                    ClientInventoryData.inventorySize = packet.inventorySize;
+                    ClientInventoryData.craftW = packet.craftW;
+                    ClientInventoryData.craftH = packet.craftH;
+                    ClientInventoryData.allowHotbar = packet.allowHotbar;
                 });
             }
 
