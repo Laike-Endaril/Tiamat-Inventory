@@ -61,7 +61,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     private final List<NonNullList<ItemStack>> allInventories;
     public EntityPlayer player;
 
-    public TiamatPlayerInventory(EntityPlayer playerIn)
+    public TiamatPlayerInventory(EntityPlayer player)
     {
         allInventories = Arrays.asList(
                 sheathedMainhand1, sheathedOffhand1,
@@ -74,8 +74,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
                 classes, offensiveSkills, utilitySkills, ultimateSkill, passiveSkills,
                 gatheringProfessions, craftingProfessions, craftingRecipes);
 
-
-        player = playerIn;
+        this.player = player;
     }
 
     public static void init(FMLServerStartingEvent event)
@@ -286,32 +285,12 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void markDirty()
     {
-        ++timesChanged;
     }
 
     public boolean isUsableByPlayer(EntityPlayer player)
     {
-        if (this.player.isDead)
-        {
-            return false;
-        }
-        else
-        {
-            return player.getDistanceSq(this.player) <= 64.0D;
-        }
-    }
-
-    public boolean hasItemStack(ItemStack itemStack)
-    {
-        for (List<ItemStack> list : allInventories)
-        {
-            for (ItemStack stack : list)
-            {
-                if (!stack.isEmpty() && stack.isItemEqual(itemStack)) return true;
-            }
-        }
-
-        return false;
+        if (player.isDead) return false;
+        return player.getDistanceSq(this.player) <= 64.0D;
     }
 
     public void openInventory(EntityPlayer player)

@@ -10,6 +10,7 @@ import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.ClientInvent
 import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.InventoryHacks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -88,6 +89,14 @@ public class TiamatInventory
     public static void entityJoinWorld(EntityJoinWorldEvent event)
     {
         Entity entity = event.getEntity();
+
+        if (entity instanceof EntityPlayer)
+        {
+            TiamatPlayerInventory inv = entity.world.isRemote ? TiamatPlayerInventory.tiamatClientInventory : TiamatPlayerInventory.tiamatServerInventories.get(entity.getPersistentID());
+            if (inv != null) inv.player = (EntityPlayer) entity;
+        }
+
+        //Render modes
         if (!entity.world.isRemote && entity instanceof EntityLivingBase && Loader.isModLoaded("armourers_workshop"))
         {
             //Cape Default
