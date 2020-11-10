@@ -1,3 +1,0 @@
-Set attribute list defaults to "AUTOFILL", then detect that setting and autofill the list
-...leave the "AUTOFILL" entry, but don't display it, and add all auto-found entries to the config
-...this way if the player wants, they can remove the "AUTOFILL" as well as some select entries
