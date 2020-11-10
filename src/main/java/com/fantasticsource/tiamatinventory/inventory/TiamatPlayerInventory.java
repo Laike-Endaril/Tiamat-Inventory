@@ -121,150 +121,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         inventory.save();
     }
 
-    private boolean canMergeStacks(ItemStack stack1, ItemStack stack2)
-    {
-        return !stack1.isEmpty() && stackEqualExact(stack1, stack2) && stack1.isStackable() && stack1.getCount() < stack1.getMaxStackSize() && stack1.getCount() < getInventoryStackLimit();
-    }
-
-    private boolean stackEqualExact(ItemStack stack1, ItemStack stack2)
-    {
-        return stack1.getItem() == stack2.getItem() && (!stack1.getHasSubtypes() || stack1.getMetadata() == stack2.getMetadata()) && ItemStack.areItemStackTagsEqual(stack1, stack2);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void changeCurrentItem(int direction)
-    {
-        if (direction > 0)
-        {
-            direction = 1;
-        }
-
-        if (direction < 0)
-        {
-            direction = -1;
-        }
-
-        for (currentItem -= direction; currentItem < 0; currentItem += 9)
-        {
-        }
-
-        while (currentItem >= 9)
-        {
-            currentItem -= 9;
-        }
-    }
-
-    public int clearMatchingItems(@Nullable Item itemIn, int metadataIn, int removeCount, @Nullable NBTTagCompound itemNBT)
-    {
-        int i = 0;
-
-        for (int j = 0; j < getSizeInventory(); ++j)
-        {
-            ItemStack itemstack = getStackInSlot(j);
-
-            if (!itemstack.isEmpty() && (itemIn == null || itemstack.getItem() == itemIn) && (metadataIn <= -1 || itemstack.getMetadata() == metadataIn) && (itemNBT == null || NBTUtil.areNBTEquals(itemNBT, itemstack.getTagCompound(), true)))
-            {
-                int k = removeCount <= 0 ? itemstack.getCount() : Math.min(removeCount - i, itemstack.getCount());
-                i += k;
-
-                if (removeCount != 0)
-                {
-                    itemstack.shrink(k);
-
-                    if (itemstack.isEmpty())
-                    {
-                        setInventorySlotContents(j, ItemStack.EMPTY);
-                    }
-
-                    if (removeCount > 0 && i >= removeCount)
-                    {
-                        return i;
-                    }
-                }
-            }
-        }
-
-        if (!itemStack.isEmpty())
-        {
-            if (itemIn != null && itemStack.getItem() != itemIn)
-            {
-                return i;
-            }
-
-            if (metadataIn > -1 && itemStack.getMetadata() != metadataIn)
-            {
-                return i;
-            }
-
-            if (itemNBT != null && !NBTUtil.areNBTEquals(itemNBT, itemStack.getTagCompound(), true))
-            {
-                return i;
-            }
-
-            int l = removeCount <= 0 ? itemStack.getCount() : Math.min(removeCount - i, itemStack.getCount());
-            i += l;
-
-            if (removeCount != 0)
-            {
-                itemStack.shrink(l);
-
-                if (itemStack.isEmpty())
-                {
-                    itemStack = ItemStack.EMPTY;
-                }
-
-                if (removeCount > 0 && i >= removeCount)
-                {
-                    return i;
-                }
-            }
-        }
-
-        return i;
-    }
-
-    private int addResource(int p_191973_1_, ItemStack p_191973_2_)
-    {
-        int i = p_191973_2_.getCount();
-        ItemStack itemstack = getStackInSlot(p_191973_1_);
-
-        if (itemstack.isEmpty())
-        {
-            itemstack = p_191973_2_.copy(); // Forge: Replace Item clone above to preserve item capabilities when picking the item up.
-            itemstack.setCount(0);
-
-            if (p_191973_2_.hasTagCompound())
-            {
-                itemstack.setTagCompound(p_191973_2_.getTagCompound().copy());
-            }
-
-            setInventorySlotContents(p_191973_1_, itemstack);
-        }
-
-        int j = i;
-
-        if (i > itemstack.getMaxStackSize() - itemstack.getCount())
-        {
-            j = itemstack.getMaxStackSize() - itemstack.getCount();
-        }
-
-        if (j > getInventoryStackLimit() - itemstack.getCount())
-        {
-            j = getInventoryStackLimit() - itemstack.getCount();
-        }
-
-        if (j == 0)
-        {
-            return i;
-        }
-        else
-        {
-            i = i - j;
-            itemstack.grow(j);
-            itemstack.setAnimationsToGo(5);
-            return i;
-        }
-    }
 
     public void decrementAnimations()
     {
@@ -437,24 +293,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         return 64;
     }
 
-    public void damageArmor(float damage)
-    {
-        damage = damage / 4.0F;
-
-        if (damage < 1.0F)
-        {
-            damage = 1.0F;
-        }
-
-        for (ItemStack itemstack : armor)
-        {
-            if (itemstack.getItem() instanceof ItemArmor)
-            {
-                itemstack.damageItem((int) damage, player);
-            }
-        }
-    }
-
     public void dropAllItems()
     {
         for (List<ItemStack> list : Arrays.asList(
@@ -481,22 +319,6 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public void markDirty()
     {
         ++timesChanged;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public int getTimesChanged()
-    {
-        return timesChanged;
-    }
-
-    public ItemStack getItemStack()
-    {
-        return itemStack;
-    }
-
-    public void setItemStack(ItemStack itemStackIn)
-    {
-        itemStack = itemStackIn;
     }
 
     public boolean isUsableByPlayer(EntityPlayer player)
