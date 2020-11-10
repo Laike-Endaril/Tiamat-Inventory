@@ -4,6 +4,7 @@ import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatinventory.TiamatInventory;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.config.TiamatConfig;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ItemStackHelper;
@@ -262,6 +263,12 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void dropAllItems()
     {
+        for (int i = 0; i < getSizeInventory(); ++i)
+        {
+            ItemStack itemstack = getStackInSlot(i);
+            if (!itemstack.isEmpty() && EnchantmentHelper.hasVanishingCurse(itemstack)) removeStackFromSlot(i);
+        }
+
         for (List<ItemStack> list : Arrays.asList(
                 sheathedMainhand1, sheathedOffhand1,
                 sheathedMainhand2, sheathedOffhand2,

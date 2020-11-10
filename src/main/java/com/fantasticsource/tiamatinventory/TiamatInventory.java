@@ -179,7 +179,13 @@ public class TiamatInventory
     @SubscribeEvent
     public static void playerDrops(PlayerDropsEvent event)
     {
-        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(event.getEntityPlayer().getPersistentID());
-        if (inventory != null) inventory.dropAllItems();
+        EntityPlayer player = event.getEntityPlayer();
+        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+        if (inventory != null)
+        {
+            player.captureDrops = true;
+            inventory.dropAllItems();
+            player.captureDrops = false;
+        }
     }
 }
