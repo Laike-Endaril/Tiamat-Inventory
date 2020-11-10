@@ -342,7 +342,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     {
         if (keyCode == 1 || Keys.INVENTORY.isActiveAndMatches(keyCode))
         {
-            if (tab == 0) mc.player.connection.sendPacket(new CPacketCloseWindow(mc.player.openContainer.windowId));
+            mc.player.connection.sendPacket(new CPacketCloseWindow(inventorySlotsSaved.windowId));
             mc.player.closeScreenAndDropStack();
             return;
         }

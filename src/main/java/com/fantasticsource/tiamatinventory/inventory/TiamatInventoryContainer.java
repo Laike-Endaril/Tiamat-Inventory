@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatinventory.inventory;
 
 import com.fantasticsource.mctools.GlobalInventory;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.inventory.slot.BetterSlot;
 import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
@@ -151,10 +152,36 @@ public class TiamatInventoryContainer extends Container
     @Override
     public void onContainerClosed(EntityPlayer player)
     {
-        super.onContainerClosed(player);
+        InventoryPlayer inventoryplayer = player.inventory;
+        ItemStack stack = inventoryplayer.getItemStack();
+        if (!stack.isEmpty())
+        {
+            if (player instanceof EntityPlayerMP) MCTools.give((EntityPlayerMP) player, stack);
+            inventoryplayer.setItemStack(ItemStack.EMPTY);
+        }
 
         craftResult.clear();
         if (!player.world.isRemote) clearContainer(player, player.world, craftMatrix);
+    }
+
+    @Override
+    protected void clearContainer(EntityPlayer player, World worldIn, IInventory inventoryIn)
+    {
+        if (!player.isEntityAlive() || player instanceof EntityPlayerMP && ((EntityPlayerMP) player).hasDisconnected())
+        {
+            for (int j = 0; j < inventoryIn.getSizeInventory(); ++j)
+            {
+                player.dropItem(inventoryIn.removeStackFromSlot(j), false);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < inventoryIn.getSizeInventory(); ++i)
+            {
+                ItemStack stack = inventoryIn.removeStackFromSlot(i);
+                if (player instanceof EntityPlayerMP) MCTools.give((EntityPlayerMP) player, stack);
+            }
+        }
     }
 
     @Override
