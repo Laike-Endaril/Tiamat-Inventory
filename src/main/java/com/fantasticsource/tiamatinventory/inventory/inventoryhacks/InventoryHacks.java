@@ -291,9 +291,6 @@ public class InventoryHacks
             slotOrder.add(new Pair<>(vanilla, player.inventory.currentItem));
             slotOrder.add(new Pair<>(vanilla, 40));
 
-            //Weaponsets
-            for (int i = 0; i < 4; i++) slotOrder.add(new Pair<>(tiamat, i));
-
             //Hotbar
             for (int i = 1; i <= 8; i++)
             {
@@ -303,6 +300,9 @@ public class InventoryHacks
             //Cargo
             int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
             for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
+
+            //Weaponsets
+            for (int i = 0; i < 4; i++) slotOrder.add(new Pair<>(tiamat, i));
         }
         else
         {
@@ -323,13 +323,6 @@ public class InventoryHacks
             {
                 slotOrder.add(new Pair<>(vanilla, 40));
             }
-            if (TiamatConfig.serverSettings.allowPickupWeaponset)
-            {
-                if (tiamat.getSheathedOffhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedOffhand1()))) slotOrder.add(new Pair<>(tiamat, 0));
-                if (tiamat.getSheathedMainhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedMainhand1()))) slotOrder.add(new Pair<>(tiamat, 1));
-                if (tiamat.getSheathedOffhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedOffhand2()))) slotOrder.add(new Pair<>(tiamat, 2));
-                if (tiamat.getSheathedMainhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedMainhand2()))) slotOrder.add(new Pair<>(tiamat, 3));
-            }
             if (TiamatConfig.serverSettings.allowPickupHotbar)
             {
                 for (int i = 1; i <= 8; i++)
@@ -341,6 +334,13 @@ public class InventoryHacks
             {
                 int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
                 for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
+            }
+            if (TiamatConfig.serverSettings.allowPickupWeaponset)
+            {
+                if (tiamat.getSheathedOffhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedOffhand1()))) slotOrder.add(new Pair<>(tiamat, 0));
+                if (tiamat.getSheathedMainhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedMainhand1()))) slotOrder.add(new Pair<>(tiamat, 1));
+                if (tiamat.getSheathedOffhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedOffhand2()))) slotOrder.add(new Pair<>(tiamat, 2));
+                if (tiamat.getSheathedMainhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedMainhand2()))) slotOrder.add(new Pair<>(tiamat, 3));
             }
         }
 
