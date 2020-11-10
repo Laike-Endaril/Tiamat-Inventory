@@ -1,5 +1,3 @@
-Options for auto-pickup to armor slots
-Options for auto-pickup to weaponset slots
-
-
-Before public release: consider editing vanilla inventory instead of Tiamat Inventory being a completely new GUI, for mod compat
+Set attribute list defaults to "AUTOFILL", then detect that setting and autofill the list
+...leave the "AUTOFILL" entry, but don't display it, and add all auto-found entries to the config
+...this way if the player wants, they can remove the "AUTOFILL" as well as some select entries

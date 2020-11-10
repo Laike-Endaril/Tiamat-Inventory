@@ -13,6 +13,7 @@ import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.nbt.SlotDataTags;
 import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
+import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -269,31 +270,86 @@ public class InventoryHacks
 
     protected static void autoPickup(EntityPlayerMP player, ItemStack stack)
     {
-        ArrayList<Integer> slotOrder = new ArrayList<>();
+        InventoryPlayer vanilla = player.inventory;
+        TiamatPlayerInventory tiamat = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+
+        ArrayList<Pair<IInventory, Integer>> slotOrder = new ArrayList<>();
         ItemStack mainhand = player.getHeldItemMainhand(), offhand = player.getHeldItemOffhand();
-        if (player.isCreative() || (TiamatConfig.serverSettings.allowPickupMainHand && (offhand.isEmpty() || (!Slottings.isTwoHanded(offhand) && !Slottings.isTwoHanded(stack))))) slotOrder.add(player.inventory.currentItem);
-        if (player.isCreative() || (TiamatConfig.serverSettings.allowPickupOffhand && (mainhand.isEmpty() || (!Slottings.isTwoHanded(mainhand) && !Slottings.isTwoHanded(stack))))) slotOrder.add(40);
-        if (player.isCreative() || TiamatConfig.serverSettings.allowPickupHotbar)
+        boolean stackIs2H = Slottings.isTwoHanded(stack);
+
+        if (player.isCreative())
         {
+            //Armor
+            if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanilla, 39));
+            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamat, 4));
+            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Cape", player)) slotOrder.add(new Pair<>(tiamat, 5));
+            if (Slottings.slotTypeValidForItemstack(stack, "Chest", player)) slotOrder.add(new Pair<>(vanilla, 38));
+            if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanilla, 37));
+            if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanilla, 36));
+
+            //Vanilla hands
+            slotOrder.add(new Pair<>(vanilla, player.inventory.currentItem));
+            slotOrder.add(new Pair<>(vanilla, 40));
+
+            //Weaponsets
+            for (int i = 0; i < 4; i++) slotOrder.add(new Pair<>(tiamat, i));
+
+            //Hotbar
             for (int i = 1; i <= 8; i++)
             {
-                slotOrder.add(Tools.posMod(i + player.inventory.currentItem, 9));
+                slotOrder.add(new Pair<>(vanilla, Tools.posMod(i + player.inventory.currentItem, 9)));
+            }
+
+            //Cargo
+            int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
+            for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
+        }
+        else
+        {
+            if (TiamatConfig.serverSettings.allowPickupArmor)
+            {
+                if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanilla, 39));
+                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamat, 4));
+                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Cape", player)) slotOrder.add(new Pair<>(tiamat, 5));
+                if (Slottings.slotTypeValidForItemstack(stack, "Chest", player)) slotOrder.add(new Pair<>(vanilla, 38));
+                if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanilla, 37));
+                if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanilla, 36));
+            }
+            if (TiamatConfig.serverSettings.allowPickupMainHand && (offhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(offhand))))
+            {
+                slotOrder.add(new Pair<>(vanilla, player.inventory.currentItem));
+            }
+            if (TiamatConfig.serverSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
+            {
+                slotOrder.add(new Pair<>(vanilla, 40));
+            }
+            if (TiamatConfig.serverSettings.allowPickupWeaponset)
+            {
+                if (tiamat.getSheathedOffhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedOffhand1()))) slotOrder.add(new Pair<>(tiamat, 0));
+                if (tiamat.getSheathedMainhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedMainhand1()))) slotOrder.add(new Pair<>(tiamat, 1));
+                if (tiamat.getSheathedOffhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedOffhand2()))) slotOrder.add(new Pair<>(tiamat, 2));
+                if (tiamat.getSheathedMainhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedMainhand2()))) slotOrder.add(new Pair<>(tiamat, 3));
+            }
+            if (TiamatConfig.serverSettings.allowPickupHotbar)
+            {
+                for (int i = 1; i <= 8; i++)
+                {
+                    slotOrder.add(new Pair<>(vanilla, Tools.posMod(i + player.inventory.currentItem, 9)));
+                }
+            }
+            if (TiamatConfig.serverSettings.allowPickupCargo)
+            {
+                int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
+                for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
             }
         }
-        if (player.isCreative() || TiamatConfig.serverSettings.allowPickupCargo)
-        {
-            int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
-            for (int i = 9; i <= last; i++) slotOrder.add(i);
-        }
 
-
-        InventoryPlayer playerInventory = player.inventory;
 
         //Fill slots that already have the same type of item in forward order, track whether any did (even if they were full), and remove them from the list if they're not empty
         Boolean[] found = new Boolean[]{false};
-        slotOrder.removeIf(slot ->
+        slotOrder.removeIf(pair ->
         {
-            ItemStack stack2 = playerInventory.getStackInSlot(slot);
+            ItemStack stack2 = pair.getKey().getStackInSlot(pair.getValue());
             if (stack2.isEmpty()) return false;
 
             if (ItemMatcher.stacksMatch(stack, stack2))
@@ -316,18 +372,21 @@ public class InventoryHacks
         int max = stack.getMaxStackSize();
         if (!found[0])
         {
-            for (int slot : slotOrder)
+            for (Pair<IInventory, Integer> pair : slotOrder)
             {
-                if (!playerInventory.getStackInSlot(slot).isEmpty()) continue;
+                IInventory inventory = pair.getKey();
+                int slot = pair.getValue();
+
+                if (!inventory.getStackInSlot(slot).isEmpty()) continue;
 
                 ItemStack copy = stack.copy();
                 int moveAmount = Tools.min(max, stack.getCount());
                 stack.shrink(moveAmount);
                 copy.setCount(moveAmount);
-                playerInventory.setInventorySlotContents(slot, copy);
+                inventory.setInventorySlotContents(slot, copy);
 
                 //Only filling one slot max!
-                slotOrder.remove((Integer) slot);
+                slotOrder.remove(pair);
                 break;
             }
             if (stack.isEmpty() || slotOrder.isEmpty()) return;
@@ -337,14 +396,17 @@ public class InventoryHacks
         //Fill empty slots in reverse order
         for (int i = slotOrder.size() - 1; i >= 0; i--)
         {
-            int slot = slotOrder.get(i);
-            if (!playerInventory.getStackInSlot(slot).isEmpty()) continue;
+            Pair<IInventory, Integer> pair = slotOrder.get(i);
+            IInventory inventory = pair.getKey();
+            int slot = pair.getValue();
+
+            if (!inventory.getStackInSlot(slot).isEmpty()) continue;
 
             ItemStack copy = stack.copy();
             int moveAmount = Tools.min(max, stack.getCount());
             stack.shrink(moveAmount);
             copy.setCount(moveAmount);
-            playerInventory.setInventorySlotContents(slot, copy);
+            inventory.setInventorySlotContents(slot, copy);
 
             if (stack.isEmpty()) break;
         }

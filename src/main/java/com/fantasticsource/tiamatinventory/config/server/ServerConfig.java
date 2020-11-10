@@ -29,6 +29,11 @@ public class ServerConfig
     @Config.LangKey(MODID + ".config.allowHotbar")
     public boolean allowHotbar = true;
 
+    @Config.Name("Allow Auto-Pickup to Armor")
+    @Config.Comment("Whether players can auto-pickup items to their armor slots")
+    @Config.LangKey(MODID + ".config.allowPickupArmor")
+    public boolean allowPickupArmor = true;
+
     @Config.Name("Allow Auto-Pickup to Main Hand")
     @Config.Comment("Whether players can auto-pickup items to their vanilla main hand slot")
     @Config.LangKey(MODID + ".config.allowPickupMainHand")
@@ -38,6 +43,11 @@ public class ServerConfig
     @Config.Comment("Whether players can auto-pickup items to their vanilla offhand slot")
     @Config.LangKey(MODID + ".config.allowPickupOffhand")
     public boolean allowPickupOffhand = true;
+
+    @Config.Name("Allow Auto-Pickup to Weaponsets")
+    @Config.Comment("Whether players can auto-pickup items to their weaponset slots")
+    @Config.LangKey(MODID + ".config.allowPickupWeaponset")
+    public boolean allowPickupWeaponset = true;
 
     @Config.Name("Allow Auto-Pickup to Hotbar")
     @Config.Comment("Whether players can auto-pickup items to their not-in-hand hotbar slots (requires hotbar to be enabled)")
