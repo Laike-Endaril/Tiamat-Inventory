@@ -1,7 +1,7 @@
 tiamatinventory.keyCategory=Tiamat Inventory
 tiamatinventory.key.inventory=Open Tiamat Inventory
-tiamatinventory.key.swap=Swap / Cycle Backward
-tiamatinventory.key.sheathe=Sheathe / Unsheathe / Cycle Forward
+tiamatinventory.key.swap=Swap / Cycle Left
+tiamatinventory.key.sheathe=Sheathe / Unsheathe / Cycle Right
 
 
 

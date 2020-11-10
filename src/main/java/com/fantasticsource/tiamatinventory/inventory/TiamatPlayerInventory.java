@@ -680,11 +680,9 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void sheatheUnsheathe()
     {
-        if (isSheathed() && !player.isCreative() && !TiamatConfig.serverSettings.allowHotbar)
-        {
-            if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) swap();
-            if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) return;
-        }
+        if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) swap();
+        if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) return;
+
         sheatheUnsheathe(false);
     }
 
@@ -759,31 +757,16 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         }
     }
 
-    public void cycle(boolean forward)
+    public void cycle(boolean right)
     {
-        if (forward)
-        {
-            sheatheUnsheathe(false);
+        sheatheUnsheathe(right);
 
-            ItemStack swap = getSheathedMainhand1();
-            setSheathedMainhand1(getSheathedMainhand2());
-            setSheathedMainhand2(swap);
+        ItemStack swap = getSheathedMainhand1();
+        setSheathedMainhand1(getSheathedMainhand2());
+        setSheathedMainhand2(swap);
 
-            swap = getSheathedOffhand1();
-            setSheathedOffhand1(getSheathedOffhand2());
-            setSheathedOffhand2(swap);
-        }
-        else
-        {
-            sheatheUnsheathe(true);
-
-            ItemStack swap = getSheathedMainhand1();
-            setSheathedMainhand1(getSheathedMainhand2());
-            setSheathedMainhand2(swap);
-
-            swap = getSheathedOffhand1();
-            setSheathedOffhand1(getSheathedOffhand2());
-            setSheathedOffhand2(swap);
-        }
+        swap = getSheathedOffhand1();
+        setSheathedOffhand1(getSheathedOffhand2());
+        setSheathedOffhand2(swap);
     }
 }
