@@ -251,7 +251,7 @@ public class InventoryHacks
         }
         if (player.isCreative() || TiamatConfig.serverSettings.allowPickupCargo)
         {
-            int last = getCurrentInventorySize(player) + 8;
+            int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
             for (int i = 9; i <= last; i++) slotOrder.add(i);
         }
 
