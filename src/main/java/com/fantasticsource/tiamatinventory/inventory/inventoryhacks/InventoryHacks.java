@@ -58,10 +58,14 @@ public class InventoryHacks
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent event)
     {
-        GameType gameType = MCTools.getGameType(event.player);
-        if (TiamatConfig.serverSettings.allowHotbar || gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        EntityPlayer player = event.player;
+        GameType gameType = MCTools.getGameType(player);
+        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
-        event.player.inventory.currentItem = 0;
+
+        if (!TiamatConfig.serverSettings.allowHotbar) player.inventory.currentItem = 0;
+
+        if (player instanceof EntityPlayerMP) dropItemsInBlockedSlots((EntityPlayerMP) player);
     }
 
     @SubscribeEvent
@@ -174,7 +178,11 @@ public class InventoryHacks
         GameType gameType = MCTools.getGameType(player);
         if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
+        dropItemsInBlockedSlots(player);
+    }
 
+    public static void dropItemsInBlockedSlots(EntityPlayerMP player)
+    {
         InventoryPlayer playerInventory = player.inventory;
 
         boolean changed = false;

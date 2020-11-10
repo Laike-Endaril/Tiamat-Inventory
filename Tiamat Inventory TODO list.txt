@@ -1,6 +1,3 @@
-Do spectator as creative in code
-Drop items when going from creative or spectator to non
-
 Crafting grid w/h attributes
 Option for default crafting grid w/h
 
