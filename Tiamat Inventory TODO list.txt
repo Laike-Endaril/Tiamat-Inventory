@@ -1,0 +1,1 @@
+Add quickmove (shift + click) functionality
