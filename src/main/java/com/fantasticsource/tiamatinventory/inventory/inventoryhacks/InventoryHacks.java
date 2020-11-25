@@ -121,7 +121,7 @@ public class InventoryHacks
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(player))
+                    if (!TiamatInventory.playerHasHotbar(player) && (slotIndex < 9 || slotIndex == 40))
                     {
                         container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                     }
@@ -136,7 +136,7 @@ public class InventoryHacks
                 //For Non-TiamatInventoryContainer
                 if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(player))
+                    if (!TiamatInventory.playerHasHotbar(player) && (slotIndex < 9 || slotIndex == 40))
                     {
                         if (tiamatInventory != null)
                         {

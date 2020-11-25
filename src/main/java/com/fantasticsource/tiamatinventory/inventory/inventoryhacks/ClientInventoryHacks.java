@@ -108,7 +108,7 @@ public class ClientInventoryHacks extends GuiButton
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
                     //Render blank textures over blocked hotbar and cargo slots
-                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
+                    if (!TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player) && (slotIndex < 9 || slotIndex == 40))
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
@@ -133,7 +133,8 @@ public class ClientInventoryHacks extends GuiButton
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
+                    //Render blank textures over blocked hotbar and cargo slots
+                    if (!TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player) && (slotIndex < 9 || slotIndex == 40))
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
@@ -231,7 +232,7 @@ public class ClientInventoryHacks extends GuiButton
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
+                    if (!TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player) && (slotIndex < 9 || slotIndex == 40))
                     {
                         container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                     }
@@ -246,7 +247,7 @@ public class ClientInventoryHacks extends GuiButton
                 //For Non-TiamatInventoryContainer
                 if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
+                    if (!TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player) && (slotIndex < 9 || slotIndex == 40))
                     {
                         if (tiamatInventory != null)
                         {
