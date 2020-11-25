@@ -290,7 +290,7 @@ public class InventoryHacks
         ItemStack mainhand = player.getHeldItemMainhand(), offhand = player.getHeldItemOffhand();
         boolean stackIs2H = Slottings.isTwoHanded(stack);
 
-        if (player.isCreative())
+        if (player.isCreative() || player.isSpectator())
         {
             //Armor
             if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanilla, 39));
@@ -330,11 +330,11 @@ public class InventoryHacks
                 if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanilla, 37));
                 if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanilla, 36));
             }
-            if (TiamatConfig.serverSettings.allowPickupMainHand && (offhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(offhand))))
+            if (player.openContainer == player.inventoryContainer && TiamatConfig.serverSettings.allowPickupMainHand && (offhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(offhand))))
             {
                 slotOrder.add(new Pair<>(vanilla, player.inventory.currentItem));
             }
-            if (TiamatConfig.serverSettings.allowPickupHotbar)
+            if (TiamatConfig.serverSettings.allowHotbar && TiamatConfig.serverSettings.allowPickupHotbar)
             {
                 for (int i = 1; i <= 8; i++)
                 {
@@ -346,7 +346,7 @@ public class InventoryHacks
                 int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
                 for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
             }
-            if (TiamatConfig.serverSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
+            if (player.openContainer == player.inventoryContainer && TiamatConfig.serverSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
             {
                 slotOrder.add(new Pair<>(vanilla, 40));
             }
