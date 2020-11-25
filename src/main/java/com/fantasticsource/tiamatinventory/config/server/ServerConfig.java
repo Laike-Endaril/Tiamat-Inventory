@@ -6,9 +6,9 @@ import static com.fantasticsource.tiamatinventory.TiamatInventory.MODID;
 
 public class ServerConfig
 {
-    @Config.Name("Autopickup")
-    @Config.LangKey(MODID + ".config.autopickup")
-    public AutopickupConfig autopickup = new AutopickupConfig();
+    @Config.Name("Auto-Pickup Settings")
+    @Config.LangKey(MODID + ".config.autopickupSettings")
+    public AutopickupConfig autopickupSettings = new AutopickupConfig();
 
     @Config.Name("Crafting Grid Width")
     @Config.Comment("The width of the crafting grid in the Tiamat Inventory")
@@ -33,4 +33,14 @@ public class ServerConfig
     @Config.LangKey(MODID + ".config.allowHotbar")
     public boolean allowHotbar = true;
 
+    @Config.Name("Attributes To Sync")
+    @Config.LangKey(MODID + ".config.attributesToSync")
+    @Config.Comment(
+            {
+                    "Which player attributes to sync to the client (to make them viewable in the inventory)",
+                    "Custom attributes from Tiamat Actions are already synced",
+                    "Only use this after testing whether it's synced with a client (in the attribute view, it will say if it's not synced)",
+                    "eg. generic.knockbackResistance"
+            })
+    public String[] attributesToSync = new String[0];
 }

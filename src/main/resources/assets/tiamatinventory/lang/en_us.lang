@@ -8,6 +8,7 @@ tiamatinventory.key.sheathe=Sheathe / Unsheathe / Cycle Right
 tiamatinventory.config.serverSettings=Server Settings
 tiamatinventory.config.clientSettings=Client Settings
 
+tiamatinventory.config.autopickupSettings=Auto-Pickup Settings
 tiamatinventory.config.craftW=Crafting Grid Width
 tiamatinventory.config.craftW.tooltip=FILLSCREEN FIXNEWLINES The width of the crafting grid in the Tiamat Inventory\n \n
 tiamatinventory.config.craftH=Crafting Grid Height
@@ -16,6 +17,9 @@ tiamatinventory.config.defaultInvSize=Default Inventory Size
 tiamatinventory.config.defaultInvSize.tooltip=FILLSCREEN FIXNEWLINES The default inventory size, without a backpack\n \n
 tiamatinventory.config.allowHotbar=Allow Hotbar
 tiamatinventory.config.allowHotbar.tooltip=FILLSCREEN FIXNEWLINES Whether the hotbar is enabled in non-creative mode (always enabled in creative)\n \n
+tiamatinventory.config.attributesToSync=Attributes To Sync
+tiamatinventory.config.attributesToSync.tooltip=FILLSCREEN FIXNEWLINES Which player attributes to sync to the client (to make them viewable in the inventory)\nCustom attributes from Tiamat Actions are already synced\nOnly use this after testing whether it's synced with a client (in the attribute view, it will say if it's not synced)\neg. generic.knockbackResistance\n \n
+
 tiamatinventory.config.allowPickupPet=Allow Auto-Pickup to Pet
 tiamatinventory.config.allowPickupPet.tooltip=FILLSCREEN FIXNEWLINES Whether players can auto-pickup items to their pet slot\n \n
 tiamatinventory.config.allowPickupDeck=Allow Auto-Pickup to Deck

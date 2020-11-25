@@ -1,1 +1,3 @@
+Fix sync detection in client inventory GUI
+
 Add quickmove (shift + click) functionality

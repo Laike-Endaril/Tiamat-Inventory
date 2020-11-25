@@ -56,13 +56,14 @@ public class InventoryHacks
     public static void playerTick(TickEvent.PlayerTickEvent event)
     {
         EntityPlayer player = event.player;
+
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType != GameType.CREATIVE && gameType != GameType.SPECTATOR)
+        {
+            if (!TiamatInventory.playerHasHotbar(player)) player.inventory.currentItem = 0;
 
-
-        if (!TiamatInventory.playerHasHotbar(player)) player.inventory.currentItem = 0;
-
-        if (player instanceof EntityPlayerMP) dropItemsInBlockedSlots((EntityPlayerMP) player);
+            if (player instanceof EntityPlayerMP) dropItemsInBlockedSlots((EntityPlayerMP) player);
+        }
     }
 
     @SubscribeEvent
@@ -394,10 +395,10 @@ public class InventoryHacks
             else
             {
                 //No hotbar
-                if ((TiamatConfig.serverSettings.autopickup.allowPickupMainHand || TiamatConfig.serverSettings.autopickup.allowPickupOffhand) && (tiamatInv.weaponset1Empty() || tiamatInv.weaponset2Empty()))
+                if ((TiamatConfig.serverSettings.autopickupSettings.allowPickupMainHand || TiamatConfig.serverSettings.autopickupSettings.allowPickupOffhand) && (tiamatInv.weaponset1Empty() || tiamatInv.weaponset2Empty()))
                 {
                     targetVanillaHands = true;
-                    if (TiamatConfig.serverSettings.autopickup.allowPickupWeaponset)
+                    if (TiamatConfig.serverSettings.autopickupSettings.allowPickupWeaponset)
                     {
                         if (tiamatInv.weaponset1Empty())
                         {
@@ -419,7 +420,7 @@ public class InventoryHacks
                 else
                 {
                     targetVanillaHands = false;
-                    if (TiamatConfig.serverSettings.autopickup.allowPickupWeaponset)
+                    if (TiamatConfig.serverSettings.autopickupSettings.allowPickupWeaponset)
                     {
                         targetWeaponset1 = true;
                         targetWeaponset2 = true;
@@ -433,15 +434,15 @@ public class InventoryHacks
             }
 
 
-            if (TiamatConfig.serverSettings.autopickup.allowPickupPet)
+            if (TiamatConfig.serverSettings.autopickupSettings.allowPickupPet)
             {
                 if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player)) slotOrder.add(new Pair<>(tiamatInv, 10));
             }
-            if (TiamatConfig.serverSettings.autopickup.allowPickupDeck)
+            if (TiamatConfig.serverSettings.autopickupSettings.allowPickupDeck)
             {
                 if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player)) slotOrder.add(new Pair<>(tiamatInv, 11));
             }
-            if (TiamatConfig.serverSettings.autopickup.allowPickupArmor)
+            if (TiamatConfig.serverSettings.autopickupSettings.allowPickupArmor)
             {
                 if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanillaInv, 39));
                 if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamatInv, 4));
@@ -450,7 +451,7 @@ public class InventoryHacks
                 if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanillaInv, 37));
                 if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanillaInv, 36));
             }
-            if (TiamatConfig.serverSettings.autopickup.allowPickupQuickslots)
+            if (TiamatConfig.serverSettings.autopickupSettings.allowPickupQuickslots)
             {
                 if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player))
                 {
@@ -459,27 +460,27 @@ public class InventoryHacks
                     slotOrder.add(new Pair<>(tiamatInv, 8));
                 }
             }
-            if (targetVanillaHands && TiamatConfig.serverSettings.autopickup.allowPickupMainHand && (offhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(offhand))))
+            if (targetVanillaHands && TiamatConfig.serverSettings.autopickupSettings.allowPickupMainHand && (offhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(offhand))))
             {
                 slotOrder.add(new Pair<>(vanillaInv, player.inventory.currentItem));
             }
-            if (TiamatConfig.serverSettings.allowHotbar && TiamatConfig.serverSettings.autopickup.allowPickupHotbar)
+            if (TiamatConfig.serverSettings.allowHotbar && TiamatConfig.serverSettings.autopickupSettings.allowPickupHotbar)
             {
                 for (int i = 1; i <= 8; i++)
                 {
                     slotOrder.add(new Pair<>(vanillaInv, Tools.posMod(i + player.inventory.currentItem, 9)));
                 }
             }
-            if (TiamatConfig.serverSettings.autopickup.allowPickupCargo)
+            if (TiamatConfig.serverSettings.autopickupSettings.allowPickupCargo)
             {
                 int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
                 for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
             }
-            if (targetVanillaHands && TiamatConfig.serverSettings.autopickup.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
+            if (targetVanillaHands && TiamatConfig.serverSettings.autopickupSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
             {
                 slotOrder.add(new Pair<>(vanillaInv, 40));
             }
-            if (TiamatConfig.serverSettings.autopickup.allowPickupWeaponset)
+            if (TiamatConfig.serverSettings.autopickupSettings.allowPickupWeaponset)
             {
                 if (targetWeaponset1)
                 {

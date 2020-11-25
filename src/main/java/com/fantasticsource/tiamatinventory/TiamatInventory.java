@@ -10,8 +10,13 @@ import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.ClientInventoryHacks;
 import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.InventoryHacks;
+import com.fantasticsource.tools.Tools;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+import net.minecraft.entity.ai.attributes.BaseAttribute;
+import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -101,6 +106,21 @@ public class TiamatInventory
     public static void entityJoinWorld(EntityJoinWorldEvent event)
     {
         Entity entity = event.getEntity();
+
+
+        if (!entity.world.isRemote && entity instanceof EntityLivingBase)
+        {
+            AbstractAttributeMap attributeMap = ((EntityLivingBase) entity).getAttributeMap();
+            for (IAttributeInstance attributeInstance : attributeMap.getAllAttributes())
+            {
+                IAttribute attribute = attributeInstance.getAttribute();
+                if (attribute instanceof BaseAttribute && Tools.contains(TiamatConfig.serverSettings.attributesToSync, attribute.getName()))
+                {
+                    ((BaseAttribute) attribute).setShouldWatch(true);
+                }
+            }
+        }
+
 
         if (entity instanceof EntityPlayer)
         {
