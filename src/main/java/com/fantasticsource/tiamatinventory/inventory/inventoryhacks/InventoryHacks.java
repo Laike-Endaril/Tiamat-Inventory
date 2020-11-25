@@ -163,6 +163,22 @@ public class InventoryHacks
                                 newSlot.slotNumber = oldSlot.slotNumber;
                                 container.inventorySlots.set(i, newSlot);
                             }
+                            else if (slotIndex == 7)
+                            {
+                                //Replace 8th (unavailable) hotbar slot with pet
+                                Slot oldSlot = container.inventorySlots.get(i);
+                                Slot newSlot = new FilteredSlot(tiamatInventory, 10, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player));
+                                newSlot.slotNumber = oldSlot.slotNumber;
+                                container.inventorySlots.set(i, newSlot);
+                            }
+                            else if (slotIndex == 8)
+                            {
+                                //Replace 9th (unavailable) hotbar slot with deck
+                                Slot oldSlot = container.inventorySlots.get(i);
+                                Slot newSlot = new FilteredSlot(tiamatInventory, 11, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player));
+                                newSlot.slotNumber = oldSlot.slotNumber;
+                                container.inventorySlots.set(i, newSlot);
+                            }
                             else container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                         }
                         else container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));

@@ -128,6 +128,8 @@ public class ClientInventoryHacks extends GuiButton
                     {
                         if (slotIndex < 4) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * (slotIndex % 2 == 0 ? 608 : 624), 0, 16);
                         else if (slotIndex >= 6 && slotIndex <= 8) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 784, 0, 16);
+                        else if (slotIndex == 10) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 640, 0, 16);
+                        else if (slotIndex == 11) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 752, 0, 16);
                         else System.out.println(slotIndex + ", " + i + ", " + slot.getSlotIndex() + ", " + slot.slotNumber);
                     }
                 }
@@ -271,6 +273,22 @@ public class ClientInventoryHacks extends GuiButton
                                 //Replace 5th - 7th (unavailable) hotbar slots with quickslots
                                 Slot oldSlot = container.inventorySlots.get(i);
                                 Slot newSlot = new FilteredSlot(tiamatInventory, slotIndex + 2, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player));
+                                newSlot.slotNumber = oldSlot.slotNumber;
+                                container.inventorySlots.set(i, newSlot);
+                            }
+                            else if (slotIndex == 7)
+                            {
+                                //Replace 8th (unavailable) hotbar slot with pet
+                                Slot oldSlot = container.inventorySlots.get(i);
+                                Slot newSlot = new FilteredSlot(tiamatInventory, 10, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player));
+                                newSlot.slotNumber = oldSlot.slotNumber;
+                                container.inventorySlots.set(i, newSlot);
+                            }
+                            else if (slotIndex == 8)
+                            {
+                                //Replace 9th (unavailable) hotbar slot with deck
+                                Slot oldSlot = container.inventorySlots.get(i);
+                                Slot newSlot = new FilteredSlot(tiamatInventory, 11, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player));
                                 newSlot.slotNumber = oldSlot.slotNumber;
                                 container.inventorySlots.set(i, newSlot);
                             }
