@@ -29,10 +29,25 @@ public class ServerConfig
     @Config.LangKey(MODID + ".config.allowHotbar")
     public boolean allowHotbar = true;
 
+    @Config.Name("Allow Auto-Pickup to Pet")
+    @Config.Comment("Whether players can auto-pickup items to their pet slot")
+    @Config.LangKey(MODID + ".config.allowPickupPet")
+    public boolean allowPickupPet = true;
+
+    @Config.Name("Allow Auto-Pickup to Deck")
+    @Config.Comment("Whether players can auto-pickup items to their deck slot")
+    @Config.LangKey(MODID + ".config.allowPickupDeck")
+    public boolean allowPickupDeck = true;
+
     @Config.Name("Allow Auto-Pickup to Armor")
     @Config.Comment("Whether players can auto-pickup items to their armor slots")
     @Config.LangKey(MODID + ".config.allowPickupArmor")
     public boolean allowPickupArmor = true;
+
+    @Config.Name("Allow Auto-Pickup to Quickslots")
+    @Config.Comment("Whether players can auto-pickup items to their quickslots")
+    @Config.LangKey(MODID + ".config.allowPickupQuickslots")
+    public boolean allowPickupQuickslots = true;
 
     @Config.Name("Allow Auto-Pickup to Main Hand")
     @Config.Comment("Whether players can auto-pickup items to their vanilla main hand slot")
