@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatinventory;
 
 import com.fantasticsource.mctools.component.CItemStack;
+import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
 import com.fantasticsource.tiamatinventory.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
@@ -15,6 +16,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundCategory;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -93,6 +95,7 @@ public class Network
     {
         public int inventorySize, craftW, craftH;
         public boolean allowHotbar;
+        public String[] syncedAttributes;
 
         public InventoryDataPacket()
         {
@@ -105,6 +108,7 @@ public class Network
             this.craftW = craftW;
             this.craftH = craftH;
             this.allowHotbar = allowHotbar;
+            this.syncedAttributes = TiamatConfig.serverSettings.attributesToSync;
         }
 
         @Override
@@ -114,6 +118,8 @@ public class Network
             buf.writeInt(craftW);
             buf.writeInt(craftH);
             buf.writeBoolean(allowHotbar);
+            buf.writeInt(syncedAttributes.length);
+            for (String attribute : syncedAttributes) ByteBufUtils.writeUTF8String(buf, attribute);
         }
 
         @Override
@@ -123,6 +129,8 @@ public class Network
             craftW = buf.readInt();
             craftH = buf.readInt();
             allowHotbar = buf.readBoolean();
+            syncedAttributes = new String[buf.readInt()];
+            for (int i = 0; i < syncedAttributes.length; i++) syncedAttributes[i] = ByteBufUtils.readUTF8String(buf);
         }
     }
 
@@ -139,6 +147,7 @@ public class Network
                     ClientInventoryData.craftW = packet.craftW;
                     ClientInventoryData.craftH = packet.craftH;
                     ClientInventoryData.allowHotbar = packet.allowHotbar;
+                    ClientInventoryData.additionalSyncedAttributes = packet.syncedAttributes;
                 });
             }
 

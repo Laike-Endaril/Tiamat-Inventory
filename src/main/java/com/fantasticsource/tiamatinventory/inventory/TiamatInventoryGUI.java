@@ -169,7 +169,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
 
                 String stat = stats[i];
                 int color = hoveredIndex == i ? 0xffffffff : 0xff777777;
-                if (!attributeInstance.getAttribute().getShouldWatch())
+                if (!attributeInstance.getAttribute().getShouldWatch() && !Tools.contains(ClientInventoryData.additionalSyncedAttributes, attributeInstance.getAttribute().getName()))
                 {
                     color = hoveredIndex == i ? 0xffff0000 : 0xff770000;
                     stat += " (not synced)";
