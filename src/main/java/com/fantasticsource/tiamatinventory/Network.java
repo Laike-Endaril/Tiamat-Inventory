@@ -1,7 +1,6 @@
 package com.fantasticsource.tiamatinventory;
 
 import com.fantasticsource.mctools.component.CItemStack;
-import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
 import com.fantasticsource.tiamatinventory.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
@@ -34,7 +33,7 @@ public class Network
     public static void init()
     {
         WRAPPER.registerMessage(OpenTiamatInventoryPacketHandler.class, OpenTiamatInventoryPacket.class, discriminator++, Side.SERVER);
-        WRAPPER.registerMessage(InventorySizePacketHandler.class, InventorySizePacket.class, discriminator++, Side.CLIENT);
+        WRAPPER.registerMessage(InventoryDataPacketHandler.class, InventoryDataPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(PickupSoundPacketHandler.class, PickupSoundPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(TiamatItemSyncPacketHandler.class, TiamatItemSyncPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(SheatheUnsheathePacketHandler.class, SheatheUnsheathePacket.class, discriminator++, Side.SERVER);
@@ -90,17 +89,17 @@ public class Network
     }
 
 
-    public static class InventorySizePacket implements IMessage
+    public static class InventoryDataPacket implements IMessage
     {
         public int inventorySize, craftW, craftH;
         public boolean allowHotbar;
 
-        public InventorySizePacket()
+        public InventoryDataPacket()
         {
             //Required
         }
 
-        public InventorySizePacket(int inventorySize, int craftW, int craftH, boolean allowHotbar)
+        public InventoryDataPacket(int inventorySize, int craftW, int craftH, boolean allowHotbar)
         {
             this.inventorySize = inventorySize;
             this.craftW = craftW;
@@ -127,10 +126,10 @@ public class Network
         }
     }
 
-    public static class InventorySizePacketHandler implements IMessageHandler<InventorySizePacket, IMessage>
+    public static class InventoryDataPacketHandler implements IMessageHandler<InventoryDataPacket, IMessage>
     {
         @Override
-        public IMessage onMessage(InventorySizePacket packet, MessageContext ctx)
+        public IMessage onMessage(InventoryDataPacket packet, MessageContext ctx)
         {
             if (ctx.side == Side.CLIENT)
             {
@@ -281,7 +280,7 @@ public class Network
                 if (inventory == null) return;
 
 
-                if (TiamatInventory.serverPlayerHasHotbar(player)) inventory.cycle(true);
+                if (TiamatInventory.playerHasHotbar(player)) inventory.cycle(true);
                 else inventory.sheatheUnsheathe();
             });
             return null;
@@ -314,7 +313,7 @@ public class Network
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
                 if (inventory == null) return;
 
-                if (TiamatInventory.serverPlayerHasHotbar(player)) inventory.cycle(false);
+                if (TiamatInventory.playerHasHotbar(player)) inventory.cycle(false);
                 else inventory.swap();
             });
             return null;

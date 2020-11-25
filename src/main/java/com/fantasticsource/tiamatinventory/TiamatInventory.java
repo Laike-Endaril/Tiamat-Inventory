@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
@@ -67,6 +68,14 @@ public class TiamatInventory
     @SubscribeEvent
     public static void syncConfig(ConfigChangedEvent.PostConfigChangedEvent event)
     {
+        MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+        if (server != null)
+        {
+            for (EntityPlayerMP player : server.getPlayerList().getPlayers())
+            {
+                Network.WRAPPER.sendTo(new Network.InventoryDataPacket(InventoryHacks.getCurrentInventorySize(player), TiamatConfig.serverSettings.craftW, TiamatConfig.serverSettings.craftH, TiamatConfig.serverSettings.allowHotbar), player);
+            }
+        }
         AttributeDisplayData.updateDisplayList();
     }
 
@@ -85,7 +94,7 @@ public class TiamatInventory
     {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         TiamatPlayerInventory.load(event);
-        Network.WRAPPER.sendTo(new Network.InventorySizePacket(InventoryHacks.getCurrentInventorySize(player), TiamatConfig.serverSettings.craftW, TiamatConfig.serverSettings.craftH, TiamatConfig.serverSettings.allowHotbar), player);
+        Network.WRAPPER.sendTo(new Network.InventoryDataPacket(InventoryHacks.getCurrentInventorySize(player), TiamatConfig.serverSettings.craftW, TiamatConfig.serverSettings.craftH, TiamatConfig.serverSettings.allowHotbar), player);
     }
 
     @SubscribeEvent
