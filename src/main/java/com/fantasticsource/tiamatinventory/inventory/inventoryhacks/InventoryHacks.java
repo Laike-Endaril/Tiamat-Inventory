@@ -283,8 +283,8 @@ public class InventoryHacks
 
     protected static void autoPickup(EntityPlayerMP player, ItemStack stack)
     {
-        InventoryPlayer vanilla = player.inventory;
-        TiamatPlayerInventory tiamat = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+        InventoryPlayer vanillaInv = player.inventory;
+        TiamatPlayerInventory tiamatInv = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
 
         ArrayList<Pair<IInventory, Integer>> slotOrder = new ArrayList<>();
         ItemStack mainhand = player.getHeldItemMainhand(), offhand = player.getHeldItemOffhand();
@@ -293,69 +293,123 @@ public class InventoryHacks
         if (player.isCreative() || player.isSpectator())
         {
             //Armor
-            if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanilla, 39));
-            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamat, 4));
-            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Cape", player)) slotOrder.add(new Pair<>(tiamat, 5));
-            if (Slottings.slotTypeValidForItemstack(stack, "Chest", player)) slotOrder.add(new Pair<>(vanilla, 38));
-            if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanilla, 37));
-            if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanilla, 36));
+            if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanillaInv, 39));
+            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamatInv, 4));
+            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Cape", player)) slotOrder.add(new Pair<>(tiamatInv, 5));
+            if (Slottings.slotTypeValidForItemstack(stack, "Chest", player)) slotOrder.add(new Pair<>(vanillaInv, 38));
+            if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanillaInv, 37));
+            if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanillaInv, 36));
 
             //Vanilla mainhand
-            slotOrder.add(new Pair<>(vanilla, player.inventory.currentItem));
+            slotOrder.add(new Pair<>(vanillaInv, player.inventory.currentItem));
 
             //Hotbar
             for (int i = 1; i <= 8; i++)
             {
-                slotOrder.add(new Pair<>(vanilla, Tools.posMod(i + player.inventory.currentItem, 9)));
+                slotOrder.add(new Pair<>(vanillaInv, Tools.posMod(i + player.inventory.currentItem, 9)));
             }
 
             //Cargo
             int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
-            for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
+            for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
 
             //Vanilla offhand
-            slotOrder.add(new Pair<>(vanilla, 40));
+            slotOrder.add(new Pair<>(vanillaInv, 40));
 
             //Weaponsets
-            for (int i = 0; i < 4; i++) slotOrder.add(new Pair<>(tiamat, i));
+            for (int i = 0; i < 4; i++) slotOrder.add(new Pair<>(tiamatInv, i));
         }
         else
         {
+            boolean targetVanillaHands, targetWeaponset1, targetWeaponset2;
+            if (TiamatInventory.playerHasHotbar(player))
+            {
+                targetVanillaHands = true;
+                targetWeaponset1 = true;
+                targetWeaponset2 = true;
+            }
+            else
+            {
+                //No hotbar
+                if ((TiamatConfig.serverSettings.allowPickupMainHand || TiamatConfig.serverSettings.allowPickupOffhand) && (tiamatInv.weaponset1Empty() || tiamatInv.weaponset2Empty()))
+                {
+                    targetVanillaHands = true;
+                    if (TiamatConfig.serverSettings.allowPickupWeaponset)
+                    {
+                        if (tiamatInv.weaponset1Empty())
+                        {
+                            targetWeaponset1 = false;
+                            targetWeaponset2 = true;
+                        }
+                        else
+                        {
+                            targetWeaponset1 = true;
+                            targetWeaponset2 = false;
+                        }
+                    }
+                    else
+                    {
+                        targetWeaponset1 = false;
+                        targetWeaponset2 = false;
+                    }
+                }
+                else
+                {
+                    targetVanillaHands = false;
+                    if (TiamatConfig.serverSettings.allowPickupWeaponset)
+                    {
+                        targetWeaponset1 = true;
+                        targetWeaponset2 = true;
+                    }
+                    else
+                    {
+                        targetWeaponset1 = false;
+                        targetWeaponset2 = false;
+                    }
+                }
+            }
+
             if (TiamatConfig.serverSettings.allowPickupArmor)
             {
-                if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanilla, 39));
-                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamat, 4));
-                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Cape", player)) slotOrder.add(new Pair<>(tiamat, 5));
-                if (Slottings.slotTypeValidForItemstack(stack, "Chest", player)) slotOrder.add(new Pair<>(vanilla, 38));
-                if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanilla, 37));
-                if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanilla, 36));
+                if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanillaInv, 39));
+                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamatInv, 4));
+                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Cape", player)) slotOrder.add(new Pair<>(tiamatInv, 5));
+                if (Slottings.slotTypeValidForItemstack(stack, "Chest", player)) slotOrder.add(new Pair<>(vanillaInv, 38));
+                if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanillaInv, 37));
+                if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanillaInv, 36));
             }
-            if (player.openContainer == player.inventoryContainer && TiamatConfig.serverSettings.allowPickupMainHand && (offhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(offhand))))
+            if (targetVanillaHands && TiamatConfig.serverSettings.allowPickupMainHand && (offhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(offhand))))
             {
-                slotOrder.add(new Pair<>(vanilla, player.inventory.currentItem));
+                slotOrder.add(new Pair<>(vanillaInv, player.inventory.currentItem));
             }
             if (TiamatConfig.serverSettings.allowHotbar && TiamatConfig.serverSettings.allowPickupHotbar)
             {
                 for (int i = 1; i <= 8; i++)
                 {
-                    slotOrder.add(new Pair<>(vanilla, Tools.posMod(i + player.inventory.currentItem, 9)));
+                    slotOrder.add(new Pair<>(vanillaInv, Tools.posMod(i + player.inventory.currentItem, 9)));
                 }
             }
             if (TiamatConfig.serverSettings.allowPickupCargo)
             {
                 int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
-                for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanilla, i));
+                for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
             }
-            if (player.openContainer == player.inventoryContainer && TiamatConfig.serverSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
+            if (targetVanillaHands && TiamatConfig.serverSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
             {
-                slotOrder.add(new Pair<>(vanilla, 40));
+                slotOrder.add(new Pair<>(vanillaInv, 40));
             }
             if (TiamatConfig.serverSettings.allowPickupWeaponset)
             {
-                if (tiamat.getSheathedOffhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedOffhand1()))) slotOrder.add(new Pair<>(tiamat, 0));
-                if (tiamat.getSheathedMainhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedMainhand1()))) slotOrder.add(new Pair<>(tiamat, 1));
-                if (tiamat.getSheathedOffhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedOffhand2()))) slotOrder.add(new Pair<>(tiamat, 2));
-                if (tiamat.getSheathedMainhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamat.getSheathedMainhand2()))) slotOrder.add(new Pair<>(tiamat, 3));
+                if (targetWeaponset1)
+                {
+                    if (tiamatInv.getSheathedOffhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamatInv.getSheathedOffhand1()))) slotOrder.add(new Pair<>(tiamatInv, 0));
+                    if (tiamatInv.getSheathedMainhand1().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamatInv.getSheathedMainhand1()))) slotOrder.add(new Pair<>(tiamatInv, 1));
+                }
+                if (targetWeaponset2)
+                {
+                    if (tiamatInv.getSheathedOffhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamatInv.getSheathedOffhand2()))) slotOrder.add(new Pair<>(tiamatInv, 2));
+                    if (tiamatInv.getSheathedMainhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamatInv.getSheathedMainhand2()))) slotOrder.add(new Pair<>(tiamatInv, 3));
+                }
             }
         }
 

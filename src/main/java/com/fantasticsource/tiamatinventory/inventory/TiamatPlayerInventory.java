@@ -641,31 +641,34 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     }
 
 
-    public boolean isSheathed()
+    public boolean handsEmpty()
     {
         return player.getHeldItemMainhand().isEmpty() && player.getHeldItemOffhand().isEmpty();
     }
 
+    public boolean weaponset1Empty()
+    {
+        return getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty();
+    }
+
+    public boolean weaponset2Empty()
+    {
+        return getSheathedMainhand2().isEmpty() && getSheathedOffhand2().isEmpty();
+    }
+
+
     public boolean forceEmptyHands()
     {
         //Return if hotbar is available or if we're already sheathed
-        if (TiamatInventory.playerHasHotbar(player) || isSheathed()) return true;
+        if (TiamatInventory.playerHasHotbar(player) || handsEmpty()) return true;
 
 
         //Sheathe normally if possible
-        if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty())
-        {
-            sheatheUnsheathe();
-            return true;
-        }
-        if (getSheathedMainhand2().isEmpty() && getSheathedOffhand2().isEmpty())
-        {
-            sheatheUnsheathe(true);
-            return true;
-        }
+        sheathe();
+        if (handsEmpty()) return true;
 
 
-        //Try to drop vanilla hand items if forced sheathing failed
+        //Try to drop vanilla hand items if sheathing failed
         boolean dropFailed = false;
         for (int index : new int[]{player.inventory.currentItem, 40})
         {
@@ -684,27 +687,36 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         return !dropFailed;
     }
 
-    public void sheatheUnsheathe()
+    public void sheatheUnsheatheKeyPressed()
     {
-        if (isSheathed()) unsheathe();
-        else sheathe();
+        if (TiamatInventory.playerHasHotbar(player)) cycle(true);
+        else
+        {
+            if (!weaponset1Empty() || !handsEmpty()) sheatheUnsheathe(false);
+            else if (!weaponset2Empty())
+            {
+                swap();
+                sheatheUnsheathe(false);
+            }
+        }
     }
 
     public void sheathe()
     {
-        if (isSheathed()) return;
+        if (handsEmpty()) return;
 
         if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) sheatheUnsheathe(false);
-        else
+        else if (getSheathedMainhand2().isEmpty() && getSheathedOffhand2().isEmpty())
         {
             swap();
-            if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) sheatheUnsheathe(false);
+            sheatheUnsheathe(false);
         }
+        else sheatheUnsheathe(false);
     }
 
     public void unsheathe()
     {
-        if (!isSheathed()) return;
+        if (!handsEmpty()) return;
 
         if (!getSheathedMainhand1().isEmpty() || !getSheathedOffhand1().isEmpty()) sheatheUnsheathe(false);
         else
@@ -759,30 +771,25 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         }
     }
 
-    public void swap()
+    public void swapKeyPressed()
     {
-        if (isSheathed())
-        {
-            ItemStack swap = getSheathedMainhand1();
-            setSheathedMainhand1(getSheathedMainhand2());
-            setSheathedMainhand2(swap);
-
-            swap = getSheathedOffhand1();
-            setSheathedOffhand1(getSheathedOffhand2());
-            setSheathedOffhand2(swap);
-        }
+        if (TiamatInventory.playerHasHotbar(player)) cycle(false);
         else
         {
-            ItemStack swap = getSheathedMainhand2();
-            if (swap.isEmpty() && getSheathedOffhand2().isEmpty()) return;
-
-            setSheathedMainhand2(player.getHeldItemMainhand());
-            player.setHeldItem(EnumHand.MAIN_HAND, swap);
-
-            swap = getSheathedOffhand2();
-            setSheathedOffhand2(player.getHeldItemOffhand());
-            player.setHeldItem(EnumHand.OFF_HAND, swap);
+            if (handsEmpty()) swap();
+            else sheatheUnsheathe(true);
         }
+    }
+
+    public void swap()
+    {
+        ItemStack swap = getSheathedMainhand1();
+        setSheathedMainhand1(getSheathedMainhand2());
+        setSheathedMainhand2(swap);
+
+        swap = getSheathedOffhand1();
+        setSheathedOffhand1(getSheathedOffhand2());
+        setSheathedOffhand2(swap);
     }
 
     public void cycle(boolean right)

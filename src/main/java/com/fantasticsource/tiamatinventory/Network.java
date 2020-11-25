@@ -277,11 +277,7 @@ public class Network
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
-                if (inventory == null) return;
-
-
-                if (TiamatInventory.playerHasHotbar(player)) inventory.cycle(true);
-                else inventory.sheatheUnsheathe();
+                if (inventory != null) inventory.sheatheUnsheatheKeyPressed();
             });
             return null;
         }
@@ -311,10 +307,7 @@ public class Network
             {
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
-                if (inventory == null) return;
-
-                if (TiamatInventory.playerHasHotbar(player)) inventory.cycle(false);
-                else inventory.swap();
+                if (inventory != null) inventory.swapKeyPressed();
             });
             return null;
         }
