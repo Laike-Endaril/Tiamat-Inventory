@@ -648,7 +648,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public boolean forceEmptyHands()
     {
-        //Return if sheathed or creative, or if hotbar is enabled
+        //Return if hotbar is available or if we're already sheathed
         if (TiamatInventory.playerHasHotbar(player) || isSheathed()) return true;
 
 
@@ -686,10 +686,32 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     public void sheatheUnsheathe()
     {
-        if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) swap();
-        if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) return;
+        if (isSheathed()) unsheathe();
+        else sheathe();
+    }
 
-        sheatheUnsheathe(false);
+    public void sheathe()
+    {
+        if (isSheathed()) return;
+
+        if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) sheatheUnsheathe(false);
+        else
+        {
+            swap();
+            if (getSheathedMainhand1().isEmpty() && getSheathedOffhand1().isEmpty()) sheatheUnsheathe(false);
+        }
+    }
+
+    public void unsheathe()
+    {
+        if (!isSheathed()) return;
+
+        if (!getSheathedMainhand1().isEmpty() || !getSheathedOffhand1().isEmpty()) sheatheUnsheathe(false);
+        else
+        {
+            swap();
+            if (!getSheathedMainhand1().isEmpty() || !getSheathedOffhand1().isEmpty()) sheatheUnsheathe(false);
+        }
     }
 
     public void sheatheUnsheathe(boolean to2ndSet)
