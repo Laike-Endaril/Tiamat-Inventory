@@ -3,6 +3,7 @@ package com.fantasticsource.tiamatinventory.inventory.inventoryhacks;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
+import com.fantasticsource.tiamatinventory.TiamatInventory;
 import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI;
@@ -91,6 +92,7 @@ public class ClientInventoryHacks extends GuiButton
             {
                 if (slot.inventory instanceof InventoryCraftResult)
                 {
+                    //Render blank textures over blocked crafting result slot
                     if (ClientInventoryData.craftW == 0 || ClientInventoryData.craftH == 0)
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
@@ -98,6 +100,7 @@ public class ClientInventoryHacks extends GuiButton
                 }
                 else if (slot.inventory instanceof InventoryCrafting)
                 {
+                    //Render blank textures over blocked crafting slots
                     if (!allowedCraftingSlots.contains(slotIndex))
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
@@ -105,7 +108,8 @@ public class ClientInventoryHacks extends GuiButton
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !ClientInventoryData.allowHotbar)
+                    //Render blank textures over blocked hotbar and cargo slots
+                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 576, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
@@ -120,14 +124,15 @@ public class ClientInventoryHacks extends GuiButton
                 if (slot.inventory == inventory)
                 {
                     //Textures for tiamat slots that exist in non-tiamat-inventory GUIs
-                    if (slotIndex < 4 && inventory.getStackInSlot(slotIndex).isEmpty())
+                    if (inventory.getStackInSlot(slotIndex).isEmpty())
                     {
-                        renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * (slotIndex % 2 == 0 ? 608 : 624), 0, 16);
+                        if (slotIndex < 4) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * (slotIndex % 2 == 0 ? 608 : 624), 0, 16);
+                        else if (slotIndex < 7) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 784, 0, 16);
                     }
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !ClientInventoryData.allowHotbar)
+                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
                     {
                         renderTextureAt(gui.getGuiLeft() + slot.xPos - 1, gui.getGuiTop() + slot.yPos - 1, TiamatInventoryGUI.U_PIXEL * 544, TiamatInventoryGUI.V_PIXEL * 16, 18);
                     }
@@ -225,7 +230,7 @@ public class ClientInventoryHacks extends GuiButton
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !ClientInventoryData.allowHotbar)
+                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
                     {
                         container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                     }
@@ -239,11 +244,12 @@ public class ClientInventoryHacks extends GuiButton
             {
                 if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !ClientInventoryData.allowHotbar)
+                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
                     {
-                        if (slotIndex < 4 && inventory != null)
+                        if (inventory != null)
                         {
-                            tiamatSlotToCurrentSlot.put(slotIndex, i);
+                            if (slotIndex < 4) tiamatSlotToCurrentSlot.put(slotIndex, i);
+                            else if (slotIndex < 7) tiamatSlotToCurrentSlot.put(slotIndex, i + 33);
                         }
                     }
                     else if (slotIndex >= 9 + invSize && slotIndex < 36)
@@ -276,8 +282,7 @@ public class ClientInventoryHacks extends GuiButton
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void renderHotbar(RenderGameOverlayEvent.Pre event)
     {
-        GameType gameType = MCTools.getGameType(Minecraft.getMinecraft().player);
-        if (ClientInventoryData.allowHotbar || gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player)) return;
 
         if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR) event.setCanceled(true);
     }

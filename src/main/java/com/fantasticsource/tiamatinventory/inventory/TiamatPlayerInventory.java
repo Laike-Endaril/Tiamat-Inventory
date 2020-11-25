@@ -3,7 +3,6 @@ package com.fantasticsource.tiamatinventory.inventory;
 import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.tiamatinventory.TiamatInventory;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
-import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -650,7 +649,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
     public boolean forceEmptyHands()
     {
         //Return if sheathed or creative, or if hotbar is enabled
-        if (TiamatConfig.serverSettings.allowHotbar || player.isCreative() || isSheathed()) return true;
+        if (TiamatInventory.playerHasHotbar(player) || isSheathed()) return true;
 
 
         //Sheathe normally if possible

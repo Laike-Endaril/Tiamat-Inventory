@@ -281,7 +281,7 @@ public class Network
                 if (inventory == null) return;
 
 
-                if (player.isCreative() || TiamatConfig.serverSettings.allowHotbar) inventory.cycle(true);
+                if (TiamatInventory.serverPlayerHasHotbar(player)) inventory.cycle(true);
                 else inventory.sheatheUnsheathe();
             });
             return null;
@@ -314,7 +314,7 @@ public class Network
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
                 if (inventory == null) return;
 
-                if (player.isCreative() || TiamatConfig.serverSettings.allowHotbar) inventory.cycle(false);
+                if (TiamatInventory.serverPlayerHasHotbar(player)) inventory.cycle(false);
                 else inventory.swap();
             });
             return null;

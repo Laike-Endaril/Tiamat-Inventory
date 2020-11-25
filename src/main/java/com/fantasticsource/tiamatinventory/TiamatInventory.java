@@ -1,9 +1,11 @@
 package com.fantasticsource.tiamatinventory;
 
 import com.fantasticsource.mctools.GlobalInventory;
+import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.aw.RenderModes;
 import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.tiamatinventory.config.TiamatConfig;
+import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryGUI;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.ClientInventoryHacks;
@@ -13,6 +15,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.GameType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
@@ -187,5 +190,21 @@ public class TiamatInventory
             inventory.dropAllItems();
             player.captureDrops = false;
         }
+    }
+
+
+    public static boolean playerHasHotbar(EntityPlayer player)
+    {
+        if (player instanceof EntityPlayerMP)
+        {
+            if (TiamatConfig.serverSettings.allowHotbar) return true;
+        }
+        else
+        {
+            if (ClientInventoryData.allowHotbar) return true;
+        }
+
+        GameType gameType = MCTools.getGameType(player);
+        return gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR;
     }
 }

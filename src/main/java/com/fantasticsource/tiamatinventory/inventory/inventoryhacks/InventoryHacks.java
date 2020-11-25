@@ -7,6 +7,7 @@ import com.fantasticsource.mctools.event.InventoryChangedEvent;
 import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
 import com.fantasticsource.mctools.items.ItemMatcher;
 import com.fantasticsource.tiamatinventory.Network;
+import com.fantasticsource.tiamatinventory.TiamatInventory;
 import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
@@ -57,7 +58,7 @@ public class InventoryHacks
         if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
-        if (!TiamatConfig.serverSettings.allowHotbar) player.inventory.currentItem = 0;
+        if (!TiamatInventory.playerHasHotbar(player)) player.inventory.currentItem = 0;
 
         if (player instanceof EntityPlayerMP) dropItemsInBlockedSlots((EntityPlayerMP) player);
     }
@@ -118,7 +119,7 @@ public class InventoryHacks
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (slotIndex < 9 && !TiamatConfig.serverSettings.allowHotbar)
+                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(player))
                     {
                         container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                     }
@@ -130,11 +131,12 @@ public class InventoryHacks
             }
             else
             {
-                if (slotIndex < 9 && !TiamatConfig.serverSettings.allowHotbar)
+                if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(player))
                 {
-                    if (inventory != null && slotIndex < 4)
+                    if (inventory != null)
                     {
-                        tiamatSlotToCurrentSlot.put(slotIndex, i);
+                        if (slotIndex < 4) tiamatSlotToCurrentSlot.put(slotIndex, i);
+                        else if (slotIndex < 7) tiamatSlotToCurrentSlot.put(slotIndex, i + 33);
                     }
                 }
                 else if (slotIndex >= 9 + invSize && slotIndex < 36)
@@ -212,7 +214,7 @@ public class InventoryHacks
         boolean changed = false;
 
         //Blocked hotbar slots (all except first, unless hotbar is enabled)
-        if (!TiamatConfig.serverSettings.allowHotbar)
+        if (!TiamatInventory.playerHasHotbar(player))
         {
             for (int i = 1; i < 9; i++)
             {
