@@ -30,10 +30,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
 
@@ -64,7 +62,7 @@ public class ClientInventoryHacks extends GuiButton
 
         mc.renderEngine.bindTexture(TEXTURE);
 
-        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatClientInventory;
+        TiamatPlayerInventory tiamatInventory = TiamatPlayerInventory.tiamatClientInventory;
 
         Container container = gui.inventorySlots;
         if (container == null) return;
@@ -90,6 +88,7 @@ public class ClientInventoryHacks extends GuiButton
             int invSize = ClientInventoryData.inventorySize;
             if (isTiamat)
             {
+                //For Tiamat Inventory GUI
                 if (slot.inventory instanceof InventoryCraftResult)
                 {
                     //Render blank textures over blocked crafting result slot
@@ -121,13 +120,15 @@ public class ClientInventoryHacks extends GuiButton
             }
             else
             {
-                if (slot.inventory == inventory)
+                //For Non-Tiamat Inventory GUI
+                if (slot.inventory == tiamatInventory)
                 {
                     //Textures for tiamat slots that exist in non-tiamat-inventory GUIs
-                    if (inventory.getStackInSlot(slotIndex).isEmpty())
+                    if (slot.getStack().isEmpty())
                     {
                         if (slotIndex < 4) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * (slotIndex % 2 == 0 ? 608 : 624), 0, 16);
-                        else if (slotIndex < 7) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 784, 0, 16);
+                        else if (slotIndex >= 6 && slotIndex <= 8) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 784, 0, 16);
+                        else System.out.println(slotIndex + ", " + i + ", " + slot.getSlotIndex() + ", " + slot.slotNumber);
                     }
                 }
                 else if (slot.inventory instanceof InventoryPlayer)
@@ -168,7 +169,7 @@ public class ClientInventoryHacks extends GuiButton
         if (player == null) return;
 
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         Gui gui = event.getGui();
         if (!(gui instanceof GuiContainer)) return;
@@ -202,8 +203,7 @@ public class ClientInventoryHacks extends GuiButton
 
 
         int invSize = ClientInventoryData.inventorySize;
-        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatClientInventory;
-        HashMap<Integer, Integer> tiamatSlotToCurrentSlot = new HashMap<>();
+        TiamatPlayerInventory tiamatInventory = TiamatPlayerInventory.tiamatClientInventory;
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
@@ -214,6 +214,7 @@ public class ClientInventoryHacks extends GuiButton
 
             if (container instanceof TiamatInventoryContainer)
             {
+                //For TiamatInventoryContainer
                 if (slot.inventory instanceof InventoryCraftResult)
                 {
                     if (ClientInventoryData.craftW == 0 || ClientInventoryData.craftH == 0)
@@ -242,14 +243,37 @@ public class ClientInventoryHacks extends GuiButton
             }
             else
             {
+                //For Non-TiamatInventoryContainer
                 if (slot.inventory instanceof InventoryPlayer)
                 {
                     if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(Minecraft.getMinecraft().player))
                     {
-                        if (inventory != null)
+                        if (tiamatInventory != null)
                         {
-                            if (slotIndex < 4) tiamatSlotToCurrentSlot.put(slotIndex, i);
-                            else if (slotIndex < 7) tiamatSlotToCurrentSlot.put(slotIndex, i + 33);
+                            if (slotIndex < 4)
+                            {
+                                //Replace first 4 (unavailable) hotbar slots with weaponsets
+                                int pairedIndex = slotIndex % 2 == 0 ? slotIndex + 1 : slotIndex - 1;
+
+                                Slot oldSlot = container.inventorySlots.get(i);
+                                //First 4 slot indices just happen to line up here; first four hotbar in vanilla inv -> weaponsets in Tiamat inv
+                                Slot newSlot = new FilteredSlot(tiamatInventory, slotIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
+                                {
+                                    ItemStack other = tiamatInventory.getStackInSlot(pairedIndex);
+                                    return other.isEmpty() || (!Slottings.isTwoHanded(stack) && !Slottings.isTwoHanded(other));
+                                });
+                                newSlot.slotNumber = oldSlot.slotNumber;
+                                container.inventorySlots.set(i, newSlot);
+                            }
+                            else if (slotIndex < 7)
+                            {
+                                //Replace 5th - 7th (unavailable) hotbar slots with quickslots
+                                Slot oldSlot = container.inventorySlots.get(i);
+                                Slot newSlot = new FilteredSlot(tiamatInventory, slotIndex + 2, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player));
+                                newSlot.slotNumber = oldSlot.slotNumber;
+                                container.inventorySlots.set(i, newSlot);
+                            }
+                            else container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                         }
                     }
                     else if (slotIndex >= 9 + invSize && slotIndex < 36)
@@ -257,24 +281,6 @@ public class ClientInventoryHacks extends GuiButton
                         container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                     }
                 }
-            }
-        }
-
-        if (inventory != null)
-        {
-            for (Map.Entry<Integer, Integer> entry : tiamatSlotToCurrentSlot.entrySet())
-            {
-                int tiamatIndex = entry.getKey(), currentIndex = entry.getValue();
-                int pairedIndex = tiamatIndex % 2 == 0 ? tiamatIndex + 1 : tiamatIndex - 1;
-
-                Slot oldSlot = container.inventorySlots.get(currentIndex);
-                Slot newSlot = new FilteredSlot(inventory, tiamatIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
-                {
-                    ItemStack other = inventory.getStackInSlot(pairedIndex);
-                    return other.isEmpty() || (!Slottings.isTwoHanded(stack) && !Slottings.isTwoHanded(other));
-                });
-                newSlot.slotNumber = oldSlot.slotNumber;
-                container.inventorySlots.set(currentIndex, newSlot);
             }
         }
     }

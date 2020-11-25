@@ -31,7 +31,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
 
@@ -55,7 +57,7 @@ public class InventoryHacks
     {
         EntityPlayer player = event.player;
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         if (!TiamatInventory.playerHasHotbar(player)) player.inventory.currentItem = 0;
@@ -68,12 +70,12 @@ public class InventoryHacks
     {
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         Container container = event.getContainer();
-        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
-        if (inventory != null && !inventory.forceEmptyHands())
+        TiamatPlayerInventory tiamatInventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+        if (tiamatInventory != null && !tiamatInventory.forceEmptyHands())
         {
             player.closeScreen();
             return;
@@ -93,7 +95,6 @@ public class InventoryHacks
 
         //Limit slots
         int invSize = getCurrentInventorySize(player);
-        HashMap<Integer, Integer> tiamatSlotToCurrentSlot = new HashMap<>();
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
@@ -103,6 +104,7 @@ public class InventoryHacks
             int slotIndex = slot.getSlotIndex();
             if (container instanceof TiamatInventoryContainer)
             {
+                //For TiamatInventoryContainer
                 if (slot.inventory instanceof InventoryCraftResult)
                 {
                     if (TiamatConfig.serverSettings.craftW == 0 || TiamatConfig.serverSettings.craftH == 0)
@@ -131,36 +133,45 @@ public class InventoryHacks
             }
             else
             {
-                if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(player))
+                //For Non-TiamatInventoryContainer
+                if (slot.inventory instanceof InventoryPlayer)
                 {
-                    if (inventory != null)
+                    if (slotIndex < 9 && !TiamatInventory.playerHasHotbar(player))
                     {
-                        if (slotIndex < 4) tiamatSlotToCurrentSlot.put(slotIndex, i);
-                        else if (slotIndex < 7) tiamatSlotToCurrentSlot.put(slotIndex, i + 33);
+                        if (tiamatInventory != null)
+                        {
+                            if (slotIndex < 4)
+                            {
+                                //Replace first 4 (unavailable) hotbar slots with weaponsets
+                                int pairedIndex = slotIndex % 2 == 0 ? slotIndex + 1 : slotIndex - 1;
+
+                                Slot oldSlot = container.inventorySlots.get(i);
+                                //First 4 slot indices just happen to line up here; first four hotbar in vanilla inv -> weaponsets in Tiamat inv
+                                Slot newSlot = new FilteredSlot(tiamatInventory, slotIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
+                                {
+                                    ItemStack other = tiamatInventory.getStackInSlot(pairedIndex);
+                                    return other.isEmpty() || (!Slottings.isTwoHanded(stack) && !Slottings.isTwoHanded(other));
+                                });
+                                newSlot.slotNumber = oldSlot.slotNumber;
+                                container.inventorySlots.set(i, newSlot);
+                            }
+                            else if (slotIndex < 7)
+                            {
+                                //Replace 5th - 7th (unavailable) hotbar slots with quickslots
+                                Slot oldSlot = container.inventorySlots.get(i);
+                                Slot newSlot = new FilteredSlot(tiamatInventory, slotIndex + 2, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player));
+                                newSlot.slotNumber = oldSlot.slotNumber;
+                                container.inventorySlots.set(i, newSlot);
+                            }
+                            else container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                        }
+                        else container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
+                    }
+                    else if (slotIndex >= 9 + invSize && slotIndex < 36)
+                    {
+                        container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
                     }
                 }
-                else if (slotIndex >= 9 + invSize && slotIndex < 36)
-                {
-                    container.inventorySlots.set(i, new FakeSlot(slot.inventory, slotIndex, slot.xPos, slot.yPos));
-                }
-            }
-        }
-
-        if (inventory != null)
-        {
-            for (Map.Entry<Integer, Integer> entry : tiamatSlotToCurrentSlot.entrySet())
-            {
-                int tiamatIndex = entry.getKey(), currentIndex = entry.getValue();
-                int pairedIndex = tiamatIndex % 2 == 0 ? tiamatIndex + 1 : tiamatIndex - 1;
-
-                Slot oldSlot = container.inventorySlots.get(currentIndex);
-                Slot newSlot = new FilteredSlot(inventory, tiamatIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
-                {
-                    ItemStack other = inventory.getStackInSlot(pairedIndex);
-                    return other.isEmpty() || (!Slottings.isTwoHanded(stack) && !Slottings.isTwoHanded(other));
-                });
-                newSlot.slotNumber = oldSlot.slotNumber;
-                container.inventorySlots.set(currentIndex, newSlot);
             }
         }
     }
@@ -170,7 +181,7 @@ public class InventoryHacks
     {
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == null || gameType == GameType.SPECTATOR) return;
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
 
         ItemStack stack = event.getItem().getItem();
@@ -202,7 +213,7 @@ public class InventoryHacks
 
         EntityPlayerMP player = (EntityPlayerMP) entity;
         GameType gameType = MCTools.getGameType(player);
-        if (gameType == null || gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         dropItemsInBlockedSlots(player);
     }
