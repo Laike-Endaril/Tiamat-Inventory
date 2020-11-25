@@ -238,10 +238,10 @@ public class InventoryHacks
     {
         InventoryPlayer playerInventory = player.inventory;
 
-        boolean changed = false;
+        boolean changed = false, haveHotbar = TiamatInventory.playerHasHotbar(player);
 
         //Blocked hotbar slots (all except first, unless hotbar is enabled)
-        if (!TiamatInventory.playerHasHotbar(player))
+        if (!haveHotbar)
         {
             for (int i = 1; i < 9; i++)
             {
@@ -288,11 +288,44 @@ public class InventoryHacks
             changed = true;
         }
 
+        //If no hotbar and both weaponsets are non-empty, drop vanilla hands
+        if (!haveHotbar)
+        {
+            TiamatPlayerInventory tiamatInv = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
+            if (tiamatInv != null)
+            {
+                if (!tiamatInv.weaponset1Empty() && !tiamatInv.weaponset2Empty())
+                {
+                    mainhand = player.getHeldItemMainhand();
+                    if (!mainhand.isEmpty())
+                    {
+                        ItemStack copy = mainhand.copy();
+                        mainhand.setCount(0);
+                        player.entityDropItem(copy, 0);
+
+                        changed = true;
+                    }
+
+                    offhand = player.getHeldItemOffhand();
+                    if (!offhand.isEmpty())
+                    {
+                        ItemStack copy = offhand.copy();
+                        offhand.setCount(0);
+                        player.entityDropItem(copy, 0);
+
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+
+        //Update
         if (changed)
         {
-            for (IContainerListener listener : (List<IContainerListener>) ReflectionTool.get(CONTAINER_LISTENERS_FIELD, player.openContainer))
+            for (IContainerListener listener : (List<IContainerListener>) ReflectionTool.get(CONTAINER_LISTENERS_FIELD, player.inventoryContainer))
             {
-                listener.sendAllContents(player.openContainer, player.openContainer.inventoryItemStacks);
+                listener.sendAllContents(player.inventoryContainer, player.inventoryContainer.inventoryItemStacks);
             }
         }
     }
