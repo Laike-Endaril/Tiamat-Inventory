@@ -5,12 +5,7 @@
   "description": "Greatly alters the inventory systems, adding multiple weaponsets, additional armor slots, expandable inventory and more",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
   "authorList": ["Laike_Endaril"],
-  "credits": "\nLordPhrozen (art and planning)\n\nLomeli12 (TrophySlots mod, which I used as a reference for some code)",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
+  "credits": "\nLordPhrozen (art and planning)\n\nLomeli12 (TrophySlots mod, which I used as a reference for some code)"
 }
 ]

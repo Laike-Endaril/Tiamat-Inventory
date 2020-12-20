@@ -6,6 +6,7 @@ import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
 import com.fantasticsource.tiamatinventory.inventory.InterfaceTiamatInventory;
 import com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer;
 import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
+import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.ClientInventoryHacks;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -148,6 +149,8 @@ public class Network
                     ClientInventoryData.craftH = packet.craftH;
                     ClientInventoryData.allowHotbar = packet.allowHotbar;
                     ClientInventoryData.additionalSyncedAttributes = packet.syncedAttributes;
+
+                    ClientInventoryHacks.update();
                 });
             }
 

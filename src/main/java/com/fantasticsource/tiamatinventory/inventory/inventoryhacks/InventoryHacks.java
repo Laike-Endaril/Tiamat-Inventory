@@ -45,7 +45,7 @@ public class InventoryHacks
     public static int getCurrentInventorySize(EntityPlayerMP player)
     {
         int slotCount = TiamatConfig.serverSettings.defaultInventorySize;
-        for (ItemStack stack : GlobalInventory.getAllNonSkinItems(player))
+        for (ItemStack stack : GlobalInventory.getValidEquippedItems(player))
         {
             slotCount += SlotDataTags.getInvSlotCount(stack);
         }
@@ -231,6 +231,8 @@ public class InventoryHacks
         EntityPlayerMP player = (EntityPlayerMP) entity;
         GameType gameType = MCTools.getGameType(player);
         if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+
+        Network.WRAPPER.sendTo(new Network.InventoryDataPacket(InventoryHacks.getCurrentInventorySize(player), TiamatConfig.serverSettings.craftW, TiamatConfig.serverSettings.craftH, TiamatConfig.serverSettings.allowHotbar), player);
 
         dropItemsInBlockedSlots(player);
     }
