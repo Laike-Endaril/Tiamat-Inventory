@@ -163,36 +163,35 @@ public class TiamatInventory
     public static void inventoryChanged(InventoryChangedEvent event)
     {
         Entity entity = event.getEntity();
-        if (!entity.world.isRemote)
+
+
+        //Update render modes
+        if (entity instanceof EntityLivingBase && Loader.isModLoaded("armourers_workshop"))
         {
-            //Update render modes
-            if (entity instanceof EntityLivingBase && Loader.isModLoaded("armourers_workshop"))
+            //Cape
+            ItemStack cape = GlobalInventory.getTiamatCapeItem(entity);
+            if (cape == null || cape.isEmpty()) RenderModes.setRenderMode(entity, "CapeInv", "Off");
+            else RenderModes.setRenderMode(entity, "CapeInv", RenderModes.getRenderMode(entity, "CapeInvControl"));
+
+            //Shoulders
+            ItemStack shoulder = GlobalInventory.getTiamatShoulderItem(entity);
+            if (shoulder == null || shoulder.isEmpty())
             {
-                //Cape
-                ItemStack cape = GlobalInventory.getTiamatCapeItem(entity);
-                if (cape == null || cape.isEmpty()) RenderModes.setRenderMode(entity, "CapeInv", "Off");
-                else RenderModes.setRenderMode(entity, "CapeInv", RenderModes.getRenderMode(entity, "CapeInvControl"));
-
-                //Shoulders
-                ItemStack shoulder = GlobalInventory.getTiamatShoulderItem(entity);
-                if (shoulder == null || shoulder.isEmpty())
-                {
-                    RenderModes.setRenderMode(entity, "ShoulderL", "Off");
-                    RenderModes.setRenderMode(entity, "ShoulderR", "Off");
-                }
-                else
-                {
-                    RenderModes.setRenderMode(entity, "ShoulderL", RenderModes.getRenderMode(entity, "ShoulderLControl"));
-                    RenderModes.setRenderMode(entity, "ShoulderR", RenderModes.getRenderMode(entity, "ShoulderRControl"));
-                }
+                RenderModes.setRenderMode(entity, "ShoulderL", "Off");
+                RenderModes.setRenderMode(entity, "ShoulderR", "Off");
             }
-
-
-            //Sync changed tiamat inventory items to client
-            if (entity instanceof EntityPlayerMP && event.newTiamatItems.size() > 0)
+            else
             {
-                Network.WRAPPER.sendTo(new Network.TiamatItemSyncPacket(event.newTiamatItems), (EntityPlayerMP) entity);
+                RenderModes.setRenderMode(entity, "ShoulderL", RenderModes.getRenderMode(entity, "ShoulderLControl"));
+                RenderModes.setRenderMode(entity, "ShoulderR", RenderModes.getRenderMode(entity, "ShoulderRControl"));
             }
+        }
+
+
+        //Sync changed tiamat inventory items to client
+        if (entity instanceof EntityPlayerMP && event.newTiamatItems.size() > 0)
+        {
+            Network.WRAPPER.sendTo(new Network.TiamatItemSyncPacket(event.newTiamatItems), (EntityPlayerMP) entity);
         }
     }
 
