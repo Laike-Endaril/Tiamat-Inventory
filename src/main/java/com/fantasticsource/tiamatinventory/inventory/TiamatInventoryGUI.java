@@ -5,7 +5,11 @@ import com.fantasticsource.tiamatinventory.AttributeDisplayData;
 import com.fantasticsource.tiamatinventory.Keys;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
+import moe.plushie.rpg_framework.api.RpgEconomyAPI;
+import moe.plushie.rpg_framework.api.currency.ICurrency;
+import moe.plushie.rpg_framework.api.currency.ICurrencyCapability;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.ScaledResolution;
@@ -16,17 +20,21 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.CPacketCloseWindow;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +45,11 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends BetterContainerGUI
 {
+    @CapabilityInject(ICurrencyCapability.class)
+    public static Capability<ICurrencyCapability> CURRENCY_CAPABILITY = null;
+
     public static final int MODEL_WINDOW_X = 43, MODEL_WINDOW_Y = 6, MODEL_WINDOW_W = 88, MODEL_WINDOW_H = 106;
+    public static final int MONEY_WINDOW_X = 151, MONEY_WINDOW_Y = 6, MONEY_WINDOW_W = 88, MONEY_WINDOW_H = 16;
     public static final int STAT_WINDOW_X = 25, STAT_WINDOW_Y = 6, STAT_WINDOW_W = 261, STAT_WINDOW_H = 124;
     public static final int STAT_SCROLLBAR_X = 288, STAT_SCROLLBAR_Y = 6, STAT_SCROLLBAR_W = 5, STAT_SCROLLBAR_H = 124;
     public static final int STAT_SCROLLKNOB_SIZE = 5;
@@ -118,7 +130,94 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        if (tab == 1)
+        if (tab == 0)
+        {
+            //Render money
+            if (CURRENCY_CAPABILITY != null)
+            {
+                ICurrency[] currencies = RpgEconomyAPI.getCurrencyManager().getCurrencies();
+                if (currencies.length > 0)
+                {
+                    ICurrency currency = currencies[0];
+                    if (currency != null)
+                    {
+                        int rawAmount = mc.player.getCapability(CURRENCY_CAPABILITY, null).getWallet(currency).getAmount();
+
+                        ArrayList<ICurrency.ICurrencyVariant> orderedVariants = new ArrayList<>();
+                        for (ICurrency.ICurrencyVariant variant : currency.getCurrencyVariants())
+                        {
+                            int i = 0;
+                            while (i < orderedVariants.size() && orderedVariants.get(i).getValue() > variant.getValue()) i++;
+                            orderedVariants.add(i, variant);
+                        }
+
+                        int totalWidth = 0;
+                        ArrayList<CurrencyRenderData> data = new ArrayList<>();
+                        for (ICurrency.ICurrencyVariant variant : orderedVariants)
+                        {
+                            int variantAmount = rawAmount / variant.getValue();
+                            if (variantAmount == 0 && data.size() == 0) continue;
+
+                            rawAmount -= variantAmount * variant.getValue();
+
+                            CurrencyRenderData currentData = new CurrencyRenderData(fontRenderer, variant.getItem().getItemStack(), variantAmount, data.size() > 0 ? " " : "", "");
+                            data.add(currentData);
+                            totalWidth += currentData.width;
+                        }
+
+                        int padding = (MONEY_WINDOW_H - fontRenderer.FONT_HEIGHT) >>> 1;
+                        int xx = MONEY_WINDOW_X + MONEY_WINDOW_W - totalWidth - padding;
+
+                        //Remove lower significance elements until they fit or until only the highest significance element remains
+                        while (xx - padding < MONEY_WINDOW_X && data.size() > 1)
+                        {
+                            totalWidth -= data.remove(data.size() - 1).width;
+                            xx = MONEY_WINDOW_X + MONEY_WINDOW_W - totalWidth - padding;
+                        }
+
+                        //If all but one element was removed, lower precision on remaining element until it fits
+                        boolean error = false;
+                        while (xx - padding < MONEY_WINDOW_X)
+                        {
+                            int oldTotal = totalWidth;
+
+                            CurrencyRenderData currentData = data.remove(0);
+                            totalWidth -= currentData.width;
+                            currentData = new CurrencyRenderData(fontRenderer, currentData.stack, currentData.amount / 1000, currentData.prefix, currentData.getNextSuffix());
+                            data.add(currentData);
+                            totalWidth += currentData.width;
+                            xx = MONEY_WINDOW_X + MONEY_WINDOW_W - totalWidth - padding;
+
+                            if (totalWidth > oldTotal)
+                            {
+                                error = true;
+                                break;
+                            }
+                        }
+
+
+                        scissor(MONEY_WINDOW_X, MONEY_WINDOW_Y, MONEY_WINDOW_W, MONEY_WINDOW_H);
+                        if (error) drawString(fontRenderer, "ERROR", MONEY_WINDOW_X + MONEY_WINDOW_W - fontRenderer.getStringWidth("ERROR") - padding, MONEY_WINDOW_Y + padding, 0xffff0000);
+                        else
+                        {
+                            int yy = MONEY_WINDOW_Y + padding;
+                            for (CurrencyRenderData currentData : data)
+                            {
+                                drawString(fontRenderer, currentData.toString(), xx, yy, 0xffffaa00);
+                                GlStateManager.pushMatrix();
+                                GlStateManager.translate(xx + currentData.width - 8, yy, 0);
+                                GlStateManager.scale(0.5, 0.5, 1);
+                                itemRender.renderItemAndEffectIntoGUI(currentData.stack, 0, 0);
+                                GlStateManager.popMatrix();
+                                xx += currentData.width;
+                            }
+                        }
+                        unScissor();
+                    }
+                }
+            }
+        }
+        else if (tab == 1)
         {
             //Render scrollknob
             GlStateManager.color(1, 1, 1, 1);
@@ -374,5 +473,53 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     private void unScissor()
     {
         GL11.glDisable(GL_SCISSOR_TEST);
+    }
+
+    public static class CurrencyRenderData
+    {
+        public ItemStack stack;
+        public int amount, width;
+        public String prefix, suffix;
+
+        public CurrencyRenderData(FontRenderer fontRenderer, ItemStack stack, int amount, String prefix, String suffix)
+        {
+            this.stack = stack;
+            this.amount = amount;
+            this.prefix = prefix;
+            this.suffix = suffix;
+
+            width = fontRenderer.getStringWidth(toString()) + 8; //String and 8px itemstack render
+        }
+
+        @Override
+        public String toString()
+        {
+            return prefix + amount + suffix;
+        }
+
+        public String getNextSuffix()
+        {
+            switch (suffix)
+            {
+                case "":
+                    return "K";
+
+                case "K":
+                    return "M";
+
+                case "M":
+                    return "B";
+
+                case "B":
+                    return "T";
+
+                case "T":
+                    return "*10^15";
+
+                default:
+                    int power = Integer.parseInt(suffix.replace("*10^", ""));
+                    return "*10^" + power + 3;
+            }
+        }
     }
 }
