@@ -7,7 +7,6 @@ import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
 import moe.plushie.rpg_framework.api.RpgEconomyAPI;
 import moe.plushie.rpg_framework.api.currency.ICurrency;
-import moe.plushie.rpg_framework.api.currency.ICurrencyCapability;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -26,8 +25,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
@@ -38,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.fantasticsource.tiamatinventory.TiamatInventory.CURRENCY_CAPABILITY;
 import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
@@ -45,9 +43,6 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends BetterContainerGUI
 {
-    @CapabilityInject(ICurrencyCapability.class)
-    public static Capability<ICurrencyCapability> CURRENCY_CAPABILITY = null;
-
     public static final int MODEL_WINDOW_X = 43, MODEL_WINDOW_Y = 6, MODEL_WINDOW_W = 88, MODEL_WINDOW_H = 106;
     public static final int MONEY_WINDOW_X = 151, MONEY_WINDOW_Y = 6, MONEY_WINDOW_W = 88, MONEY_WINDOW_H = 16;
     public static final int STAT_WINDOW_X = 25, STAT_WINDOW_Y = 6, STAT_WINDOW_W = 261, STAT_WINDOW_H = 124;

@@ -11,6 +11,7 @@ import com.fantasticsource.tiamatinventory.inventory.TiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.ClientInventoryHacks;
 import com.fantasticsource.tiamatinventory.inventory.inventoryhacks.InventoryHacks;
 import com.fantasticsource.tools.Tools;
+import moe.plushie.rpg_framework.api.currency.ICurrencyCapability;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
@@ -23,6 +24,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameType;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -44,6 +47,10 @@ public class TiamatInventory
     public static final String MODID = "tiamatinventory";
     public static final String NAME = "Tiamat Inventory";
     public static final String VERSION = "1.12.2.000zs";
+
+
+    @CapabilityInject(ICurrencyCapability.class)
+    public static Capability<ICurrencyCapability> CURRENCY_CAPABILITY = null;
 
 
     @Mod.EventHandler
