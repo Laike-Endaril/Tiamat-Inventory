@@ -375,15 +375,15 @@ public class InventoryHacks
                 slotOrder.add(new Pair<>(vanillaInv, Tools.posMod(i + player.inventory.currentItem, 9)));
             }
 
-            //Cargo
-            int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
-            for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
-
             //Vanilla offhand
             slotOrder.add(new Pair<>(vanillaInv, 40));
 
             //Weaponsets
             for (int i = 0; i < 4; i++) slotOrder.add(new Pair<>(tiamatInv, i));
+
+            //Cargo
+            int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
+            for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
         }
         else
         {
@@ -473,11 +473,6 @@ public class InventoryHacks
                     slotOrder.add(new Pair<>(vanillaInv, Tools.posMod(i + player.inventory.currentItem, 9)));
                 }
             }
-            if (TiamatConfig.serverSettings.autopickupSettings.allowPickupCargo)
-            {
-                int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
-                for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
-            }
             if (targetVanillaHands && TiamatConfig.serverSettings.autopickupSettings.allowPickupOffhand && (mainhand.isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(mainhand))))
             {
                 slotOrder.add(new Pair<>(vanillaInv, 40));
@@ -494,6 +489,11 @@ public class InventoryHacks
                     if (tiamatInv.getSheathedOffhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamatInv.getSheathedOffhand2()))) slotOrder.add(new Pair<>(tiamatInv, 2));
                     if (tiamatInv.getSheathedMainhand2().isEmpty() || (!stackIs2H && !Slottings.isTwoHanded(tiamatInv.getSheathedMainhand2()))) slotOrder.add(new Pair<>(tiamatInv, 3));
                 }
+            }
+            if (TiamatConfig.serverSettings.autopickupSettings.allowPickupCargo)
+            {
+                int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
+                for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
             }
         }
 
