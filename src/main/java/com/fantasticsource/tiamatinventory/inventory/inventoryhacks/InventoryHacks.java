@@ -240,12 +240,33 @@ public class InventoryHacks
     public static void dropItemsInBlockedSlots(EntityPlayerMP player)
     {
         InventoryPlayer playerInventory = player.inventory;
+        TiamatPlayerInventory tiamatInv = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
 
         boolean changed = false, haveHotbar = TiamatInventory.playerHasHotbar(player);
 
-        //Blocked hotbar slots (all except first, unless hotbar is enabled)
         if (!haveHotbar)
         {
+            //Blocked mainhand / offhand (if a container is opened)
+            if (player.openContainer != player.inventoryContainer || (tiamatInv != null && tiamatInv.playerMPHasAnyContainerOpen))
+            {
+                for (int i : new int[]{0, 40})
+                {
+                    ItemStack stack = playerInventory.getStackInSlot(i);
+                    if (!stack.isEmpty())
+                    {
+                        autoPickup(player, stack);
+                        if (!stack.isEmpty())
+                        {
+                            ItemStack copy = stack.copy();
+                            stack.setCount(0);
+                            player.entityDropItem(copy, 0);
+                        }
+                        changed = true;
+                    }
+                }
+            }
+
+            //Blocked hotbar slots (all except first)
             for (int i = 1; i < 9; i++)
             {
                 ItemStack stack = playerInventory.getStackInSlot(i);
@@ -294,7 +315,6 @@ public class InventoryHacks
         //If no hotbar and both weaponsets are non-empty, drop vanilla hands
         if (!haveHotbar)
         {
-            TiamatPlayerInventory tiamatInv = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
             if (tiamatInv != null)
             {
                 if (!tiamatInv.weaponset1Empty() && !tiamatInv.weaponset2Empty())
