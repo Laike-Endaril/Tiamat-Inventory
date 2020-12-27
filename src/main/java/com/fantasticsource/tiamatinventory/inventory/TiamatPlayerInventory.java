@@ -60,6 +60,7 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
 
     private final List<NonNullList<ItemStack>> allInventories;
     public EntityPlayer player;
+    public boolean playerMPHasAnyContainerOpen = false;
 
     public TiamatPlayerInventory(EntityPlayer player)
     {

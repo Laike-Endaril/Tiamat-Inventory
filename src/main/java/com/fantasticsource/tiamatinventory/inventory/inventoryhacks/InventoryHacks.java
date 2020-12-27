@@ -397,7 +397,7 @@ public class InventoryHacks
             else
             {
                 //No hotbar
-                if ((TiamatConfig.serverSettings.autopickupSettings.allowPickupMainHand || TiamatConfig.serverSettings.autopickupSettings.allowPickupOffhand) && (tiamatInv.weaponset1Empty() || tiamatInv.weaponset2Empty()))
+                if (player.openContainer == player.inventoryContainer && !tiamatInv.playerMPHasAnyContainerOpen && (TiamatConfig.serverSettings.autopickupSettings.allowPickupMainHand || TiamatConfig.serverSettings.autopickupSettings.allowPickupOffhand) && (tiamatInv.weaponset1Empty() || tiamatInv.weaponset2Empty()))
                 {
                     targetVanillaHands = true;
                     if (TiamatConfig.serverSettings.autopickupSettings.allowPickupWeaponset)
@@ -563,5 +563,24 @@ public class InventoryHacks
 
             if (stack.isEmpty()) break;
         }
+    }
+
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void playerContainerState(PlayerContainerEvent.Open event)
+    {
+        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(event.getEntityPlayer().getPersistentID());
+        if (inventory == null) return;
+
+        inventory.playerMPHasAnyContainerOpen = true;
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void playerContainerState(PlayerContainerEvent.Close event)
+    {
+        TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(event.getEntityPlayer().getPersistentID());
+        if (inventory == null) return;
+
+        inventory.playerMPHasAnyContainerOpen = false;
     }
 }
