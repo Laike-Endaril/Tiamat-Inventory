@@ -193,7 +193,7 @@ public class InventoryHacks
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void itemPickup(EntityItemPickupEvent event)
     {
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
