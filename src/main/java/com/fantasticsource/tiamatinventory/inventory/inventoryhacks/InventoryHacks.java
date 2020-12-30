@@ -257,7 +257,7 @@ public class InventoryHacks
                         autoPickup(player, stack);
                         if (!stack.isEmpty())
                         {
-                            ItemStack copy = stack.copy();
+                            ItemStack copy = MCTools.cloneItemStack(stack);
                             stack.setCount(0);
                             player.entityDropItem(copy, 0);
                         }
@@ -275,7 +275,7 @@ public class InventoryHacks
                     autoPickup(player, stack);
                     if (!stack.isEmpty())
                     {
-                        ItemStack copy = stack.copy();
+                        ItemStack copy = MCTools.cloneItemStack(stack);
                         stack.setCount(0);
                         player.entityDropItem(copy, 0);
                     }
@@ -293,7 +293,7 @@ public class InventoryHacks
                 autoPickup(player, stack);
                 if (!stack.isEmpty())
                 {
-                    ItemStack copy = stack.copy();
+                    ItemStack copy = MCTools.cloneItemStack(stack);
                     stack.setCount(0);
                     player.entityDropItem(copy, 0);
                 }
@@ -305,7 +305,7 @@ public class InventoryHacks
         ItemStack mainhand = player.getHeldItemMainhand(), offhand = player.getHeldItemOffhand();
         if (!mainhand.isEmpty() && !offhand.isEmpty() && (Slottings.isTwoHanded(mainhand) || Slottings.isTwoHanded(offhand)))
         {
-            ItemStack copy = offhand.copy();
+            ItemStack copy = MCTools.cloneItemStack(offhand);
             offhand.setCount(0);
             player.entityDropItem(copy, 0);
 
@@ -322,7 +322,7 @@ public class InventoryHacks
                     mainhand = player.getHeldItemMainhand();
                     if (!mainhand.isEmpty())
                     {
-                        ItemStack copy = mainhand.copy();
+                        ItemStack copy = MCTools.cloneItemStack(mainhand);
                         mainhand.setCount(0);
                         player.entityDropItem(copy, 0);
 
@@ -332,7 +332,7 @@ public class InventoryHacks
                     offhand = player.getHeldItemOffhand();
                     if (!offhand.isEmpty())
                     {
-                        ItemStack copy = offhand.copy();
+                        ItemStack copy = MCTools.cloneItemStack(offhand);
                         offhand.setCount(0);
                         player.entityDropItem(copy, 0);
 
@@ -552,7 +552,7 @@ public class InventoryHacks
 
                 if (!inventory.getStackInSlot(slot).isEmpty()) continue;
 
-                ItemStack copy = stack.copy();
+                ItemStack copy = MCTools.cloneItemStack(stack);
                 int moveAmount = Tools.min(max, stack.getCount());
                 stack.shrink(moveAmount);
                 copy.setCount(moveAmount);
@@ -575,7 +575,7 @@ public class InventoryHacks
 
             if (!inventory.getStackInSlot(slot).isEmpty()) continue;
 
-            ItemStack copy = stack.copy();
+            ItemStack copy = MCTools.cloneItemStack(stack);
             int moveAmount = Tools.min(max, stack.getCount());
             stack.shrink(moveAmount);
             copy.setCount(moveAmount);
