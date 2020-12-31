@@ -160,7 +160,7 @@ public class InventoryHacks
                             {
                                 //Replace 5th - 7th (unavailable) hotbar slots with quickslots
                                 Slot oldSlot = container.inventorySlots.get(i);
-                                Slot newSlot = new FilteredSlot(tiamatInventory, slotIndex + 2, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player));
+                                Slot newSlot = new FilteredSlot(tiamatInventory, slotIndex + 2, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 784, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.itemIsValidForSlot(stack, "Tiamat Quick Item"));
                                 newSlot.slotNumber = oldSlot.slotNumber;
                                 container.inventorySlots.set(i, newSlot);
                             }
@@ -168,7 +168,7 @@ public class InventoryHacks
                             {
                                 //Replace 8th (unavailable) hotbar slot with pet
                                 Slot oldSlot = container.inventorySlots.get(i);
-                                Slot newSlot = new FilteredSlot(tiamatInventory, 10, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player));
+                                Slot newSlot = new FilteredSlot(tiamatInventory, 10, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 640, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.itemIsValidForSlot(stack, "Tiamat Pet"));
                                 newSlot.slotNumber = oldSlot.slotNumber;
                                 container.inventorySlots.set(i, newSlot);
                             }
@@ -176,7 +176,7 @@ public class InventoryHacks
                             {
                                 //Replace 9th (unavailable) hotbar slot with deck
                                 Slot oldSlot = container.inventorySlots.get(i);
-                                Slot newSlot = new FilteredSlot(tiamatInventory, 11, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player));
+                                Slot newSlot = new FilteredSlot(tiamatInventory, 11, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 752, 0, true, 1, stack -> stack.hasTagCompound() && Slottings.itemIsValidForSlot(stack, "Tiamat Deck"));
                                 newSlot.slotNumber = oldSlot.slotNumber;
                                 container.inventorySlots.set(i, newSlot);
                             }
@@ -365,21 +365,21 @@ public class InventoryHacks
         if (player.isCreative() || player.isSpectator())
         {
             //Pet
-            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player)) slotOrder.add(new Pair<>(tiamatInv, 10));
+            if (Slottings.itemIsValidForSlot(stack, "Tiamat Pet")) slotOrder.add(new Pair<>(tiamatInv, 10));
 
             //Deck
-            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player)) slotOrder.add(new Pair<>(tiamatInv, 11));
+            if (Slottings.itemIsValidForSlot(stack, "Tiamat Deck")) slotOrder.add(new Pair<>(tiamatInv, 11));
 
             //Armor
-            if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanillaInv, 39));
-            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamatInv, 4));
-            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Cape", player)) slotOrder.add(new Pair<>(tiamatInv, 5));
-            if (Slottings.slotTypeValidForItemstack(stack, "Chest", player)) slotOrder.add(new Pair<>(vanillaInv, 38));
-            if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanillaInv, 37));
-            if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanillaInv, 36));
+            if (Slottings.itemIsValidForSlot(stack, "Head")) slotOrder.add(new Pair<>(vanillaInv, 39));
+            if (Slottings.itemIsValidForSlot(stack, "Tiamat Shoulders")) slotOrder.add(new Pair<>(tiamatInv, 4));
+            if (Slottings.itemIsValidForSlot(stack, "Tiamat Cape")) slotOrder.add(new Pair<>(tiamatInv, 5));
+            if (Slottings.itemIsValidForSlot(stack, "Chest")) slotOrder.add(new Pair<>(vanillaInv, 38));
+            if (Slottings.itemIsValidForSlot(stack, "Legs")) slotOrder.add(new Pair<>(vanillaInv, 37));
+            if (Slottings.itemIsValidForSlot(stack, "Feet")) slotOrder.add(new Pair<>(vanillaInv, 36));
 
             //Quickslots
-            if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player))
+            if (Slottings.itemIsValidForSlot(stack, "Tiamat Quick Item"))
             {
                 slotOrder.add(new Pair<>(tiamatInv, 6));
                 slotOrder.add(new Pair<>(tiamatInv, 7));
@@ -458,24 +458,24 @@ public class InventoryHacks
 
             if (TiamatConfig.serverSettings.autopickupSettings.allowPickupPet)
             {
-                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Pet", player)) slotOrder.add(new Pair<>(tiamatInv, 10));
+                if (Slottings.itemIsValidForSlot(stack, "Tiamat Pet")) slotOrder.add(new Pair<>(tiamatInv, 10));
             }
             if (TiamatConfig.serverSettings.autopickupSettings.allowPickupDeck)
             {
-                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Deck", player)) slotOrder.add(new Pair<>(tiamatInv, 11));
+                if (Slottings.itemIsValidForSlot(stack, "Tiamat Deck")) slotOrder.add(new Pair<>(tiamatInv, 11));
             }
             if (TiamatConfig.serverSettings.autopickupSettings.allowPickupArmor)
             {
-                if (Slottings.slotTypeValidForItemstack(stack, "Head", player)) slotOrder.add(new Pair<>(vanillaInv, 39));
-                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Shoulders", player)) slotOrder.add(new Pair<>(tiamatInv, 4));
-                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Cape", player)) slotOrder.add(new Pair<>(tiamatInv, 5));
-                if (Slottings.slotTypeValidForItemstack(stack, "Chest", player)) slotOrder.add(new Pair<>(vanillaInv, 38));
-                if (Slottings.slotTypeValidForItemstack(stack, "Legs", player)) slotOrder.add(new Pair<>(vanillaInv, 37));
-                if (Slottings.slotTypeValidForItemstack(stack, "Feet", player)) slotOrder.add(new Pair<>(vanillaInv, 36));
+                if (Slottings.itemIsValidForSlot(stack, "Head")) slotOrder.add(new Pair<>(vanillaInv, 39));
+                if (Slottings.itemIsValidForSlot(stack, "Tiamat Shoulders")) slotOrder.add(new Pair<>(tiamatInv, 4));
+                if (Slottings.itemIsValidForSlot(stack, "Tiamat Cape")) slotOrder.add(new Pair<>(tiamatInv, 5));
+                if (Slottings.itemIsValidForSlot(stack, "Chest")) slotOrder.add(new Pair<>(vanillaInv, 38));
+                if (Slottings.itemIsValidForSlot(stack, "Legs")) slotOrder.add(new Pair<>(vanillaInv, 37));
+                if (Slottings.itemIsValidForSlot(stack, "Feet")) slotOrder.add(new Pair<>(vanillaInv, 36));
             }
             if (TiamatConfig.serverSettings.autopickupSettings.allowPickupQuickslots)
             {
-                if (Slottings.slotTypeValidForItemstack(stack, "Tiamat Quick Item", player))
+                if (Slottings.itemIsValidForSlot(stack, "Tiamat Quick Item"))
                 {
                     slotOrder.add(new Pair<>(tiamatInv, 6));
                     slotOrder.add(new Pair<>(tiamatInv, 7));

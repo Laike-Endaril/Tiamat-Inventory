@@ -42,12 +42,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = TiamatInventory.MODID, name = TiamatInventory.NAME, version = TiamatInventory.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044f,)")
+@Mod(modid = TiamatInventory.MODID, name = TiamatInventory.NAME, version = TiamatInventory.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044m,)")
 public class TiamatInventory
 {
     public static final String MODID = "tiamatinventory";
     public static final String NAME = "Tiamat Inventory";
-    public static final String VERSION = "1.12.2.000zs";
+    public static final String VERSION = "1.12.2.000zt";
 
 
     @CapabilityInject(ICurrencyCapability.class)
