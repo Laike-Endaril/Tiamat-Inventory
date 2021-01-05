@@ -25,9 +25,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Network
 {
     public static final SimpleNetworkWrapper WRAPPER = new SimpleNetworkWrapper(TiamatInventory.MODID);
@@ -201,14 +198,14 @@ public class Network
 
     public static class TiamatItemSyncPacket implements IMessage
     {
-        public HashMap<Integer, ItemStack> newTiamatItems;
+        public ItemStack[] newTiamatItems;
 
         public TiamatItemSyncPacket()
         {
             //Required
         }
 
-        public TiamatItemSyncPacket(HashMap<Integer, ItemStack> newTiamatItems)
+        public TiamatItemSyncPacket(ItemStack[] newTiamatItems)
         {
             this.newTiamatItems = newTiamatItems;
         }
@@ -216,11 +213,11 @@ public class Network
         @Override
         public void toBytes(ByteBuf buf)
         {
-            buf.writeInt(newTiamatItems.size());
-            for (Map.Entry<Integer, ItemStack> entry : newTiamatItems.entrySet())
+            CItemStack cstack = new CItemStack();
+            buf.writeInt(newTiamatItems.length);
+            for (ItemStack stack : newTiamatItems)
             {
-                buf.writeInt(entry.getKey());
-                new CItemStack().set(entry.getValue()).write(buf);
+                cstack.set(stack).write(buf);
             }
         }
 
@@ -228,10 +225,10 @@ public class Network
         public void fromBytes(ByteBuf buf)
         {
             CItemStack cstack = new CItemStack();
-            newTiamatItems = new HashMap<>();
-            for (int i = buf.readInt(); i > 0; i--)
+            newTiamatItems = new ItemStack[buf.readInt()];
+            for (int i = 0; i < newTiamatItems.length; i++)
             {
-                newTiamatItems.put(buf.readInt(), cstack.read(buf).value);
+                newTiamatItems[i] = cstack.read(buf).value;
             }
         }
     }
@@ -254,9 +251,10 @@ public class Network
                         TiamatPlayerInventory.tiamatClientInventory = inventory;
                     }
 
-                    for (Map.Entry<Integer, ItemStack> entry : packet.newTiamatItems.entrySet())
+                    int i = 0;
+                    for (ItemStack stack : packet.newTiamatItems)
                     {
-                        inventory.setInventorySlotContents(entry.getKey(), entry.getValue());
+                        inventory.setInventorySlotContents(i++, stack);
                     }
                 });
             }

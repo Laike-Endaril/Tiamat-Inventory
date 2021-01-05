@@ -197,9 +197,10 @@ public class TiamatInventory
 
 
         //Sync changed tiamat inventory items to client
-        if (entity instanceof EntityPlayerMP && event.newTiamatItems.size() > 0)
+
+        if (entity instanceof EntityPlayerMP)
         {
-            Network.WRAPPER.sendTo(new Network.TiamatItemSyncPacket(event.newTiamatItems), (EntityPlayerMP) entity);
+            Network.WRAPPER.sendTo(new Network.TiamatItemSyncPacket(event.newInventory.tiamatInventory), (EntityPlayerMP) entity);
         }
     }
 
