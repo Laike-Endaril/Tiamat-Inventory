@@ -42,7 +42,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = TiamatInventory.MODID, name = TiamatInventory.NAME, version = TiamatInventory.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044m,)")
+@Mod(modid = TiamatInventory.MODID, name = TiamatInventory.NAME, version = TiamatInventory.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044p,)")
 public class TiamatInventory
 {
     public static final String MODID = "tiamatinventory";
@@ -60,6 +60,7 @@ public class TiamatInventory
         Network.init();
         MinecraftForge.EVENT_BUS.register(TiamatInventory.class);
         MinecraftForge.EVENT_BUS.register(InventoryHacks.class);
+        InventoryChangedEvent.watchedClasses.add(EntityPlayerMP.class);
 
         if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
         {
