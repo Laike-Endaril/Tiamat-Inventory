@@ -48,6 +48,14 @@ task deobfJar(type: Jar) {
     classifier "deobf"
 }
 
+task apiJar(type: Jar) {
+    from sourceSets.main.allSource
+    from sourceSets.main.output
+    include 'com/fantasticsource/tiamatinventory/api/**'
+    classifier = 'api'
+}
+
 artifacts {
     archives deobfJar
+    archives apiJar
 }
