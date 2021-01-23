@@ -16,6 +16,7 @@ import com.fantasticsource.tools.ReflectionTool;
 import com.fantasticsource.tools.Tools;
 import com.fantasticsource.tools.datastructures.Pair;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -39,7 +40,9 @@ import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryConta
 
 public class InventoryHacks
 {
-    protected static final Field CONTAINER_LISTENERS_FIELD = ReflectionTool.getField(Container.class, "field_75149_d", "listeners");
+    protected static final Field
+            CONTAINER_LISTENERS_FIELD = ReflectionTool.getField(Container.class, "field_75149_d", "listeners"),
+            ITEMSTACK_AGE_FIELD = ReflectionTool.getField(EntityItem.class, "field_70292_b", "age");
 
 
     public static int getCurrentInventorySize(EntityPlayerMP player)
@@ -199,6 +202,11 @@ public class InventoryHacks
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
         GameType gameType = MCTools.getGameType(player);
         if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
+
+        EntityItem entityItem = event.getItem();
+        if (entityItem.cannotPickup()) return;
+        String owner = entityItem.getOwner();
+        if (owner != null && !owner.equals(player.getName()) && entityItem.lifespan - (int) ReflectionTool.get(ITEMSTACK_AGE_FIELD, entityItem) > 200) return;
 
 
         ItemStack stack = event.getItem().getItem();
@@ -525,7 +533,7 @@ public class InventoryHacks
             ItemStack stack2 = pair.getKey().getStackInSlot(pair.getValue());
             if (stack2.isEmpty()) return false;
 
-            if (ItemMatcher.stacksMatch(stack, stack2))
+            if (ItemMatcher.stacksMatch(stack, stack2, false))
             {
                 found[0] = true;
 
