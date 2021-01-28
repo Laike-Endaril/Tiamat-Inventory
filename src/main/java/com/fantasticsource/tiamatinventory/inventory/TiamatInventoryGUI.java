@@ -3,6 +3,8 @@ package com.fantasticsource.tiamatinventory.inventory;
 import com.fantasticsource.mctools.inventory.gui.BetterContainerGUI;
 import com.fantasticsource.tiamatinventory.AttributeDisplayData;
 import com.fantasticsource.tiamatinventory.Keys;
+import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
+import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
 import com.fantasticsource.tools.Collision;
 import com.fantasticsource.tools.Tools;
 import moe.plushie.rpg_framework.api.RpgEconomyAPI;
@@ -80,6 +82,110 @@ public class TiamatInventoryGUI extends BetterContainerGUI
         statHeightDif = Tools.max(0, statLineHeight * stats.length - STAT_WINDOW_H);
     }
 
+    @Override
+    public void initGui()
+    {
+        setTab(tab);
+
+        guiLeft = (width - xSize) / 2;
+        guiTop = (height - ySize) / 2;
+    }
+
+    @Override
+    public void onGuiClosed()
+    {
+        if (mc.player != null && inventorySlots != null) inventorySlots.onContainerClosed(mc.player);
+    }
+
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
+    {
+        GlStateManager.color(1, 1, 1, 1);
+        mc.getTextureManager().bindTexture(TEXTURE);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        bufferbuilder.pos(guiLeft, guiTop + ySize, zLevel).tex(uOffset * U_PIXEL, (vOffset + ySize) * V_PIXEL).endVertex();
+        bufferbuilder.pos(guiLeft + xSize, guiTop + ySize, zLevel).tex((uOffset + xSize) * U_PIXEL, (vOffset + ySize) * V_PIXEL).endVertex();
+        bufferbuilder.pos(guiLeft + xSize, guiTop, zLevel).tex((uOffset + xSize) * U_PIXEL, vOffset * V_PIXEL).endVertex();
+        bufferbuilder.pos(guiLeft, guiTop, zLevel).tex(uOffset * U_PIXEL, vOffset * V_PIXEL).endVertex();
+        tessellator.draw();
+
+        if (tab == 0)
+        {
+            scissor(MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_W, MODEL_WINDOW_H);
+            drawEntityOnScreen(guiLeft + MODEL_WINDOW_X + (MODEL_WINDOW_W >> 1), guiTop + MODEL_WINDOW_Y + (MODEL_WINDOW_H >> 1), modelScale, modelYaw, modelPitch, mc.player);
+            unScissor();
+        }
+        else if (tab == 5)
+        {
+            ITiamatPlayerInventory inv = TiamatInventoryAPI.getTiamatPlayerInventory(Minecraft.getMinecraft().player);
+            if (inv != null)
+            {
+                int i = 0, x1, y1;
+                for (ItemStack stack : inv.getCraftingProfessions())
+                {
+                    x1 = guiLeft + 25 + i++ * 18;
+                    y1 = guiTop + 6;
+
+                    if (stack.isEmpty()) drawSlotBackground(x1, y1, 720, 0, 16, 16);
+                    drawItem(x1, y1, stack, mouseX, mouseY);
+                }
+
+                i = 0;
+                for (ItemStack stack : inv.getGatheringProfessions())
+                {
+                    x1 = guiLeft + 79 + i++ * 18;
+                    y1 = guiTop + 6;
+
+                    if (stack.isEmpty()) drawSlotBackground(x1, y1, 800, 0, 16, 16);
+                    drawItem(x1, y1, stack, mouseX, mouseY);
+                }
+
+                i = 0;
+                for (ItemStack stack : inv.getCraftingRecipes())
+                {
+                    x1 = guiLeft + 25 + ((i % 5) * 18);
+                    y1 = guiTop + 24 + (i++ / 5) * 18;
+
+                    if (stack.isEmpty()) drawSlotBackground(x1, y1, 736, 0, 16, 16);
+                    drawItem(x1, y1, stack, mouseX, mouseY);
+                }
+            }
+        }
+    }
+
+    protected void drawSlotBackground(int x, int y, int u, int v, int w, int h)
+    {
+        GlStateManager.color(1, 1, 1, 1);
+        GlStateManager.enableTexture2D();
+        mc.getTextureManager().bindTexture(TEXTURE);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        bufferbuilder.pos(x, y + h, zLevel).tex(u * U_PIXEL, (v + h) * V_PIXEL).endVertex();
+        bufferbuilder.pos(x + w, y + h, zLevel).tex((u + w) * U_PIXEL, (v + h) * V_PIXEL).endVertex();
+        bufferbuilder.pos(x + w, y, zLevel).tex((u + w) * U_PIXEL, v * V_PIXEL).endVertex();
+        bufferbuilder.pos(x, y, zLevel).tex(u * U_PIXEL, v * V_PIXEL).endVertex();
+        tessellator.draw();
+    }
+
+    protected void drawItem(int x, int y, ItemStack stack, int mouseX, int mouseY)
+    {
+        int x2 = x + 16, y2 = y + 16;
+
+        if (!stack.isEmpty())
+        {
+            RenderHelper.enableGUIStandardItemLighting();
+            itemRender.renderItemAndEffectIntoGUI(stack, x, y);
+            if (stack.getCount() > 1) itemRender.renderItemOverlayIntoGUI(fontRenderer, stack, x, y, "" + stack.getCount());
+            RenderHelper.disableStandardItemLighting();
+        }
+
+        if (Collision.pointRectangle(mouseX, mouseY, x, y, x2, y2)) drawRect(x, y, x2, y2, -2130706433);
+
+        GlStateManager.enableBlend();
+    }
+
     public static void drawEntityOnScreen(int posX, int posY, double scale, double yaw, double pitch, EntityLivingBase ent)
     {
         GlStateManager.enableColorMaterial();
@@ -105,21 +211,6 @@ public class TiamatInventoryGUI extends BetterContainerGUI
         GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
         GlStateManager.disableTexture2D();
         GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
-    }
-
-    @Override
-    public void initGui()
-    {
-        setTab(tab);
-
-        guiLeft = (width - xSize) / 2;
-        guiTop = (height - ySize) / 2;
-    }
-
-    @Override
-    public void onGuiClosed()
-    {
-        if (mc.player != null && inventorySlots != null) inventorySlots.onContainerClosed(mc.player);
     }
 
     @Override
@@ -295,28 +386,6 @@ public class TiamatInventoryGUI extends BetterContainerGUI
         }
     }
 
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
-    {
-        GlStateManager.color(1, 1, 1, 1);
-        mc.getTextureManager().bindTexture(TEXTURE);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        bufferbuilder.pos(guiLeft, guiTop + ySize, zLevel).tex(uOffset * U_PIXEL, (vOffset + ySize) * V_PIXEL).endVertex();
-        bufferbuilder.pos(guiLeft + xSize, guiTop + ySize, zLevel).tex((uOffset + xSize) * U_PIXEL, (vOffset + ySize) * V_PIXEL).endVertex();
-        bufferbuilder.pos(guiLeft + xSize, guiTop, zLevel).tex((uOffset + xSize) * U_PIXEL, vOffset * V_PIXEL).endVertex();
-        bufferbuilder.pos(guiLeft, guiTop, zLevel).tex(uOffset * U_PIXEL, vOffset * V_PIXEL).endVertex();
-        tessellator.draw();
-
-        if (tab == 0)
-        {
-            scissor(MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_W, MODEL_WINDOW_H);
-            drawEntityOnScreen(guiLeft + MODEL_WINDOW_X + (MODEL_WINDOW_W >> 1), guiTop + MODEL_WINDOW_Y + (MODEL_WINDOW_H >> 1), modelScale, modelYaw, modelPitch, mc.player);
-            unScissor();
-        }
-    }
-
     private void setTab(int tab)
     {
         inventorySlots = tab == 0 ? inventorySlotsSaved : null;
@@ -340,6 +409,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
         buttonList.add(new GuiButtonImage(2, guiLeft + 299, guiTop + 57, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
         buttonList.add(new GuiButtonImage(3, guiLeft + 299, guiTop + 82, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
         buttonList.add(new GuiButtonImage(4, guiLeft + 299, guiTop + 107, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
+        buttonList.add(new GuiButtonImage(5, guiLeft, guiTop + 7, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
 
         MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.InitGuiEvent.Post(this, buttonList));
     }
@@ -348,7 +418,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     {
         buttonClicked_ = true;
 
-        if (button.id <= 5) setTab(button.id);
+        if (button.id < 6) setTab(button.id);
     }
 
     @Override
