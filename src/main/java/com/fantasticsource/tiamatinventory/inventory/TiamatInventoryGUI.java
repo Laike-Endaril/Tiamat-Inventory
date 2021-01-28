@@ -61,6 +61,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     protected int uOffset, vOffset, modelGrabX, modelGrabY;
     protected double modelYaw = 0, modelPitch = 0, modelScale = 1;
     protected Container inventorySlotsSaved;
+    protected ItemStack hoveredStack = ItemStack.EMPTY;
 
     public TiamatInventoryGUI()
     {
@@ -181,7 +182,11 @@ public class TiamatInventoryGUI extends BetterContainerGUI
             RenderHelper.disableStandardItemLighting();
         }
 
-        if (Collision.pointRectangle(mouseX, mouseY, x, y, x2, y2)) drawRect(x, y, x2, y2, -2130706433);
+        if (Collision.pointRectangle(mouseX, mouseY, x, y, x2, y2))
+        {
+            drawRect(x, y, x2, y2, -2130706433);
+            hoveredStack = stack;
+        }
 
         GlStateManager.enableBlend();
     }
@@ -384,6 +389,13 @@ public class TiamatInventoryGUI extends BetterContainerGUI
                 }
             }
         }
+        else if (tab == 5)
+        {
+            if (!hoveredStack.isEmpty()) renderToolTip(hoveredStack, mouseX - guiLeft, mouseY - guiTop);
+        }
+
+
+        hoveredStack = ItemStack.EMPTY;
     }
 
     private void setTab(int tab)
