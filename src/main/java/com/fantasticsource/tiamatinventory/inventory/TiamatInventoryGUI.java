@@ -430,7 +430,10 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     {
         buttonClicked_ = true;
 
-        if (button.id < 6) setTab(button.id);
+        if (button.id < 6)
+        {
+            if (Minecraft.getMinecraft().player.inventory.getItemStack().isEmpty()) setTab(button.id);
+        }
     }
 
     @Override
