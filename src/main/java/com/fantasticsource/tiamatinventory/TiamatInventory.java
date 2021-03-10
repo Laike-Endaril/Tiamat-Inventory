@@ -139,6 +139,9 @@ public class TiamatInventory
         //Render modes
         if (!entity.world.isRemote && entity instanceof EntityLivingBase && Loader.isModLoaded("armourers_workshop"))
         {
+            //Headpiece Default
+            if (RenderModes.getRenderMode(entity, "HeadControl") == null) RenderModes.setRenderMode(entity, "HeadControl", "On");
+
             //Cape Default
             if (RenderModes.getRenderMode(entity, "CapeInvControl") == null) RenderModes.setRenderMode(entity, "CapeInvControl", "On");
 
@@ -146,6 +149,43 @@ public class TiamatInventory
             if (RenderModes.getRenderMode(entity, "ShoulderLControl") == null) RenderModes.setRenderMode(entity, "ShoulderLControl", "On");
             if (RenderModes.getRenderMode(entity, "ShoulderRControl") == null) RenderModes.setRenderMode(entity, "ShoulderRControl", "On");
 
+
+            //Headpiece
+            ItemStack headpiece = GlobalInventory.getVanillaHeadItem(entity);
+            if (headpiece == null || headpiece.isEmpty() || !headpiece.hasTagCompound())
+            {
+                RenderModes.setRenderMode(entity, "Hat", "Off");
+                RenderModes.setRenderMode(entity, "Helmet", "Off");
+                RenderModes.setRenderMode(entity, "Mask", "Off");
+            }
+            else
+            {
+                String nbtString = headpiece.getTagCompound().toString();
+                if (nbtString.contains("@Hat"))
+                {
+                    RenderModes.setRenderMode(entity, "Hat", RenderModes.getRenderMode(entity, "HeadControl"));
+                    RenderModes.setRenderMode(entity, "Helmet", "Off");
+                    RenderModes.setRenderMode(entity, "Mask", "Off");
+                }
+                else if (nbtString.contains("@Helmet"))
+                {
+                    RenderModes.setRenderMode(entity, "Hat", "Off");
+                    RenderModes.setRenderMode(entity, "Helmet", RenderModes.getRenderMode(entity, "HeadControl"));
+                    RenderModes.setRenderMode(entity, "Mask", "Off");
+                }
+                else if (nbtString.contains("@Mask"))
+                {
+                    RenderModes.setRenderMode(entity, "Hat", "Off");
+                    RenderModes.setRenderMode(entity, "Helmet", "Off");
+                    RenderModes.setRenderMode(entity, "Mask", RenderModes.getRenderMode(entity, "HeadControl"));
+                }
+                else
+                {
+                    RenderModes.setRenderMode(entity, "Hat", "Off");
+                    RenderModes.setRenderMode(entity, "Helmet", "Off");
+                    RenderModes.setRenderMode(entity, "Mask", "Off");
+                }
+            }
 
             //Cape
             ItemStack cape = GlobalInventory.getTiamatCapeItem(entity);
@@ -176,6 +216,43 @@ public class TiamatInventory
         //Update render modes
         if (entity instanceof EntityLivingBase && Loader.isModLoaded("armourers_workshop"))
         {
+            //Headpiece
+            ItemStack headpiece = GlobalInventory.getVanillaHeadItem(entity);
+            if (headpiece == null || headpiece.isEmpty() || !headpiece.hasTagCompound())
+            {
+                RenderModes.setRenderMode(entity, "Hat", "Off");
+                RenderModes.setRenderMode(entity, "Helmet", "Off");
+                RenderModes.setRenderMode(entity, "Mask", "Off");
+            }
+            else
+            {
+                String nbtString = headpiece.getTagCompound().toString();
+                if (nbtString.contains("@Hat"))
+                {
+                    RenderModes.setRenderMode(entity, "Hat", RenderModes.getRenderMode(entity, "HeadControl"));
+                    RenderModes.setRenderMode(entity, "Helmet", "Off");
+                    RenderModes.setRenderMode(entity, "Mask", "Off");
+                }
+                else if (nbtString.contains("@Helmet"))
+                {
+                    RenderModes.setRenderMode(entity, "Hat", "Off");
+                    RenderModes.setRenderMode(entity, "Helmet", RenderModes.getRenderMode(entity, "HeadControl"));
+                    RenderModes.setRenderMode(entity, "Mask", "Off");
+                }
+                else if (nbtString.contains("@Mask"))
+                {
+                    RenderModes.setRenderMode(entity, "Hat", "Off");
+                    RenderModes.setRenderMode(entity, "Helmet", "Off");
+                    RenderModes.setRenderMode(entity, "Mask", RenderModes.getRenderMode(entity, "HeadControl"));
+                }
+                else
+                {
+                    RenderModes.setRenderMode(entity, "Hat", "Off");
+                    RenderModes.setRenderMode(entity, "Helmet", "Off");
+                    RenderModes.setRenderMode(entity, "Mask", "Off");
+                }
+            }
+
             //Cape
             ItemStack cape = GlobalInventory.getTiamatCapeItem(entity);
             if (cape == null || cape.isEmpty()) RenderModes.setRenderMode(entity, "CapeInv", "Off");
