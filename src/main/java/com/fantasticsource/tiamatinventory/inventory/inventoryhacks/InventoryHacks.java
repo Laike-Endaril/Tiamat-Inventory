@@ -98,7 +98,7 @@ public class InventoryHacks
 
 
         //Limit slots
-        int invSize = getCurrentInventorySize(player);
+        int invSize = TiamatInventory.inventorySize(player);
         for (int i = 0; i < container.inventorySlots.size(); i++)
         {
             Slot slot = container.inventorySlots.get(i);
@@ -200,8 +200,6 @@ public class InventoryHacks
     public static void itemPickup(EntityItemPickupEvent event)
     {
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityPlayer();
-        GameType gameType = MCTools.getGameType(player);
-        if (gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR) return;
 
         EntityItem entityItem = event.getItem();
         if (entityItem.cannotPickup()) return;
@@ -293,7 +291,7 @@ public class InventoryHacks
         }
 
         //Blocked "cargo" slots
-        for (int i = 9 + getCurrentInventorySize(player); i < 36; i++)
+        for (int i = 9 + TiamatInventory.inventorySize(player); i < 36; i++)
         {
             ItemStack stack = playerInventory.getStackInSlot(i);
             if (!stack.isEmpty())
@@ -410,7 +408,7 @@ public class InventoryHacks
             for (int i = 0; i < 4; i++) slotOrder.add(new Pair<>(tiamatInv, i));
 
             //Cargo
-            int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
+            int last = TiamatInventory.inventorySize(player) + 8;
             for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
         }
         else
@@ -520,7 +518,7 @@ public class InventoryHacks
             }
             if (TiamatConfig.serverSettings.autopickupSettings.allowPickupCargo)
             {
-                int last = player.isCreative() ? 35 : getCurrentInventorySize(player) + 8;
+                int last = TiamatInventory.inventorySize(player) + 8;
                 for (int i = 9; i <= last; i++) slotOrder.add(new Pair<>(vanillaInv, i));
             }
         }

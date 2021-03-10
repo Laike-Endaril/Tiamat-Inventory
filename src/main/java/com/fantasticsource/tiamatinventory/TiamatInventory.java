@@ -42,7 +42,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = TiamatInventory.MODID, name = TiamatInventory.NAME, version = TiamatInventory.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zk,)")
+@Mod(modid = TiamatInventory.MODID, name = TiamatInventory.NAME, version = TiamatInventory.VERSION, dependencies = "required-after:fantasticlib@[1.12.2.044zl,)")
 public class TiamatInventory
 {
     public static final String MODID = "tiamatinventory";
@@ -326,5 +326,14 @@ public class TiamatInventory
 
         GameType gameType = MCTools.getGameType(player);
         return gameType == GameType.CREATIVE || gameType == GameType.SPECTATOR;
+    }
+
+
+    public static int inventorySize(EntityPlayer player)
+    {
+        if (player.isCreative()) return 27;
+
+        if (player instanceof EntityPlayerMP) return InventoryHacks.getCurrentInventorySize((EntityPlayerMP) player);
+        else return ClientInventoryData.inventorySize;
     }
 }

@@ -4,6 +4,7 @@ import com.fantasticsource.mctools.MCTools;
 import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.inventory.slot.BetterSlot;
 import com.fantasticsource.mctools.inventory.slot.FilteredSlot;
+import com.fantasticsource.tiamatinventory.TiamatInventory;
 import com.fantasticsource.tools.Tools;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -251,53 +252,60 @@ public class TiamatInventoryContainer extends Container
         });
     }
 
-    public boolean canInteractWith(EntityPlayer playerIn)
+    public boolean canInteractWith(EntityPlayer player)
     {
         return true;
     }
 
     //Returning ItemStack.EMPTY from this method indicates that we are done with the transfer.  Mine always finishes in one go, so it always returns ItemStack.EMPTY
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
+    public ItemStack transferStackInSlot(EntityPlayer player, int index)
     {
+        System.out.println(index);
         Slot slot = inventorySlots.get(index);
         if (slot == null || !slot.getHasStack()) return ItemStack.EMPTY;
 
 
         ItemStack stack = slot.getStack();
 
-        //TODO redo or remove; indices are old ones and would need to be changed, hotbar is no longer accessible, etc
-//        if (index <= 3)
-//        {
-//            //From any weaponset slot
-//            //To main inventory or hotbar, in that order
-//            tryMergeItemStackRanges(stack, 12, 38);
-//            tryMergeItemStackRanges(stack, 4, 11);
-//        }
-//        else if (index <= 11)
-//        {
-//            //From hotbar
-//            //To any armor slot, if applicable, or to a weaponset slot or main inventory otherwise
-//
-//            tryMergeItemStackRanges(stack, 39, 44);
-//            tryMergeItemStackRanges(stack, 0, 3);
-//            tryMergeItemStackRanges(stack, 12, 38);
-//        }
-//        else if (index <= 38)
-//        {
-//            //From main inventory
-//            //To any equipment slot, if applicable, or to a weaponset slot or hotbar otherwise
-//            tryMergeItemStackRanges(stack, 39, 44);
-//            tryMergeItemStackRanges(stack, 0, 3);
-//            tryMergeItemStackRanges(stack, 4, 11);
-//        }
-//        else if (index <= 44)
-//        {
-//            //From armor slots
-//            //To main inventory, hotbar, or weaponset slot, in that order
-//            tryMergeItemStackRanges(stack, 12, 38);
-//            tryMergeItemStackRanges(stack, 4, 11);
-//            tryMergeItemStackRanges(stack, 0, 3);
-//        }
+        int cargoSize = TiamatInventory.inventorySize(player);
+        int maxCargoIndex = 3 + cargoSize;
+        if (index <= 3)
+        {
+            //From any weaponset slot
+            tryMergeItemStackRanges(stack, 31, 42); //To restricted slots
+            if (cargoSize > 0) tryMergeItemStackRanges(stack, 4, maxCargoIndex); //To main inventory (cargo)
+            if (TiamatInventory.playerHasHotbar(player)) tryMergeItemStackRanges(stack, 43, 52); //To hotbar and offhand (in that order)
+        }
+        else if (index <= 30)
+        {
+            //From main inventory (cargo)
+            tryMergeItemStackRanges(stack, 31, 42); //To restricted slots
+            if (TiamatInventory.playerHasHotbar(player)) tryMergeItemStackRanges(stack, 43, 52); //To hotbar and offhand (in that order)
+            tryMergeItemStackRanges(stack, 0, 3); //To weaponsets
+        }
+        else if (index <= 42)
+        {
+            //From restricted slots
+            if (cargoSize > 0) tryMergeItemStackRanges(stack, 4, maxCargoIndex); //To main inventory (cargo)
+            if (TiamatInventory.playerHasHotbar(player)) tryMergeItemStackRanges(stack, 43, 52); //To hotbar and offhand (in that order)
+            tryMergeItemStackRanges(stack, 0, 3); //To weaponsets
+        }
+        else if (index <= 51)
+        {
+            //From hotbar (not offhand)
+            tryMergeItemStackRanges(stack, 31, 42); //To restricted slots
+            if (TiamatInventory.playerHasHotbar(player)) tryMergeItemStackRanges(stack, 52, 52); //To offhand
+            if (cargoSize > 0) tryMergeItemStackRanges(stack, 4, maxCargoIndex); //To main inventory (cargo)
+            tryMergeItemStackRanges(stack, 0, 3); //To weaponsets
+        }
+        else if (index == 52)
+        {
+            //From vanilla offhand
+            tryMergeItemStackRanges(stack, 31, 42); //To restricted slots
+            if (cargoSize > 0) tryMergeItemStackRanges(stack, 4, maxCargoIndex); //To main inventory (cargo)
+            if (TiamatInventory.playerHasHotbar(player)) tryMergeItemStackRanges(stack, 43, 51); //To hotbar
+            tryMergeItemStackRanges(stack, 0, 3); //To weaponsets
+        }
 
 
         if (stack.isEmpty()) slot.putStack(ItemStack.EMPTY);
