@@ -102,6 +102,15 @@ public class TiamatPlayerInventory implements ITiamatPlayerInventory
         playerDataFolder = null;
     }
 
+    public static void save(net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile event)
+    {
+        EntityPlayer player = event.getEntityPlayer();
+        TiamatPlayerInventory inventory = tiamatServerInventories.get(player.getUniqueID());
+        if (inventory == null) return;
+
+        inventory.save();
+    }
+
     public static void saveUnload(PlayerEvent.PlayerLoggedOutEvent event)
     {
         EntityPlayer player = event.player;

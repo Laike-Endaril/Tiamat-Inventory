@@ -282,6 +282,12 @@ public class TiamatInventory
     }
 
     @SubscribeEvent
+    public static void playerSave(net.minecraftforge.event.entity.player.PlayerEvent.SaveToFile event)
+    {
+        TiamatPlayerInventory.save(event);
+    }
+
+    @SubscribeEvent
     public static void playerLogout(PlayerEvent.PlayerLoggedOutEvent event)
     {
         TiamatPlayerInventory.saveUnload(event);
