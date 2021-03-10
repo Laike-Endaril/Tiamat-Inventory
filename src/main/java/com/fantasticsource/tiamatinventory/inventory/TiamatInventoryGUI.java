@@ -4,6 +4,7 @@ import com.fantasticsource.mctools.aw.RenderModes;
 import com.fantasticsource.mctools.inventory.gui.BetterContainerGUI;
 import com.fantasticsource.tiamatinventory.AttributeDisplayData;
 import com.fantasticsource.tiamatinventory.Keys;
+import com.fantasticsource.tiamatinventory.Network;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
 import com.fantasticsource.tools.Collision;
@@ -120,84 +121,6 @@ public class TiamatInventoryGUI extends BetterContainerGUI
             scissor(MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_W, MODEL_WINDOW_H);
             drawEntityOnScreen(guiLeft + MODEL_WINDOW_X + (MODEL_WINDOW_W >> 1), guiTop + MODEL_WINDOW_Y + (MODEL_WINDOW_H >> 1), modelScale, modelYaw, modelPitch, mc.player);
             unScissor();
-
-            //Redraw equip render toggle buttons above model
-            GlStateManager.color(1, 1, 1, 1);
-            mc.getTextureManager().bindTexture(TEXTURE);
-            bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-            int u1 = TOGGLE_BUTTONS_X, u2 = u1 + TOGGLE_BUTTONS_SIZE;
-            int v1 = TOGGLE_HEAD_BUTTON_Y, v2 = v1 + TOGGLE_BUTTONS_SIZE;
-            int x1 = guiLeft + u1, x2 = guiLeft + u2;
-            int y1 = guiTop + v1, y2 = guiTop + v2;
-            bufferbuilder.pos(x1, y2, zLevel).tex(u1 * U_PIXEL, v2 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x2, y2, zLevel).tex(u2 * U_PIXEL, v2 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x2, y1, zLevel).tex(u2 * U_PIXEL, v1 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x1, y1, zLevel).tex(u1 * U_PIXEL, v1 * V_PIXEL).endVertex();
-            v1 = TOGGLE_SHOULDER_BUTTON_Y;
-            v2 = v1 + TOGGLE_BUTTONS_SIZE;
-            y1 = guiTop + v1;
-            y2 = guiTop + v2;
-            bufferbuilder.pos(x1, y2, zLevel).tex(u1 * U_PIXEL, v2 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x2, y2, zLevel).tex(u2 * U_PIXEL, v2 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x2, y1, zLevel).tex(u2 * U_PIXEL, v1 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x1, y1, zLevel).tex(u1 * U_PIXEL, v1 * V_PIXEL).endVertex();
-            v1 = TOGGLE_CAPE_BUTTON_Y;
-            v2 = v1 + TOGGLE_BUTTONS_SIZE;
-            y1 = guiTop + v1;
-            y2 = guiTop + v2;
-            bufferbuilder.pos(x1, y2, zLevel).tex(u1 * U_PIXEL, v2 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x2, y2, zLevel).tex(u2 * U_PIXEL, v2 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x2, y1, zLevel).tex(u2 * U_PIXEL, v1 * V_PIXEL).endVertex();
-            bufferbuilder.pos(x1, y1, zLevel).tex(u1 * U_PIXEL, v1 * V_PIXEL).endVertex();
-            tessellator.draw();
-
-            //Draw button highlights
-            GlStateManager.disableTexture2D();
-            GlStateManager.enableBlend();
-            EntityPlayerSP player = Minecraft.getMinecraft().player;
-            bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            if ("On".equals(RenderModes.getRenderMode(player, "HeadControl")))
-            {
-                x1 = guiLeft + TOGGLE_BUTTONS_X + 1;
-                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
-                y1 = guiTop + TOGGLE_HEAD_BUTTON_Y + 1;
-                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
-                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
-
-            }
-            double fillAmount = 0;
-            if ("On".equals(RenderModes.getRenderMode(player, "ShoulderLControl"))) fillAmount += 0.3;
-            if ("On".equals(RenderModes.getRenderMode(player, "ShoulderRControl"))) fillAmount += 0.6;
-            if (fillAmount > 0)
-            {
-                x1 = guiLeft + TOGGLE_BUTTONS_X + 1;
-                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
-                y1 = guiTop + TOGGLE_SHOULDER_BUTTON_Y + 1;
-                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
-                y1 += (y2 - y1) * (1d - fillAmount);
-                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
-
-            }
-            if ("On".equals(RenderModes.getRenderMode(player, "CapeInvControl")))
-            {
-                x1 = guiLeft + TOGGLE_BUTTONS_X + 1;
-                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
-                y1 = guiTop + TOGGLE_CAPE_BUTTON_Y + 1;
-                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
-                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
-                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
-
-            }
-            tessellator.draw();
-            GlStateManager.enableTexture2D();
         }
         else if (tab == 5)
         {
@@ -389,6 +312,58 @@ public class TiamatInventoryGUI extends BetterContainerGUI
                     }
                 }
             }
+
+            //Draw button highlights
+            GlStateManager.disableTexture2D();
+            GlStateManager.enableBlend();
+            EntityPlayerSP player = Minecraft.getMinecraft().player;
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder bufferbuilder = tessellator.getBuffer();
+            bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+            int x1, x2, y1, y2;
+            if ("On".equals(RenderModes.getRenderMode(player, "HeadControl")))
+            {
+                x1 = TOGGLE_BUTTONS_X + 1;
+                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
+                y1 = TOGGLE_HEAD_BUTTON_Y + 1;
+                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
+                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+
+            }
+            double fillAmount = 0;
+            if ("On".equals(RenderModes.getRenderMode(player, "ShoulderLControl"))) fillAmount += 0.3;
+            if ("On".equals(RenderModes.getRenderMode(player, "ShoulderRControl"))) fillAmount += 0.6;
+            if (fillAmount > 0)
+            {
+                x1 = TOGGLE_BUTTONS_X + 1;
+                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
+                y1 = TOGGLE_SHOULDER_BUTTON_Y + 1;
+                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
+                y1 += (y2 - y1) * (1d - fillAmount);
+                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+
+            }
+            if ("On".equals(RenderModes.getRenderMode(player, "CapeInvControl")))
+            {
+                x1 = TOGGLE_BUTTONS_X + 1;
+                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
+                y1 = TOGGLE_CAPE_BUTTON_Y + 1;
+                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
+                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+
+            }
+            tessellator.draw();
+            GlStateManager.enableTexture2D();
+            GlStateManager.disableBlend();
         }
         else if (tab == 1)
         {
@@ -505,6 +480,11 @@ public class TiamatInventoryGUI extends BetterContainerGUI
         buttonList.add(new GuiButtonImage(4, guiLeft + 299, guiTop + 107, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
         buttonList.add(new GuiButtonImage(5, guiLeft, guiTop + 7, 19, 23, TEXTURE_W - 18, TEXTURE_H - 21, 0, TEXTURE));
 
+        //Render mode toggle buttons
+        buttonList.add(new GuiButtonImage(6, guiLeft + TOGGLE_BUTTONS_X, guiTop + TOGGLE_HEAD_BUTTON_Y, TOGGLE_BUTTONS_SIZE, TOGGLE_BUTTONS_SIZE, TOGGLE_BUTTONS_X - guiLeft, TOGGLE_HEAD_BUTTON_Y - guiTop, 0, TEXTURE));
+        buttonList.add(new GuiButtonImage(7, guiLeft + TOGGLE_BUTTONS_X, guiTop + TOGGLE_SHOULDER_BUTTON_Y, TOGGLE_BUTTONS_SIZE, TOGGLE_BUTTONS_SIZE, TOGGLE_BUTTONS_X - guiLeft, TOGGLE_SHOULDER_BUTTON_Y - guiTop, 0, TEXTURE));
+        buttonList.add(new GuiButtonImage(8, guiLeft + TOGGLE_BUTTONS_X, guiTop + TOGGLE_CAPE_BUTTON_Y, TOGGLE_BUTTONS_SIZE, TOGGLE_BUTTONS_SIZE, TOGGLE_BUTTONS_X - guiLeft, TOGGLE_CAPE_BUTTON_Y - guiTop, 0, TEXTURE));
+
         MinecraftForge.EVENT_BUS.post(new GuiScreenEvent.InitGuiEvent.Post(this, buttonList));
     }
 
@@ -515,6 +495,18 @@ public class TiamatInventoryGUI extends BetterContainerGUI
         if (button.id < 6)
         {
             if (Minecraft.getMinecraft().player.inventory.getItemStack().isEmpty()) setTab(button.id);
+        }
+        else if (button.id == 6)
+        {
+            Network.WRAPPER.sendToServer(new Network.ToggleRenderModePacket("HeadControl"));
+        }
+        else if (button.id == 7)
+        {
+            Network.WRAPPER.sendToServer(new Network.ToggleRenderModePacket("Shoulders"));
+        }
+        else if (button.id == 8)
+        {
+            Network.WRAPPER.sendToServer(new Network.ToggleRenderModePacket("CapeInvControl"));
         }
     }
 

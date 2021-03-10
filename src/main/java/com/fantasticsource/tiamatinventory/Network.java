@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatinventory;
 
+import com.fantasticsource.mctools.aw.RenderModes;
 import com.fantasticsource.mctools.component.CItemStack;
 import com.fantasticsource.tiamatinventory.config.TiamatConfig;
 import com.fantasticsource.tiamatinventory.inventory.ClientInventoryData;
@@ -38,6 +39,7 @@ public class Network
         WRAPPER.registerMessage(TiamatItemSyncPacketHandler.class, TiamatItemSyncPacket.class, discriminator++, Side.CLIENT);
         WRAPPER.registerMessage(SheatheUnsheathePacketHandler.class, SheatheUnsheathePacket.class, discriminator++, Side.SERVER);
         WRAPPER.registerMessage(SwapWeaponsetsPacketHandler.class, SwapWeaponsetsPacket.class, discriminator++, Side.SERVER);
+        WRAPPER.registerMessage(ToggleRenderModePacketHandler.class, ToggleRenderModePacket.class, discriminator++, Side.SERVER);
     }
 
 
@@ -318,6 +320,84 @@ public class Network
                 EntityPlayerMP player = ctx.getServerHandler().player;
                 TiamatPlayerInventory inventory = TiamatPlayerInventory.tiamatServerInventories.get(player.getPersistentID());
                 if (inventory != null) inventory.swapKeyPressed();
+            });
+            return null;
+        }
+    }
+
+
+    public static class ToggleRenderModePacket implements IMessage
+    {
+        String rendermode;
+
+        public ToggleRenderModePacket()
+        {
+        }
+
+        public ToggleRenderModePacket(String rendermode)
+        {
+            this.rendermode = rendermode;
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf)
+        {
+            ByteBufUtils.writeUTF8String(buf, rendermode);
+        }
+
+        @Override
+        public void fromBytes(ByteBuf buf)
+        {
+            rendermode = ByteBufUtils.readUTF8String(buf);
+        }
+    }
+
+    public static class ToggleRenderModePacketHandler implements IMessageHandler<ToggleRenderModePacket, IMessage>
+    {
+        @Override
+        public IMessage onMessage(ToggleRenderModePacket packet, MessageContext ctx)
+        {
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            server.addScheduledTask(() ->
+            {
+                EntityPlayerMP player = ctx.getServerHandler().player;
+                String rendermode = packet.rendermode;
+                switch (rendermode)
+                {
+                    case "HeadControl":
+                    case "CapeInvControl":
+                        if ("On".equals(RenderModes.getRenderMode(player, rendermode))) RenderModes.setRenderMode(player, rendermode, "Off");
+                        else RenderModes.setRenderMode(player, rendermode, "On");
+                        break;
+
+                    case "Shoulders":
+                        if ("On".equals(RenderModes.getRenderMode(player, "ShoulderLControl")))
+                        {
+                            if ("On".equals(RenderModes.getRenderMode(player, "ShoulderRControl")))
+                            {
+                                RenderModes.setRenderMode(player, "ShoulderLControl", "Off");
+                                RenderModes.setRenderMode(player, "ShoulderRControl", "Off");
+                            }
+                            else
+                            {
+                                RenderModes.setRenderMode(player, "ShoulderLControl", "Off");
+                                RenderModes.setRenderMode(player, "ShoulderRControl", "On");
+                            }
+                        }
+                        else
+                        {
+                            if ("On".equals(RenderModes.getRenderMode(player, "ShoulderRControl")))
+                            {
+                                RenderModes.setRenderMode(player, "ShoulderLControl", "On");
+                                RenderModes.setRenderMode(player, "ShoulderRControl", "On");
+                            }
+                            else
+                            {
+                                RenderModes.setRenderMode(player, "ShoulderLControl", "On");
+                                RenderModes.setRenderMode(player, "ShoulderRControl", "Off");
+                            }
+                        }
+                }
             });
             return null;
         }
