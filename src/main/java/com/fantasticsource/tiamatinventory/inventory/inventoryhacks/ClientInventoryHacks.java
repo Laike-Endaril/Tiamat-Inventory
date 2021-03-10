@@ -136,9 +136,9 @@ public class ClientInventoryHacks extends GuiButton
 
                                 Slot oldSlot = container.inventorySlots.get(i);
                                 //First 4 slot indices just happen to line up here; first four hotbar in vanilla inv -> weaponsets in Tiamat inv
-                                Slot newSlot = new FilteredSlot(tiamatInventory, slotIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
+                                Slot newSlot = new FilteredSlot(tiamatInventory, pairedIndex, oldSlot.xPos, oldSlot.yPos, TEXTURE, TEXTURE_W, TEXTURE_H, 608, 0, false, WEAPON_SLOT_STACK_LIMIT, stack ->
                                 {
-                                    ItemStack other = tiamatInventory.getStackInSlot(pairedIndex);
+                                    ItemStack other = tiamatInventory.getStackInSlot(slotIndex);
                                     return other.isEmpty() || (!Slottings.isTwoHanded(stack) && !Slottings.isTwoHanded(other));
                                 });
                                 newSlot.slotNumber = oldSlot.slotNumber;
