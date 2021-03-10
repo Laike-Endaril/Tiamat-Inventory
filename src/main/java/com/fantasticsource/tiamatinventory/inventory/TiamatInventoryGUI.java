@@ -1,5 +1,6 @@
 package com.fantasticsource.tiamatinventory.inventory;
 
+import com.fantasticsource.mctools.aw.RenderModes;
 import com.fantasticsource.mctools.inventory.gui.BetterContainerGUI;
 import com.fantasticsource.tiamatinventory.AttributeDisplayData;
 import com.fantasticsource.tiamatinventory.Keys;
@@ -10,6 +11,7 @@ import com.fantasticsource.tools.Tools;
 import moe.plushie.rpg_framework.api.RpgEconomyAPI;
 import moe.plushie.rpg_framework.api.currency.ICurrency;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiButtonImage;
@@ -45,6 +47,7 @@ import static org.lwjgl.opengl.GL11.GL_SCISSOR_TEST;
 @SideOnly(Side.CLIENT)
 public class TiamatInventoryGUI extends BetterContainerGUI
 {
+    public static final int TOGGLE_BUTTONS_X = 42, TOGGLE_BUTTONS_SIZE = 8, TOGGLE_HEAD_BUTTON_Y = 5, TOGGLE_SHOULDER_BUTTON_Y = 23, TOGGLE_CAPE_BUTTON_Y = 41;
     public static final int MODEL_WINDOW_X = 43, MODEL_WINDOW_Y = 6, MODEL_WINDOW_W = 88, MODEL_WINDOW_H = 106;
     public static final int MONEY_WINDOW_X = 151, MONEY_WINDOW_Y = 6, MONEY_WINDOW_W = 88, MONEY_WINDOW_H = 16;
     public static final int STAT_WINDOW_X = 25, STAT_WINDOW_Y = 6, STAT_WINDOW_W = 261, STAT_WINDOW_H = 124;
@@ -113,9 +116,88 @@ public class TiamatInventoryGUI extends BetterContainerGUI
 
         if (tab == 0)
         {
+            //Draw model
             scissor(MODEL_WINDOW_X, MODEL_WINDOW_Y, MODEL_WINDOW_W, MODEL_WINDOW_H);
             drawEntityOnScreen(guiLeft + MODEL_WINDOW_X + (MODEL_WINDOW_W >> 1), guiTop + MODEL_WINDOW_Y + (MODEL_WINDOW_H >> 1), modelScale, modelYaw, modelPitch, mc.player);
             unScissor();
+
+            //Redraw equip render toggle buttons above model
+            GlStateManager.color(1, 1, 1, 1);
+            mc.getTextureManager().bindTexture(TEXTURE);
+            bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            int u1 = TOGGLE_BUTTONS_X, u2 = u1 + TOGGLE_BUTTONS_SIZE;
+            int v1 = TOGGLE_HEAD_BUTTON_Y, v2 = v1 + TOGGLE_BUTTONS_SIZE;
+            int x1 = guiLeft + u1, x2 = guiLeft + u2;
+            int y1 = guiTop + v1, y2 = guiTop + v2;
+            bufferbuilder.pos(x1, y2, zLevel).tex(u1 * U_PIXEL, v2 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x2, y2, zLevel).tex(u2 * U_PIXEL, v2 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x2, y1, zLevel).tex(u2 * U_PIXEL, v1 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x1, y1, zLevel).tex(u1 * U_PIXEL, v1 * V_PIXEL).endVertex();
+            v1 = TOGGLE_SHOULDER_BUTTON_Y;
+            v2 = v1 + TOGGLE_BUTTONS_SIZE;
+            y1 = guiTop + v1;
+            y2 = guiTop + v2;
+            bufferbuilder.pos(x1, y2, zLevel).tex(u1 * U_PIXEL, v2 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x2, y2, zLevel).tex(u2 * U_PIXEL, v2 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x2, y1, zLevel).tex(u2 * U_PIXEL, v1 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x1, y1, zLevel).tex(u1 * U_PIXEL, v1 * V_PIXEL).endVertex();
+            v1 = TOGGLE_CAPE_BUTTON_Y;
+            v2 = v1 + TOGGLE_BUTTONS_SIZE;
+            y1 = guiTop + v1;
+            y2 = guiTop + v2;
+            bufferbuilder.pos(x1, y2, zLevel).tex(u1 * U_PIXEL, v2 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x2, y2, zLevel).tex(u2 * U_PIXEL, v2 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x2, y1, zLevel).tex(u2 * U_PIXEL, v1 * V_PIXEL).endVertex();
+            bufferbuilder.pos(x1, y1, zLevel).tex(u1 * U_PIXEL, v1 * V_PIXEL).endVertex();
+            tessellator.draw();
+
+            //Draw button highlights
+            GlStateManager.disableTexture2D();
+            GlStateManager.enableBlend();
+            EntityPlayerSP player = Minecraft.getMinecraft().player;
+            bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+            if ("On".equals(RenderModes.getRenderMode(player, "HeadControl")))
+            {
+                x1 = guiLeft + TOGGLE_BUTTONS_X + 1;
+                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
+                y1 = guiTop + TOGGLE_HEAD_BUTTON_Y + 1;
+                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
+                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+
+            }
+            double fillAmount = 0;
+            if ("On".equals(RenderModes.getRenderMode(player, "ShoulderLControl"))) fillAmount += 0.3;
+            if ("On".equals(RenderModes.getRenderMode(player, "ShoulderRControl"))) fillAmount += 0.6;
+            if (fillAmount > 0)
+            {
+                x1 = guiLeft + TOGGLE_BUTTONS_X + 1;
+                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
+                y1 = guiTop + TOGGLE_SHOULDER_BUTTON_Y + 1;
+                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
+                y1 += (y2 - y1) * (1d - fillAmount);
+                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+
+            }
+            if ("On".equals(RenderModes.getRenderMode(player, "CapeInvControl")))
+            {
+                x1 = guiLeft + TOGGLE_BUTTONS_X + 1;
+                x2 = x1 + TOGGLE_BUTTONS_SIZE - 2;
+                y1 = guiTop + TOGGLE_CAPE_BUTTON_Y + 1;
+                y2 = y1 + TOGGLE_BUTTONS_SIZE - 2;
+                bufferbuilder.pos(x1, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y2, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x2, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+                bufferbuilder.pos(x1, y1, zLevel).color(1, 1, 0, 0.4f).endVertex();
+
+            }
+            tessellator.draw();
+            GlStateManager.enableTexture2D();
         }
         else if (tab == 5)
         {
