@@ -1,10 +1,12 @@
 package com.fantasticsource.tiamatinventory.inventory;
 
+import com.fantasticsource.mctools.Slottings;
 import com.fantasticsource.mctools.aw.RenderModes;
 import com.fantasticsource.mctools.inventory.gui.BetterContainerGUI;
 import com.fantasticsource.tiamatinventory.AttributeDisplayData;
 import com.fantasticsource.tiamatinventory.Keys;
 import com.fantasticsource.tiamatinventory.Network;
+import com.fantasticsource.tiamatinventory.TiamatInventory;
 import com.fantasticsource.tiamatinventory.api.ITiamatPlayerInventory;
 import com.fantasticsource.tiamatinventory.api.TiamatInventoryAPI;
 import com.fantasticsource.tools.Collision;
@@ -21,24 +23,27 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.play.client.CPacketCloseWindow;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.fantasticsource.tiamatinventory.TiamatInventory.CURRENCY_CAPABILITY;
 import static com.fantasticsource.tiamatinventory.inventory.TiamatInventoryContainer.*;
@@ -384,6 +389,76 @@ public class TiamatInventoryGUI extends BetterContainerGUI
 
 
             //Render stats
+            EntityPlayerSP player = Minecraft.getMinecraft().player;
+            ItemStack main = ItemStack.EMPTY, off = ItemStack.EMPTY;
+            if (!TiamatInventory.playerHasHotbar(player))
+            {
+                //Account for passive attribute mods on 1st sheathed set, or 2nd if 1st is completely empty
+                ITiamatPlayerInventory inv = TiamatInventoryAPI.getTiamatPlayerInventory(player);
+                if (inv != null)
+                {
+                    main = inv.getSheathedMainhand1();
+                    off = inv.getSheathedOffhand1();
+                    if (main.isEmpty() && off.isEmpty())
+                    {
+                        main = inv.getSheathedMainhand2();
+                        off = inv.getSheathedOffhand2();
+                    }
+
+                    String slotting = Slottings.getItemSlotting(main);
+                    if (slotting.equals("Tiamat 2H"))
+                    {
+                        if (!off.isEmpty())
+                        {
+                            main = ItemStack.EMPTY;
+                            off = ItemStack.EMPTY;
+                        }
+                    }
+                    else if (!slotting.equals("Mainhand") && !slotting.equals("Hand") && !slotting.equals("Hotbar") && !slotting.equals("Any")) main = ItemStack.EMPTY;
+
+                    slotting = Slottings.getItemSlotting(off);
+                    if (slotting.equals("Tiamat 2H"))
+                    {
+                        if (!main.isEmpty())
+                        {
+                            main = ItemStack.EMPTY;
+                            off = ItemStack.EMPTY;
+                        }
+                    }
+                    else if (!slotting.equals("Offhand") && !slotting.equals("Hand") && !slotting.equals("Any")) off = ItemStack.EMPTY;
+                }
+            }
+            ArrayList<String> sheathedMods = new ArrayList<>();
+            if (!main.isEmpty()) sheathedMods.addAll(getPassiveMods(main));
+            if (!off.isEmpty()) sheathedMods.addAll(getPassiveMods(off));
+
+            AbstractAttributeMap attributeMap = player.getAttributeMap();
+            HashMap<AttributeModifier, IAttributeInstance> fakeMods = new HashMap<>();
+            for (String modString : sheathedMods)
+            {
+                String[] tokens = Tools.fixedSplit(modString, ";");
+                if (tokens.length != 3) continue;
+
+                double amount;
+                int operation;
+                try
+                {
+                    amount = Double.parseDouble(tokens[1]);
+                    operation = Integer.parseInt(tokens[2]);
+                }
+                catch (NumberFormatException e)
+                {
+                    continue;
+                }
+
+                IAttributeInstance attributeInstance = attributeMap.getAttributeInstanceByName(tokens[0]);
+                if (attributeInstance == null) continue;
+
+                AttributeModifier fakeMod = new AttributeModifier("fake", amount, operation);
+                fakeMods.put(fakeMod, attributeInstance);
+                attributeInstance.applyModifier(fakeMod);
+            }
+
             int hoveredIndex = -1;
             if (Collision.pointRectangle(mouseX - guiLeft, mouseY - guiTop, STAT_WINDOW_X, STAT_WINDOW_Y, STAT_WINDOW_X + STAT_WINDOW_W, STAT_WINDOW_Y + STAT_WINDOW_H))
             {
@@ -444,6 +519,13 @@ public class TiamatInventoryGUI extends BetterContainerGUI
                     for (int i = 0; i < list.size(); i++) list.set(i, TextFormatting.DARK_PURPLE + list.get(i));
                     drawHoveringText(list, mouseX - guiLeft, mouseY - guiTop);
                 }
+            }
+
+
+            //Undo fake attribute mods
+            for (Map.Entry<AttributeModifier, IAttributeInstance> entry : fakeMods.entrySet())
+            {
+                entry.getValue().removeModifier(entry.getKey());
             }
         }
         else if (tab == 5)
@@ -675,5 +757,26 @@ public class TiamatInventoryGUI extends BetterContainerGUI
                     return "*10^" + power + 3;
             }
         }
+    }
+
+
+    //<attributeName>;<amount>;<operation>
+    //Copied from Tiamat Items, PassiveAttributeModTags class
+    public static ArrayList<String> getPassiveMods(ItemStack stack)
+    {
+        ArrayList<String> result = new ArrayList<>();
+
+        if (!stack.hasTagCompound()) return result;
+
+        NBTTagCompound compound = stack.getTagCompound();
+        if (!compound.hasKey("tiamatrpg")) return result;
+
+        compound = compound.getCompoundTag("tiamatrpg");
+        if (!compound.hasKey("passiveMods")) return result;
+
+        NBTTagList list = compound.getTagList("passiveMods", Constants.NBT.TAG_STRING);
+        for (int i = 0; i < list.tagCount(); i++) result.add(list.getStringTagAt(i));
+
+        return result;
     }
 }
