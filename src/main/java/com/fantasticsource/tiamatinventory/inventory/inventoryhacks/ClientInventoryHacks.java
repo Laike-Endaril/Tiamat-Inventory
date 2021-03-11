@@ -326,7 +326,6 @@ public class ClientInventoryHacks extends GuiButton
                         else if (slotIndex >= 6 && slotIndex <= 8) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 784, 0, 16);
                         else if (slotIndex == 10) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 640, 0, 16);
                         else if (slotIndex == 11) renderTextureAt(gui.getGuiLeft() + slot.xPos, gui.getGuiTop() + slot.yPos, TiamatInventoryGUI.U_PIXEL * 752, 0, 16);
-                        else System.out.println(slotIndex + ", " + i + ", " + slot.getSlotIndex() + ", " + slot.slotNumber);
                     }
                 }
                 else if (slot.inventory instanceof InventoryPlayer)

@@ -260,7 +260,6 @@ public class TiamatInventoryContainer extends Container
     //Returning ItemStack.EMPTY from this method indicates that we are done with the transfer.  Mine always finishes in one go, so it always returns ItemStack.EMPTY
     public ItemStack transferStackInSlot(EntityPlayer player, int index)
     {
-        System.out.println(index);
         Slot slot = inventorySlots.get(index);
         if (slot == null || !slot.getHasStack()) return ItemStack.EMPTY;
 
