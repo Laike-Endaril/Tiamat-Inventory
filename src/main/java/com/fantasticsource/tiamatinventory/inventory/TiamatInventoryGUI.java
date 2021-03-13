@@ -319,6 +319,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
 
 
             //Redraw buttons over model
+            GlStateManager.color(1, 1, 1, 1);
             mc.getTextureManager().bindTexture(TEXTURE);
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferbuilder = tessellator.getBuffer();
