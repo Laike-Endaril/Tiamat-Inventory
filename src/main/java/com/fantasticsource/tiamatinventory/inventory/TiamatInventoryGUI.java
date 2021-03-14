@@ -331,9 +331,9 @@ public class TiamatInventoryGUI extends BetterContainerGUI
             y2 = y1 + TOGGLE_BUTTONS_SIZE;
             double u1, u2, v1, v2;
             u1 = x1 * U_PIXEL;
-            u2 = x2 / U_PIXEL;
-            v1 = y1 / V_PIXEL;
-            v2 = y2 / V_PIXEL;
+            u2 = x2 * U_PIXEL;
+            v1 = y1 * V_PIXEL;
+            v2 = y2 * V_PIXEL;
 
             bufferbuilder.pos(x1, y2, zLevel).tex(u1, v2).endVertex();
             bufferbuilder.pos(x2, y2, zLevel).tex(u2, v2).endVertex();
