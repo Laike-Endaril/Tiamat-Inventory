@@ -48,7 +48,7 @@ public class TiamatInventory
 {
     public static final String MODID = "tiamatinventory";
     public static final String NAME = "Tiamat Inventory";
-    public static final String VERSION = "1.12.2.000zza";
+    public static final String VERSION = "1.12.2.000zzb";
 
 
     @CapabilityInject(ICurrencyCapability.class)
