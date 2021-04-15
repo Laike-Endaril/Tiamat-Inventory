@@ -498,7 +498,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
                 String tooltip = statTooltips[hoveredIndex];
                 if (!tooltip.trim().isEmpty())
                 {
-                    List<String> list = Arrays.asList(Tools.fixedSplit(tooltip, "\n"));
+                    List<String> list = Arrays.asList(Tools.fixedSplit(tooltip, "\\\\n"));
                     for (int i = 0; i < list.size(); i++) list.set(i, TextFormatting.DARK_PURPLE + list.get(i));
                     drawHoveringText(list, mouseX - guiLeft, mouseY - guiTop);
                 }
