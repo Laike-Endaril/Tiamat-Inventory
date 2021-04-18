@@ -1,6 +1,7 @@
 package com.fantasticsource.tiamatinventory.inventory;
 
 import com.fantasticsource.mctools.Slottings;
+import com.fantasticsource.mctools.betterattributes.BetterAttribute;
 import com.fantasticsource.mctools.inventory.gui.BetterContainerGUI;
 import com.fantasticsource.tiamatinventory.AttributeDisplayData;
 import com.fantasticsource.tiamatinventory.Keys;
@@ -83,9 +84,20 @@ public class TiamatInventoryGUI extends BetterContainerGUI
         {
             String name = AttributeDisplayData.displayAttributes[i];
             rawStats[i] = name;
-            if (name.isEmpty()) stats[i] = "";
-            else stats[i] = name.replace(TextFormatting.getTextWithoutFormattingCodes(name), I18n.translateToLocal("attribute.name." + name));
-            statTooltips[i] = I18n.translateToLocal(AttributeDisplayData.displayAttributeDescriptions[i]);
+            if (name.isEmpty())
+            {
+                stats[i] = "";
+                statTooltips[i] = "";
+            }
+            else
+            {
+                stats[i] = name.replace(TextFormatting.getTextWithoutFormattingCodes(name), I18n.translateToLocal("attribute.name." + name));
+                if (AttributeDisplayData.displayAttributeDescriptions[i].equals(""))
+                {
+                    statTooltips[i] = I18n.translateToLocal("attribute.description." + name);
+                }
+                else statTooltips[i] = I18n.translateToLocal(AttributeDisplayData.displayAttributeDescriptions[i]);
+            }
         }
         statLineHeight = fontRenderer.FONT_HEIGHT + 1;
         statHeightDif = Tools.max(0, statLineHeight * stats.length - STAT_WINDOW_H);
@@ -419,6 +431,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
             HashMap<AttributeModifier, IAttributeInstance> fakeMods = new HashMap<>();
             for (String modString : sheathedMods)
             {
+                //TODO mods for BetterAttribute(s)?
                 String[] tokens = Tools.fixedSplit(modString, ";");
                 if (tokens.length != 3) continue;
 
@@ -464,27 +477,38 @@ public class TiamatInventoryGUI extends BetterContainerGUI
                     continue;
                 }
 
-                IAttributeInstance attributeInstance = mc.player.getAttributeMap().getAttributeInstanceByName(TextFormatting.getTextWithoutFormattingCodes(rawStat));
-                if (attributeInstance == null)
+                int color = hoveredIndex == i ? 0xffffffff : 0xff777777;
+                String stat = stats[i];
+                String amount;
+
+                BetterAttribute betterAttribute = BetterAttribute.BETTER_ATTRIBUTES.get(rawStat);
+                if (betterAttribute != null)
                 {
-                    drawString(fontRenderer, TextFormatting.RED + "ERROR: <" + rawStat + ">", STAT_WINDOW_X, yy, 0xffffffff);
-                    yy += statLineHeight;
-                    continue;
+                    amount = betterAttribute.getLocalizedDisplayValue(player);
+                }
+                else
+                {
+                    IAttributeInstance attributeInstance = mc.player.getAttributeMap().getAttributeInstanceByName(TextFormatting.getTextWithoutFormattingCodes(rawStat));
+                    if (attributeInstance == null)
+                    {
+                        drawString(fontRenderer, TextFormatting.RED + "ERROR: <" + rawStat + ">", STAT_WINDOW_X, yy, 0xffffffff);
+                        yy += statLineHeight;
+                        continue;
+                    }
+
+                    if (!attributeInstance.getAttribute().getShouldWatch() && !Tools.contains(ClientInventoryData.additionalSyncedAttributes, attributeInstance.getAttribute().getName()))
+                    {
+                        color = hoveredIndex == i ? 0xffff0000 : 0xff770000;
+                        stat += " (not synced)";
+                    }
+                    amount = String.format("%.2f", attributeInstance.getAttributeValue());
                 }
 
-                String stat = stats[i];
-                int color = hoveredIndex == i ? 0xffffffff : 0xff777777;
-                if (!attributeInstance.getAttribute().getShouldWatch() && !Tools.contains(ClientInventoryData.additionalSyncedAttributes, attributeInstance.getAttribute().getName()))
-                {
-                    color = hoveredIndex == i ? 0xffff0000 : 0xff770000;
-                    stat += " (not synced)";
-                }
                 drawString(fontRenderer, stat, STAT_WINDOW_X, yy, color);
-                String amount = String.format("%.2f", attributeInstance.getAttributeValue());
                 int xx = STAT_WINDOW_X + STAT_WINDOW_W - fontRenderer.getStringWidth(amount);
                 drawString(fontRenderer, amount, xx, yy, color);
-
                 drawHorizontalLine(STAT_WINDOW_X + fontRenderer.getStringWidth(stat) + spacing, xx - spacing, yy + (statLineHeight >>> 1) - 1, color);
+
                 yy += statLineHeight;
             }
             GlStateManager.popMatrix();
