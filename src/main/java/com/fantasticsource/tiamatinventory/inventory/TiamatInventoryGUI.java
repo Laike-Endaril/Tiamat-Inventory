@@ -685,7 +685,7 @@ public class TiamatInventoryGUI extends BetterContainerGUI
     @Override
     protected void keyTyped(char typedChar, int keyCode)
     {
-        if (keyCode == 1 || Keys.INVENTORY.isActiveAndMatches(keyCode))
+        if (keyCode == 1 || Keys.INVENTORY.isActiveAndMatches(keyCode) || mc.gameSettings.keyBindInventory.isActiveAndMatches(keyCode))
         {
             mc.player.connection.sendPacket(new CPacketCloseWindow(inventorySlotsSaved.windowId));
             mc.player.closeScreenAndDropStack();
